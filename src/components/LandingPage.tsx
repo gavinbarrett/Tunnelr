@@ -3,7 +3,7 @@ import './sass/LandingPage.scss';
 
 const LandingText = () => {
 	return (<div id="landing-text">
-		{"Type securely with Tunnlr"}
+		{"Type securely with Tunnelr"}
 	</div>);
 }
 

@@ -2,8 +2,29 @@ header {
 	width: 100vw;
 	height: 10vh;
 	background: blue;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
 }
 
-.header-text {
+#header-links {
+	width: 20vw;
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+#header-links > a {
+	text-decoration: none;
 	color: white;
+	display: flex;
+	font-size: 1.5rem;
+	margin-right: 3vw;
+}
+
+#home-link {
+	text-decoration: none;
+	color: white;
+	font-size: 2rem;
+	margin-left: 2vw;
 }

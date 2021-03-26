@@ -3,6 +3,7 @@ import * as ReactDOM from 'react-dom';
 import * as Router from 'react-router-dom';
 import { Header } from './components/Header';
 import { LandingPage } from './components/LandingPage';
+import { SignIn } from './components/SignIn';
 import { Chat } from './components/Chat';
 import { Footer } from './components/Footer';
 import './components/sass/App.scss';
@@ -22,8 +23,9 @@ const App = () => {
 		<Header/>
 		<Router.Switch>
 			<Router.Route path="/" exact render={() => <LandingPage/>}/>
-			<Router.Route path="/chat" exact render={() => <Chat/>}/>
-			<Router.Route path="/chat/*" exact render={() => <Chat/>}/>
+			<Router.Route path="/signin" render={() => <SignIn/>}/>
+			<Router.Route path="/chat" render={() => <Chat/>}/>
+			<Router.Route path="/chat/*" render={() => <Chat/>}/>
 		</Router.Switch>
 		<Footer/>
 	</div>);

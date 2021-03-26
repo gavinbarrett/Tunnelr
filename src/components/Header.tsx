@@ -4,9 +4,10 @@ import './sass/Header.scss';
 
 export const Header = () => {
 	return (<header>
-		<div className="header-text">
-			<Router.Link to="/">Tunnlr</Router.Link>
-			<Router.Link to="/chat">Chat</Router.Link>
+		<Router.Link id="home-link" to="/">Tunnelr</Router.Link>
+		<div id="header-links">
+			<Router.Link id="chat-link" to="/chat">Chat</Router.Link>
+			<Router.Link id="sign-in" to="/signin">Sign In</Router.Link>
 		</div>
 	</header>);
 }

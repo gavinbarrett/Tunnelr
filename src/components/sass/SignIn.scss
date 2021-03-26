@@ -1,0 +1,33 @@
+#signin-wrapper {
+	width: 100vw;
+	height: 90vh;
+	background: lime;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#signin-box {
+	width: 70vw;
+	height: 60vh;
+	background: pink;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: space-evenly;
+}
+
+#signin-title {
+	width: 70vw;
+	height: 20vh;
+}
+
+label {
+	width: 40vw;
+	height: 10vh;
+}
+
+input {
+	width: 40vw;
+	height: 10vh;
+}
