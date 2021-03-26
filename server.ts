@@ -1,13 +1,19 @@
-const express = require('express');
-const WebSocket = require('ws');
+import * as express from 'express';
+import * as WebSocket from 'ws';
 const app = express();
 
-const ws = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 8080 });
 
-ws.on('connection', () => {
+wss.on('connection', (ws:WebSocket) => {
 	console.log('A client has connected');
+
 	ws.on('message', data => {
-		console.log(data);
+		console.log(`Client sent:> ${data}`);
+		ws.send("I'm doing pretty well today, thanks.");
+	})
+
+	ws.on('close', () => {
+		console.log("Closing connection");
 	});
 });
 

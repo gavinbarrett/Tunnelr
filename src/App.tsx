@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Header } from './components/Header';
 import './components/sass/App.scss';
 
 const App = () => {
@@ -9,11 +10,16 @@ const App = () => {
 	React.useEffect(() => {
 		ws.onopen = () => {
 			console.log('Connected to server.');
+			ws.send("Hey server, how's your day?");
+		}
+
+		ws.onmessage = ({data}) => {
+			console.log(`Server sent:> ${data}`);
 		}
 	});
 
 	return (<div className="app-wrapper">
-		{"This is an application"}
+		<Header/>
 	</div>);
 }
 
