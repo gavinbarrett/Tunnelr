@@ -1,7 +1,8 @@
 import * as url from 'url';
 import * as express from 'express';
 import * as WebSocket from 'ws';
-import { signUserIn } from './server/authServer';
+import * as db from './server/databaseFunctions';
+import { signUserUp, signUserIn } from './server/authServer';
 const app = express();
 
 app.use(express.json());
@@ -22,6 +23,7 @@ wss.on('connection', (ws:WebSocket, req) => {
 });
 
 app.use(express.static('dist'));
+app.post('/signup', signUserUp);
 app.post('/signin', signUserIn);
 
 app.listen(5555, () => {

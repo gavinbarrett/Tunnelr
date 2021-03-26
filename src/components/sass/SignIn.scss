@@ -13,21 +13,50 @@
 	background: pink;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
-	align-items: space-evenly;
+	justify-content: space-evenly;
+	align-items: center;
 }
 
 #signin-title {
 	width: 70vw;
-	height: 20vh;
+	height: 10vh;
+	display: flex;
 }
 
 label {
 	width: 40vw;
-	height: 10vh;
+	height: 5vh;
 }
 
 input {
 	width: 40vw;
+	height: 5vh;
+}
+
+#title-box {
+	width: 35vw;
 	height: 10vh;
+	background: purple;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+	font-size: 2rem;
+}
+
+#error-box {
+	width: 35vw;
+	height: 10vh;
+	background: red;
+}
+
+#no-account {
+	width: 40vw;
+	height: 5vh;
+	font-size: 1rem;
+}
+
+#no-account > a {
+	text-decoration: none;
+	color: blue;
 }

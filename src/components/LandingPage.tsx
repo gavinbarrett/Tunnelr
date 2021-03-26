@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as Router from 'react-router-dom';
 import './sass/LandingPage.scss';
 
 const LandingText = () => {
@@ -9,7 +10,9 @@ const LandingText = () => {
 
 const SignUp = () => {
 	return (<div id="sign-up">
-		{"sign up"}
+		<button id="signup-button">
+			<Router.Link to="/signup">{"sign up"}</Router.Link>
+		</button>
 	</div>);
 }
 
