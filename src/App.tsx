@@ -6,7 +6,6 @@ import { LandingPage } from './components/LandingPage';
 import { SignUp } from './components/SignUp';
 import { SignIn } from './components/SignIn';
 import { Chat } from './components/Chat';
-import { Footer } from './components/Footer';
 import './components/sass/App.scss';
 
 const App = () => {
@@ -24,14 +23,13 @@ const App = () => {
 	return (<div className="app-wrapper">
 		<Header loggedIn={loggedIn}/>
 		<Router.Switch>
-			<Router.Route path="/" exact render={() => <LandingPage/>}/>
+			<Router.Route path="/" exact render={() => <LandingPage loggedIn={loggedIn}/>}/>
 			<Router.Route path="/signup" render={() => <SignUp/>}/>
 			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn}/>}/>
 			<Router.Route path="/chat">
 				{loggedIn ? <Chat/> : <Router.Redirect to="/signin"/>}
 			</Router.Route>
 		</Router.Switch>
-		<Footer/>
 	</div>);
 }
 

@@ -1,5 +1,17 @@
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import * as db from './databaseFunctions';
+
+export const authenticateUser = async (req, res, next) => {
+	/* Check for user */
+	console.log(req.cookies);
+	if (!req.cookies.sessionID) return res.sendStatus(401);
+	console.log(req.cookies.sessionID);
+	const user = req.cookies.sessionID.user;
+	const id = req.cookies.sessionID.sessionid;
+	console.log(`User: ${user}\nId: ${id}`);
+	next();
+}
 
 export const signUserIn = async (req, res) => {
 	const { user, pass } = req.body;
@@ -14,11 +26,19 @@ export const signUserIn = async (req, res) => {
 			console.log(matched);
 			if (matched) {
 				console.log(`Signing in ${user}`);
+				const id = await createSessionID();
+				const clientData = {
+					user: user,
+					sessionid: id
+				};
+				// set session id
+				res.cookie("sessionID", clientData, { maxAge: 1000 * 100, secure: true, httpOnly: true, sameSite: true});
+				res.send(JSON.stringify({"status": "succeeded"}));
 				// FIXME set cookie to return to user
 			} else {
 				console.log("failed");
+				res.send(JSON.stringify({"status": "failed"}));
 			}
-			res.send(JSON.stringify({"status": "success"}));
 		} else {		// 
 			res.send(JSON.stringify({"status": "failed"}));
 		}
@@ -34,7 +54,7 @@ export const signUserUp = async (req, res) => {
 	if (await validateQueries([user, pass, email], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i, /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i])) {
 		// check database for username
 		const added = await checkForUser(user);
-		if (added)	// return failed sign up attempt if user already exists
+		if (added.rows.length !== 0)	// return failed sign up attempt if user already exists
 			res.send(JSON.stringify({"status": "failed"}));
 		else {		// 
 			// if the user doesn't exist, attempt to sign them up
@@ -115,4 +135,11 @@ const addUser = async (user, pass, email) => {
 		console.log(`Error: ${err}`);
 		return false;
 	}
+}
+
+const createSessionID = async () => {
+	/* return 64 bytes of entropy encoded in base64 to be used as a session ID */
+	return new Promise(resolve => {
+		resolve(crypto.randomBytes(64).toString('base64'));
+	});
 }

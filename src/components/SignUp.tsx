@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Footer } from './Footer';
 import './sass/SignUp.scss';
 
 export const SignUp = () => {
@@ -35,7 +36,7 @@ export const SignUp = () => {
 		});
 	}
 
-	return (<div id="signup-wrapper">
+	return (<><div id="signup-wrapper">
 		<div id="signup-box">
 			<div id="signup-title">
 				<div id="title-box">{"Sign Up"}</div>
@@ -44,12 +45,13 @@ export const SignUp = () => {
 			<label for="username">Username</label>
 			<input name="username" placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
 			<label for="password">Password</label>
-			<input name="password" placeholder={"enter password"} autoComplete={"off"} onChange={e => updatePassword(e.target.value)}/>
-			<label for="username">Re-enter Password</label>
-			<input name="username" placeholder={"enter password"} autoComplete={"off"} onChange={e => updateRePassword(e.target.value)}/>
-			<label for="password">Email</label>
-			<input name="password" placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
+			<input name="password" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updatePassword(e.target.value)}/>
+			<label for="rePassword">Re-enter Password</label>
+			<input name="rePassword" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updateRePassword(e.target.value)}/>
+			<label for="email">Email</label>
+			<input name="email" placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
 			<input type="submit" onClick={attemptSignUp}/>
 		</div>
-	</div>);
+	</div>
+	<Footer/></>);
 }

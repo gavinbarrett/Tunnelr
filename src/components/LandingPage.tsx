@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
+import { Footer } from './Footer';
 import './sass/LandingPage.scss';
 
 const LandingText = () => {
@@ -8,17 +9,19 @@ const LandingText = () => {
 	</div>);
 }
 
-const SignUp = () => {
+const SignUp = ({loggedIn}) => {
 	return (<div id="sign-up">
+		{loggedIn ? "" :
 		<button id="signup-button">
 			<Router.Link to="/signup">{"sign up"}</Router.Link>
-		</button>
+		</button>}
 	</div>);
 }
 
-export const LandingPage = () => {
-	return (<div id="landing-page">
+export const LandingPage = ({loggedIn}) => {
+	return (<><div id="landing-page">
 		<LandingText/>
-		<SignUp/>
-	</div>);
+		<SignUp loggedIn={loggedIn}/>
+	</div>
+	<Footer/></>);
 }
