@@ -10,6 +10,7 @@ import { Footer } from './components/Footer';
 import './components/sass/App.scss';
 
 const App = () => {
+	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const ws = new WebSocket('ws://127.0.0.1:8080/chat?roomID=hellurr');
 	React.useEffect(() => {
 		ws.onopen = () => {
@@ -21,13 +22,14 @@ const App = () => {
 		}
 	});
 	return (<div className="app-wrapper">
-		<Header/>
+		<Header loggedIn={loggedIn}/>
 		<Router.Switch>
 			<Router.Route path="/" exact render={() => <LandingPage/>}/>
 			<Router.Route path="/signup" render={() => <SignUp/>}/>
-			<Router.Route path="/signin" render={() => <SignIn/>}/>
-			<Router.Route path="/chat" render={() => <Chat/>}/>
-			<Router.Route path="/chat/*" render={() => <Chat/>}/>
+			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn}/>}/>
+			<Router.Route path="/chat">
+				{loggedIn ? <Chat/> : <Router.Redirect to="/signin"/>}
+			</Router.Route>
 		</Router.Switch>
 		<Footer/>
 	</div>);

@@ -2,9 +2,10 @@ import * as React from 'react';
 import * as Router from 'react-router-dom';
 import './sass/SignIn.scss';
 
-export const SignIn = () => {
+export const SignIn = ({updateLoggedIn}) => {
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
+	const history = Router.useHistory();
 	const reg = /^[a-z0-9]+$/i;
 	const attemptSignIn = async () => {
 		/* attempt to sign in to the app */
@@ -12,6 +13,9 @@ export const SignIn = () => {
 			const resp = await fetch("/signin", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password}) });
 			const r = await resp.json();
 			console.log(r);
+			if (r["status"] === "succeeded")
+				updateLoggedIn(true);
+				history.push("/chat");
 		} else {
 			console.log("Creds don't match.");
 		}

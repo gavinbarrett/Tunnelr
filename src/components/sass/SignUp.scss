@@ -31,4 +31,9 @@
 #signup-box > input {
 	width: 40vw;
 	height: 5vh;
+	outline: none;
+}
+
+#signup-box > input:focus, input:active {
+	outline: none;
 }

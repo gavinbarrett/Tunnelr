@@ -31,6 +31,11 @@ label {
 input {
 	width: 40vw;
 	height: 5vh;
+	outline: none;
+}
+
+input:focus, input:active {
+	outline: none;
 }
 
 #title-box {
