@@ -32,13 +32,15 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage}) =>
 			prmpt.length ? updatePrompt('') : updatePrompt('showing');
 	}
 	const upPage = () => {
-		updatePage(<Channel/>);
+		if (expanded.length)
+			updatePage(<Channel/>);
 	}
 	const upHome = () => {
-		updatePage(<ChatMenu/>);
+		if (expanded.length)
+			updatePage(<ChatMenu/>);
 	}
 	return (<div className={`channel-bar ${expanded}`}>
-		<div id="box" onClick={alter}></div>
+		<div id="box" onClick={alter}>{">"}</div>
 		<div className={`add-channel${expanded}`} onClick={upHome}>{"Chat Menu"}</div>
 		<div className={`add-channel${expanded}`} onClick={upPrompt}>{"+ Add Channel"}</div>
 		<div className={`add-channel${expanded}`} onClick={upPage}>{"Test Channel"}</div>
@@ -47,28 +49,27 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage}) =>
 
 
 const ChatMenu = () => {
-
-	const queryFriend = async () => {
+	const queryFriend = async event => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
+		console.log(event.target.value);
 	}
-
-	const queryBox = async () => {
+	const queryBox = async event => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
+		console.log(event.target.value);
 	}
-
 	return(<div id="chat-menu">
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="friend-search"/>
+				<input className="search-box" id="friend-search" onChange={queryFriend}/>
 			</div>
 		</div>
 		<div id="channel-search-box">
 			<p className="search-title">{"search for boxes"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="channel-search"/>
+				<input className="search-box" id="channel-search" onChange={queryBox}/>
 			</div>
 		</div>
 	</div>);

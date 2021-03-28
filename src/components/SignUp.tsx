@@ -50,7 +50,7 @@ export const SignUp = () => {
 			<input name="rePassword" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updateRePassword(e.target.value)}/>
 			<label for="email">Email</label>
 			<input name="email" placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
-			<input type="submit" onClick={attemptSignUp}/>
+			<button onClick={attemptSignUp}>{"Sign Up"}</button>
 		</div>
 	</div>
 	<Footer/></>);

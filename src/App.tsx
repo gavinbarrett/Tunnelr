@@ -10,8 +10,11 @@ import './components/sass/App.scss';
 
 const App = () => {
 	const [loggedIn, updateLoggedIn] = React.useState(false);
+	const hist = Router.useHistory();
 	const ws = new WebSocket('ws://127.0.0.1:8080/chat?roomID=hellurr');
 	React.useEffect(() => {
+		// try to retrieve prior session
+		getSession();
 		ws.onopen = () => {
 			console.log('Connected to server.');
 			ws.send("Hey server, how's your day?");
@@ -20,6 +23,21 @@ const App = () => {
 			console.log(`Server sent:> ${data}`);
 		}
 	});
+	const getSession = async () => {
+		const resp = await fetch("/getsession", {method: "GET"});
+		const r = resp.json();
+		if (resp.status === 401) {
+			// FIXME: couldn't reauth session, dont log user back in
+			console.log("No session exists; please log in.");
+		} else if (resp.status === 200) {
+			// FIXME: log user into the ui
+			console.log('Logging user back into their session');
+			updateLoggedIn(true);
+		} else {
+			console.log(`${resp.status} received`);
+		}
+		console.log(r);
+	}
 	return (<div className="app-wrapper">
 		<Header loggedIn={loggedIn}/>
 		<Router.Switch>

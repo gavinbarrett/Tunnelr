@@ -28,14 +28,33 @@ label {
 	height: 5vh;
 }
 
-input {
+#signin-box > input {
 	width: 40vw;
 	height: 5vh;
 	outline: none;
+	border: 0;
+	padding: 0.5rem;
+	border-radius: 25px;
+	font-size: 1.25rem;
 }
 
-input:focus, input:active {
+#signin-box > input:focus, input:active {
 	outline: none;
+}
+
+#signin-box > button {
+	border: 0;
+	color: white;
+	width: 20vw;
+	height: 8vh;
+	background: red;
+	border-radius: 35px;
+	font-size: 1.5rem;
+	transition: all 0.2s ease-in-out;
+}
+
+#signin-box > button:hover {
+	background: orange;
 }
 
 #title-box {

@@ -16,7 +16,7 @@ export const SignIn = ({updateLoggedIn}) => {
 			console.log(r);
 			if (r["status"] === "succeeded")
 				updateLoggedIn(true);
-				history.push("/chat");
+				history.push("/");
 		} else {
 			console.log("Creds don't match.");
 		}
@@ -41,7 +41,7 @@ export const SignIn = ({updateLoggedIn}) => {
 			<div id="no-account">
 				<Router.Link to="/signup">{"Don't have an account? Sign Up Now!"}</Router.Link>
 			</div>
-			<input type="submit" onClick={attemptSignIn}/>
+			<button onClick={attemptSignIn}>{"Sign In"}</button>
 		</div>
 	</div>
 	<Footer/></>);

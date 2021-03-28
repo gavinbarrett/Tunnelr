@@ -33,8 +33,12 @@
 
 #box {
 	width: 5vw;
-	height: 5vh;
+	height: 8vh;
 	background: black;
+	color: white;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .add-channel {
@@ -48,7 +52,6 @@
 
 .add-channelexpanded {
 	opacity: 100%;
-	transition: all 0.75s ease-in-out;
 	height: 12vh;
 	display: flex;
 	align-items: center;
@@ -56,6 +59,11 @@
 	font-size: 1.5rem;
 	cursor: default;
 	padding-left: 2vw;
+	transition: all 0.75s ease-in-out;
+}
+
+.add-channelexpanded:hover {
+	background: blue;
 }
 
 .add-channelexpanded > * {
