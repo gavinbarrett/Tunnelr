@@ -1,10 +1,19 @@
 import * as React from 'react';
 import './sass/Chat.scss';
 
-const PromptBox = ({showing}) => {
+const PromptBox = ({showing, updatePrompt}) => {
 	return (<div className={`prompt ${showing}`}>
+		<div id="exit" onClick={() => updatePrompt('')}>{"\u2715"}</div>
 		<div className={`prompt-box ${showing}`}>
-			{"This is a prompt"}
+			<form>
+				<label for="channelname">{"Channel Name"}</label>
+				<input name="channelname"/>
+				<label for="authreq">{"Auth Requirements"}</label>
+				<select name="authreq">
+					<option>{"Private"}</option>
+					<option>{"Public"}</option>
+				</select>
+			</form>
 		</div>
 	</div>);
 }
@@ -92,7 +101,7 @@ const ChatMenu = () => {
 			</div>
 		</div>
 		<div id="channel-search-box">
-			<p className="search-title">{"search for boxes"}</p>
+			<p className="search-title">{"search for channels"}</p>
 			<div className="search-box-wrapper">
 				<input className="search-box" id="channel-search" onChange={queryChannel}/>
 			</div>
@@ -108,6 +117,6 @@ export const Chat = () => {
 	return (<div id="chat-wrapper">
 		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage}/>
 			{page}
-		<PromptBox showing={prmpt}/>
+		<PromptBox showing={prmpt} updatePrompt={updatePrompt}/>
 	</div>);
 }

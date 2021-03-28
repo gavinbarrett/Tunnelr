@@ -2,6 +2,8 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as db from './databaseFunctions';
 
+const expiry: number = 60 * 60 // 60 minutes
+
 export const authenticateUser = async (req, res, next) => {
 	/* Check for user */
 	console.log('Checking cookies');
@@ -75,7 +77,7 @@ export const signUserIn = async (req, res) => {
 					sessionid: id
 				};
 				// set session id
-				res.cookie("sessionID", clientData, { maxAge: 1000 * 100, secure: true, httpOnly: true, sameSite: true});
+				res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, secure: true, httpOnly: true, sameSite: true});
 				res.send(JSON.stringify({"status": "succeeded"}));
 				// FIXME set cookie to return to user
 			} else {
