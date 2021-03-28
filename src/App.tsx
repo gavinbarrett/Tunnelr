@@ -11,17 +11,9 @@ import './components/sass/App.scss';
 const App = () => {
 	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const hist = Router.useHistory();
-	const ws = new WebSocket('ws://127.0.0.1:8080/chat?roomID=hellurr');
 	React.useEffect(() => {
 		// try to retrieve prior session
 		getSession();
-		ws.onopen = () => {
-			console.log('Connected to server.');
-			ws.send("Hey server, how's your day?");
-		}
-		ws.onmessage = ({data}) => {
-			console.log(`Server sent:> ${data}`);
-		}
 	});
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});

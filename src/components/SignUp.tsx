@@ -38,10 +38,7 @@ export const SignUp = () => {
 
 	return (<><div id="signup-wrapper">
 		<div id="signup-box">
-			<div id="signup-title">
-				<div id="title-box">{"Sign Up"}</div>
-				<div id="error-box"></div>
-			</div>
+			<div id="signup-title"></div>
 			<label for="username">Username</label>
 			<input name="username" placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
 			<label for="password">Password</label>

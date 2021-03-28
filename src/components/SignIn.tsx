@@ -30,10 +30,7 @@ export const SignIn = ({updateLoggedIn}) => {
 	}
 	return (<><div id="signin-wrapper">
 		<div id="signin-box">
-			<div id="signin-title">
-				<div id="title-box">{"Sign In"}</div>
-				<div id="error-box"></div>
-			</div>
+			<div id="signin-title"></div>
 			<label for="username">Username</label>
 			<input name="username" placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
 			<label for="password">Password</label>

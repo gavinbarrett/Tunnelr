@@ -16,17 +16,18 @@ export const query = (text, values) => {
 	return pool.query(text, values);
 }
 
-/*
-module.exports = {
-	// query DB
-	query: (text, values) => pool.query(text, values),
-	// get value from redis
-	get: (id) => redisClient.get(id),
-	// set value in redis for exp time
-	set: (id, user, type, exp) => redisClient.set(id, user, type, exp),
-	// delete key/value pair
-	del: (id) => redisClient.del(id),
-	// check is key exists
-	exists: (id) => redisClient.exists(id),
+export const get = id => {
+	return redisClient.get(id);
 }
-*/
+
+export const set = (id, user, type, exp) => {
+	return redisClient.set(id, user, type, exp);
+}
+
+export const del = id => {
+	return redisClient.del(id);
+}
+
+export const exists = id => {
+	return redisClient.exists(id);
+}

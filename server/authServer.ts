@@ -4,13 +4,56 @@ import * as db from './databaseFunctions';
 
 export const authenticateUser = async (req, res, next) => {
 	/* Check for user */
-	console.log(req.cookies);
-	if (!req.cookies.sessionID) return res.sendStatus(401);
+	console.log('Checking cookies');
 	console.log(req.cookies.sessionID);
+	console.log('Cookies checked');
+	if (!req.cookies.sessionID) {
+		console.log("Returning 401");
+		return res.sendStatus(401);
+	}
 	const user = req.cookies.sessionID.user;
 	const id = req.cookies.sessionID.sessionid;
+	const keys = db.exists(id);
+	// FIXME: ensure queried user is associated with Redis entry
 	console.log(`User: ${user}\nId: ${id}`);
-	next();
+	if (keys) {
+		next() // access authenticated user functions
+	} else {
+		console.log("Returning 401");
+		return res.sendStatus(401);
+	}
+}
+
+export const retrieveSession = async (req, res) => {
+	/* Retrieve user session */
+	if (req.cookies.sessionID) {
+		console.log("Trying to retrieve");
+		const { user, sessionid } = req.cookies.sessionID;
+		console.log(`User: ${user}\nSessionID: ${sessionid}`);
+		const session = await checkForSession(sessionid);
+		console.log(`Session: ${session}`);
+		if (session) {
+			res.send(JSON.stringify({"status": "succeeded"}));
+		} else {
+			res.send(JSON.stringify({"status": "failed"}));
+		}
+	} else {
+		console.log("No cookies found.");
+		res.send(JSON.stringify({"status": "failed"}));
+	}
+}
+
+const checkForSession = async id => {
+	try {
+		const session = await db.get(id);
+		console.log(`Checked session: ${session}`);
+		if (session)
+			return session;
+		return null;
+	} catch(err) {
+		console.log(`Error occurred: ${err}`);
+		return null;
+	}
 }
 
 export const signUserIn = async (req, res) => {

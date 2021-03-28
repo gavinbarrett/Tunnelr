@@ -9,11 +9,23 @@ const PromptBox = ({showing}) => {
 	</div>);
 }
 
-const Channel = () => {
+const Channel = ({id}) => {
 	const [message, updateMessage] = React.useState('');
+	const [wsocket, updateWSocket] = React.useState(new WebSocket(`ws://127.0.0.1:8080/chat?roomID=${id}`));
+	React.useEffect(() => {
+		
+		wsocket.onopen = () => {
+			console.log('Connected to server.');
+			wsocket.send("Hey server, how's your day?");
+		}
+		wsocket.onmessage = ({data}) => {
+			console.log(`Server sent:> ${data}`);
+		}
+	}, []);
 	const sendMessage = () => {
 		if (message === '') return;
 		console.log(message);
+		wsocket.send(message);
 	}
 	return (<div className="channel">
 		<input placeholder={"Input your chat here"} onChange={e => updateMessage(e.target.value)}/>
@@ -33,7 +45,7 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage}) =>
 	}
 	const upPage = () => {
 		if (expanded.length)
-			updatePage(<Channel/>);
+			updatePage(<Channel id={"crashbanditooth"}/>);
 	}
 	const upHome = () => {
 		if (expanded.length)
@@ -53,11 +65,24 @@ const ChatMenu = () => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
 		console.log(event.target.value);
+		if (matchReg(event.target.value, /^#[a-z0-9]+$/i)) {
+			const resp = await fetch("/queryfriend", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"friendid": event.target.value})});
+			const r = await resp.json();
+			console.log(r);
+		}
 	}
-	const queryBox = async event => {
+	const queryChannel = async event => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
 		console.log(event.target.value);
+		if (matchReg(event.target.value, /^@[a-z0-9]+$/i)) {
+			const resp = await fetch("/querychannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelid": event.target.value})});
+			const r = await resp.json();
+			console.log(r);
+		}
+	}
+	const matchReg = (text, regex) => {
+		return text.match(regex);
 	}
 	return(<div id="chat-menu">
 		<div id="friend-search-box">
@@ -69,7 +94,7 @@ const ChatMenu = () => {
 		<div id="channel-search-box">
 			<p className="search-title">{"search for boxes"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="channel-search" onChange={queryBox}/>
+				<input className="search-box" id="channel-search" onChange={queryChannel}/>
 			</div>
 		</div>
 	</div>);
