@@ -2,18 +2,46 @@ import * as React from 'react';
 import './sass/Chat.scss';
 
 const PromptBox = ({showing, updatePrompt}) => {
+	const [channelName, updateChannelName] = React.useState('');
+	const [privacy, updatePrivacy] = React.useState('Private');
+	const [credentials, updateCredentials] = React.useState('');
+	const addChannel = async () => {
+		//if (!channelName.match(/^@[a-z0-9]{5,32}$/)) return;
+		const resp = await fetch("/addchannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelName": channelName, "access": privacy, "credentials": credentials})});
+		const r = await resp.json();
+		console.log(r["status"]);
+		if (r["status"] === "success")
+			updatePrompt('');
+	}
+	const up = event => {
+		console.log(event.target.value);
+		updateChannelName(event.target.value);
+	}
+	const upPriv = event => {
+		console.log(event.target.value);
+		updatePrivacy(event.target.value);
+	}
+	const upCred = event => {
+		console.log(event.target.value);
+		updateCredentials(event.target.value);
+	}
 	return (<div className={`prompt ${showing}`}>
 		<div id="exit" onClick={() => updatePrompt('')}>{"\u2715"}</div>
 		<div className={`prompt-box ${showing}`}>
-			<form>
+			<div id="form">
 				<label for="channelname">{"Channel Name"}</label>
-				<input name="channelname"/>
+				<input name="channelname" onChange={up}/>
 				<label for="authreq">{"Auth Requirements"}</label>
-				<select name="authreq">
+				<select name="authreq" onChange={upPriv}>
 					<option>{"Private"}</option>
 					<option>{"Public"}</option>
 				</select>
-			</form>
+				{(privacy === 'Private') ?
+					<><label for="credentials">{"Access code"}</label>
+					<input name="credentials" onChange={upCred}/></> : ''
+				}
+				<button onClick={addChannel}>{"Create Channel"}</button>
+			</div>
 		</div>
 	</div>);
 }
@@ -75,7 +103,7 @@ const ChatMenu = () => {
 		// FIXME: if valid, send to server to query db
 		console.log(event.target.value);
 		if (matchReg(event.target.value, /^#[a-z0-9]+$/i)) {
-			const resp = await fetch("/queryfriend", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"friendid": event.target.value})});
+			const resp = await fetch("/queryfriend", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"username": event.target.value})});
 			const r = await resp.json();
 			console.log(r);
 		}

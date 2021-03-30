@@ -14,10 +14,10 @@ const App = () => {
 	React.useEffect(() => {
 		// try to retrieve prior session
 		getSession();
-	});
+	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
-		const r = resp.json();
+		const r = await resp.json();
 		if (resp.status === 401) {
 			// FIXME: couldn't reauth session, dont log user back in
 			console.log("No session exists; please log in.");
