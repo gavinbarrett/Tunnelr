@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 //import * as WebSocket from 'ws';
 import * as db from './server/databaseFunctions';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
-import { addChannel, queryChannel } from './server/channels';
+import { addChannel, loadChannels, queryChannel } from './server/channels';
 import { queryFriend } from './server/friends';
 import * as wss from './server/websocketServer';
 
@@ -25,9 +25,11 @@ app.post('/signin', signUserIn);
 
 /* authenticated functions */
 app.get('/getsession', authenticateUser, retrieveSession);
+app.get('/loadchannels', authenticateUser, loadChannels);
 app.post('/queryfriend', authenticateUser, queryFriend);
 app.post('/querychannel', authenticateUser, queryChannel);
 app.post('/addchannel', authenticateUser, addChannel);
+
 
 app.listen(5555, () => {
 	console.log('Listening on port 5555');

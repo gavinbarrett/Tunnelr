@@ -30,6 +30,21 @@ export const addChannel = async (req, res) => {
 	}
 }
 
+export const loadChannels = async (req, res) => {
+	const { user } = req.cookies.sessionID;
+	if (!user.match(/^[a-z0-9]{2,32}$/i))
+		res.send(JSON.stringify({"status": "failed"}));
+	else {
+		const query = 'select channelname from members where username=$1';
+		const values = [user];
+		const channels = await db.query(query, values);
+		if (channels && channels.rows.length !== 0)
+			res.send(JSON.stringify({"status": channels.rows}));
+		else
+			res.send(JSON.stringify({"status": "failed"}));
+	}
+}
+
 export const queryChannel = async (req, res) => {
 	const { channelid } = req.body;
 	console.log(channelid);
@@ -80,6 +95,10 @@ const hashChannelCredentials = async pass => {
 			}
 		})
 	});
+}
+
+const getUserChannels = async user => {
+	
 }
 
 const checkForChannel = async channelName => {

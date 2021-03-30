@@ -70,7 +70,7 @@ const Channel = ({id}) => {
 	</div>);
 }
 
-const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage}) => {
+const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels}) => {
 	const alter = () => {
 		// toggle expanding sidebar on and off
 		expanded.length ? updateExpanded('') : updateExpanded('expanded');
@@ -92,7 +92,9 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage}) =>
 		<div id="box" onClick={alter}>{">"}</div>
 		<div className={`add-channel${expanded}`} onClick={upHome}>{"Chat Menu"}</div>
 		<div className={`add-channel${expanded}`} onClick={upPrompt}>{"+ Add Channel"}</div>
-		<div className={`add-channel${expanded}`} onClick={upPage}>{"Test Channel"}</div>
+		{userChannels.length ? userChannels.map(elem => {
+			return <div className={`add-channel${expanded}`} onClick={upPage}>{elem.channelname}</div>
+		}) : ''}
 	</div>);
 }
 
@@ -142,8 +144,19 @@ export const Chat = () => {
 	const [expanded, updateExpanded] = React.useState('');
 	const [prmpt, updatePrompt] = React.useState('');
 	const [page, updatePage] = React.useState(<ChatMenu/>);
+	const [userChannels, updateUserChannels] = React.useState([]);
+	React.useEffect(() => {
+		loadUserChannels();
+	}, []);
+	const loadUserChannels = async () => {
+		/* load the channels the user belongs to */
+		const resp = await fetch("/loadchannels", {method: "GET"});
+		const r = await resp.json();
+		if (r["status"] !== "failed")
+			updateUserChannels(r["status"]);
+	}
 	return (<div id="chat-wrapper">
-		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage}/>
+		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels}/>
 			{page}
 		<PromptBox showing={prmpt} updatePrompt={updatePrompt}/>
 	</div>);
