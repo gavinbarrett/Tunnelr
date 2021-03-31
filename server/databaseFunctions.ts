@@ -1,4 +1,4 @@
-import * as Redis from 'redis';
+import * as Redis from 'ioredis';
 import { Pool } from 'pg';
 
 const pool = new Pool({
@@ -9,8 +9,12 @@ const pool = new Pool({
 	port: 5432
 });
 
-const redisClient = Redis.createClient();
-redisClient.on('error', err => { if (err) console.log(`Error: ${err}`) });
+const redisClient = new Redis({
+	host: 'localhost',
+	port: 6379,
+	password: ''
+});
+//redisClient.on('error', err => { if (err) console.log(`Error: ${err}`) });
 
 export const query = (text, values) => {
 	return pool.query(text, values);
@@ -30,4 +34,12 @@ export const del = id => {
 
 export const exists = id => {
 	return redisClient.exists(id);
+}
+
+export const xadd = (channelName, message, sender) => {
+	return redisClient.xadd(channelName, "*", "message", message, "sender", sender)
+}
+
+export const xread = channelName => {
+	return redisClient.xread("BLOCK", 10000, "STREAMS", channelName, 0);
 }

@@ -9,6 +9,7 @@ import { Chat } from './components/Chat';
 import './components/sass/App.scss';
 
 const App = () => {
+	const [user, updateUser] = React.useState('');
 	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const hist = Router.useHistory();
 	React.useEffect(() => {
@@ -18,26 +19,24 @@ const App = () => {
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
 		const r = await resp.json();
-		if (resp.status === 401) {
+		if (r["status"] === "failed") {
 			// FIXME: couldn't reauth session, dont log user back in
 			console.log("No session exists; please log in.");
-		} else if (resp.status === 200) {
+		} else {
 			// FIXME: log user into the ui
 			console.log('Logging user back into their session');
 			updateLoggedIn(true);
-		} else {
-			console.log(`${resp.status} received`);
+			updateUser(r["status"]);
 		}
-		console.log(r);
 	}
 	return (<div className="app-wrapper">
 		<Header loggedIn={loggedIn}/>
 		<Router.Switch>
 			<Router.Route path="/" exact render={() => <LandingPage loggedIn={loggedIn}/>}/>
 			<Router.Route path="/signup" render={() => <SignUp/>}/>
-			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn}/>}/>
+			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
 			<Router.Route path="/chat">
-				{loggedIn ? <Chat/> : <Router.Redirect to="/signin"/>}
+				{loggedIn ? <Chat user={"gavunb"}/> : <Router.Redirect to="/signin"/>}
 			</Router.Route>
 		</Router.Switch>
 	</div>);

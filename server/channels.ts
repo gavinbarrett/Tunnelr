@@ -1,3 +1,4 @@
+import * as url from 'url';
 import * as bcrypt from 'bcrypt';
 import * as db from './databaseFunctions';
 
@@ -43,6 +44,15 @@ export const loadChannels = async (req, res) => {
 		else
 			res.send(JSON.stringify({"status": "failed"}));
 	}
+}
+
+export const getMessages = async (req, res) => {
+	const uobj = url.parse(req.url);
+	const pathname = uobj.pathname;
+	const p = new URLSearchParams(uobj.search);
+	const roomid = p.get("roomID");
+	const allMessages = await db.xread(roomid);
+	res.send(JSON.stringify({"status": allMessages[0]}));
 }
 
 export const queryChannel = async (req, res) => {
@@ -101,7 +111,7 @@ const getUserChannels = async user => {
 	
 }
 
-const checkForChannel = async channelName => {
+export const checkForChannel = async channelName => {
 	/* check if a channel exists */
 	const query = 'select * from channels where channelName=$1';
 	const values = [channelName];

@@ -46,31 +46,43 @@ const PromptBox = ({showing, updatePrompt}) => {
 	</div>);
 }
 
-const Channel = ({id}) => {
+const Channel = ({sender, id}) => {
 	const [message, updateMessage] = React.useState('');
-	const [wsocket, updateWSocket] = React.useState(new WebSocket(`ws://127.0.0.1:8080/chat?roomID=${id}`));
+	const [wsocket, updateWSocket] = React.useState(new WebSocket(`ws://192.168.1.62:8080/?roomID=${id}`));
+	const [channelMessages, updateChannelMessages] = React.useState([]);
 	React.useEffect(() => {
-		
-		wsocket.onopen = () => {
-			console.log('Connected to server.');
-			wsocket.send("Hey server, how's your day?");
-		}
-		wsocket.onmessage = ({data}) => {
-			console.log(`Server sent:> ${data}`);
-		}
+		getChannelMessages();
 	}, []);
+	const getChannelMessages = async () => {
+		console.log("grabbing messages");
+		const resp = await fetch(`/getmessages/?roomID=${id}`, {method: "GET"});
+		const r = await resp.json();
+		if (r["status"] === "failed") return;
+		else updateChannelMessages(r["status"][1]);
+	}
 	const sendMessage = () => {
+		console.log('Firing sendmessage');
 		if (message === '') return;
 		console.log(message);
-		wsocket.send(message);
+		wsocket.send(JSON.stringify({"sender": sender, "message": message}));
+	}
+	const changeMessage = event => {
+		updateMessage(event.target.value);
 	}
 	return (<div className="channel">
-		<input placeholder={"Input your chat here"} onChange={e => updateMessage(e.target.value)}/>
-		<button onClick={sendMessage}>{"Send"}</button>
+		<div id="message-box">
+			{channelMessages.length ? channelMessages.map(elem => {
+				return <div className="message-snippet">{elem[1][1]}</div>
+			}) : 'No messages found.'}
+		</div>
+		<div id="inputbox">
+			<textarea placeholder={"Input your chat here"} onChange={changeMessage}/>
+			<button id="sendmessage" onClick={sendMessage}>{"Send"}</button>
+		</div>
 	</div>);
 }
 
-const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels}) => {
+const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user}) => {
 	const alter = () => {
 		// toggle expanding sidebar on and off
 		expanded.length ? updateExpanded('') : updateExpanded('expanded');
@@ -80,9 +92,9 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 		if (expanded.length)
 			prmpt.length ? updatePrompt('') : updatePrompt('showing');
 	}
-	const upPage = () => {
+	const upPage = value => () => {
 		if (expanded.length)
-			updatePage(<Channel id={"crashbanditooth"}/>);
+			updatePage(<Channel sender={user} id={value}/>);
 	}
 	const upHome = () => {
 		if (expanded.length)
@@ -90,14 +102,13 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 	}
 	return (<div className={`channel-bar ${expanded}`}>
 		<div id="box" onClick={alter}>{">"}</div>
-		<div className={`add-channel${expanded}`} onClick={upHome}>{"Chat Menu"}</div>
-		<div className={`add-channel${expanded}`} onClick={upPrompt}>{"+ Add Channel"}</div>
-		{userChannels.length ? userChannels.map(elem => {
-			return <div className={`add-channel${expanded}`} onClick={upPage}>{elem.channelname}</div>
+		<div className={`add-channel${expanded} chatmenu`} onClick={upHome}>{"Chat Menu"}</div>
+		<div className={`add-channel${expanded} addchannel`} onClick={upPrompt}>{"+ Add Channel"}</div>
+		{userChannels.length ? userChannels.map((elem, idx) => {
+			return <div key={idx} className={`add-channel${expanded}`} onClick={upPage(elem.channelname)}>{elem.channelname}</div>
 		}) : ''}
 	</div>);
 }
-
 
 const ChatMenu = () => {
 	const queryFriend = async event => {
@@ -139,12 +150,12 @@ const ChatMenu = () => {
 	</div>);
 }
 
-export const Chat = () => {
+export const Chat = ({user}) => {
 	const [message, updateMessage] = React.useState('');
 	const [expanded, updateExpanded] = React.useState('');
 	const [prmpt, updatePrompt] = React.useState('');
-	const [page, updatePage] = React.useState(<ChatMenu/>);
 	const [userChannels, updateUserChannels] = React.useState([]);
+	const [page, updatePage] = React.useState(<ChatMenu/>);
 	React.useEffect(() => {
 		loadUserChannels();
 	}, []);
@@ -156,7 +167,7 @@ export const Chat = () => {
 			updateUserChannels(r["status"]);
 	}
 	return (<div id="chat-wrapper">
-		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels}/>
+		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user}/>
 			{page}
 		<PromptBox showing={prmpt} updatePrompt={updatePrompt}/>
 	</div>);

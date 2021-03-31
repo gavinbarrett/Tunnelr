@@ -3,7 +3,7 @@ import * as Router from 'react-router-dom';
 import { Footer } from './Footer';
 import './sass/SignIn.scss';
 
-export const SignIn = ({updateLoggedIn}) => {
+export const SignIn = ({updateLoggedIn, updateUser}) => {
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const history = Router.useHistory();
@@ -14,12 +14,14 @@ export const SignIn = ({updateLoggedIn}) => {
 			const resp = await fetch("/signin", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password}) });
 			const r = await resp.json();
 			console.log(r);
-			if (r["status"] === "succeeded")
+			if (r["status"] !== "failed") {
+				console.log(`Logging in as ${r["status"]}`);
 				updateLoggedIn(true);
+				updateUser(r["status"]);
 				history.push("/");
-		} else {
+			}
+		} else
 			console.log("Creds don't match.");
-		}
 	}
 	const validCredentials = async () => {
 		/* enforce alphanumeric usernames and passwords */

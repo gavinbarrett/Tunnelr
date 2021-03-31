@@ -195,4 +195,61 @@
 	width: 95vw;
 	height: 90vh;
 	background: turquoise;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+}
+
+.chatmenu {
+	background: yellow;
+}
+
+.addchannel {
+	background: magenta;
+	color: white;
+}
+
+#message-box {
+	width: 72vw;
+	height: 75vh;
+	background: white;
+	border: 0;
+	border-radius: 10px;
+	display: flex;
+	flex-direction: column;
+}
+
+.message-snippet {
+	background: #ADD8E6;
+	border-radius: 15px;
+	padding: 1.5rem;
+	margin: 0.5rem;
+	font-size: 1rem;
+	color: white;
+}
+
+#inputbox {
+	width: 72vw;
+	height: 15vh;
+	display: flex;
+}
+
+#inputbox > textarea {
+	width: 60vw;
+	height: 8vh;
+	font-size: 1rem;
+	resize: none;
+	border: none;
+	outline: none;
+	border-radius: 15px;
+	padding: 1rem;
+}
+
+button#sendmessage {
+	background-color: orange;
+	border: 0;
+	font-size: 1rem;
+	width: 10vw;
+	height: 8vh;
+	border-radius: 15px;
 }
