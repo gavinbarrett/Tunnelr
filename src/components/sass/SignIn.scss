@@ -1,7 +1,7 @@
 #signin-wrapper {
 	width: 100vw;
 	height: 90vh;
-	background: lime;
+	background: #f0efeb;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -10,11 +10,12 @@
 #signin-box {
 	width: 70vw;
 	height: 60vh;
-	background: pink;
+	background: #7209B7;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
 	align-items: center;
+	border-radius: 35px;
 }
 
 #signin-title {
@@ -26,6 +27,8 @@
 label {
 	width: 40vw;
 	height: 5vh;
+	font-size: 1.2rem;
+	color: #F0EFEB;
 }
 
 #signin-box > input {
@@ -82,5 +85,6 @@ label {
 
 #no-account > a {
 	text-decoration: none;
-	color: blue;
+	font-size: 1rem;
+	color: #F0EFEB;
 }

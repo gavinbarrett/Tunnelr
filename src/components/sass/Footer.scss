@@ -1,7 +1,7 @@
 footer {
 	width: 100vw;
 	height: 30vh;
-	background: lightblue;
+	background: #7209B7;
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
@@ -16,16 +16,23 @@ footer {
 }
 
 .footer-box {
-	width: 20vw;
+	width: 15vw;
 	height: 25vh;
-	background: orange;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
 }
 
-.footer-box > p {
-	font-size: 1.2rem;
+.footer-box > p, .footer-box > a {
+	font-size: 1.45rem;
+	font-family: 'Inconsolata', monospace;
+	font-weight: bold;
 	margin: 0;
 	padding-left: 30%;
+	color: #F0EFEB;
+	text-decoration: none;
+}
+
+.footer-box > a:active {
+	color: #F0EFEB;
 }

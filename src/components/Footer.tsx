@@ -13,9 +13,9 @@ export const Footer = () => {
 			</div>
 			<div className="footer-box">
 				<p>{"About"}</p>
-				<p>{"Source"}</p>
+				<a href="https://github.com/gavinbarrett/Tunnelr">{"Source"}</a>
 				<p>{"Contact"}</p>
-				<p>{"Tunnelr \u00A9 2021"}</p>
+				<p>{"\u00A9 2021"}</p>
 			</div>
 		</div>
 	</footer>);
