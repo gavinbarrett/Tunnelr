@@ -51,8 +51,21 @@ export const getMessages = async (req, res) => {
 	const pathname = uobj.pathname;
 	const p = new URLSearchParams(uobj.search);
 	const roomid = p.get("roomID");
-	const allMessages = await db.xread(roomid);
+	const allMessages = await db.xread(roomid, 0);
 	res.send(JSON.stringify({"status": allMessages[0]}));
+}
+
+export const getUpdatedMessages = async (req, res) => {
+	const uobj = url.parse(req.url);
+	const pathname = uobj.pathname;
+	const p = new URLSearchParams(uobj.search);
+	const channelName = p.get("roomID");
+	const messageid = p.get("lastmessage");
+	console.log(`channelName: ${channelName}`);
+	console.log(`messageid: ${messageid}`);
+	const newMessages = await db.xread(channelName, messageid);
+	console.log(newMessages);
+	res.send(JSON.stringify({"status": newMessages}));
 }
 
 export const queryChannel = async (req, res) => {

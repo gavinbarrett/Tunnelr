@@ -50,6 +50,7 @@ const Channel = ({sender, id}) => {
 	const [message, updateMessage] = React.useState('');
 	const [wsocket, updateWSocket] = React.useState(new WebSocket(`ws://192.168.1.62:8080/?roomID=${id}`));
 	const [channelMessages, updateChannelMessages] = React.useState([]);
+	const [lastMessage, updateLastMessage] = React.useState('0');
 	React.useEffect(() => {
 		getChannelMessages();
 	}, []);
@@ -57,14 +58,36 @@ const Channel = ({sender, id}) => {
 		console.log("grabbing messages");
 		const resp = await fetch(`/getmessages/?roomID=${id}`, {method: "GET"});
 		const r = await resp.json();
+		console.log(r["status"]);
 		if (r["status"] === "failed") return;
-		else updateChannelMessages(r["status"][1]);
+		else {
+			const allmessages = r["status"][1];
+			const last = allmessages[allmessages.length - 1];
+			// store most recent message id
+			updateLastMessage(last[0]);
+			// update displayed messages
+			updateChannelMessages(allmessages);
+		}
 	}
-	const sendMessage = () => {
+	const sendMessage = async () => {
 		console.log('Firing sendmessage');
 		if (message === '') return;
-		console.log(message);
+		// send message to the websocket server
 		wsocket.send(JSON.stringify({"sender": sender, "message": message}));
+		// clear the chat box
+		updateMessage('');
+		// FIXME: keep track of last message id and use it to pull all new messages
+		const resp = await fetch(`/getupdatedmessages/?roomID=${id}&lastmessage=${lastMessage}`, {method: "GET"});
+		const r = await resp.json();
+		console.log(r["status"]);
+		const latest = r["status"][0][1];
+		console.log(`Latest: ${latest}`);
+		updateChannelMessages(channelMessages => [...channelMessages, ...latest]);
+		updateLastMessage(latest[0][0]);
+		console.log(lastMessage);
+		console.log(channelMessages);
+		console.log(`Channel messages: ${channelMessages}`);
+		console.log(r);
 	}
 	const changeMessage = event => {
 		updateMessage(event.target.value);
@@ -76,7 +99,7 @@ const Channel = ({sender, id}) => {
 			}) : 'No messages found.'}
 		</div>
 		<div id="inputbox">
-			<textarea placeholder={"Input your chat here"} onChange={changeMessage}/>
+			<textarea placeholder={"Input your chat here"} onChange={changeMessage} value={message}/>
 			<button id="sendmessage" onClick={sendMessage}>{"Send"}</button>
 		</div>
 	</div>);
@@ -115,7 +138,7 @@ const ChatMenu = () => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
 		console.log(event.target.value);
-		if (matchReg(event.target.value, /^#[a-z0-9]+$/i)) {
+		if (event.target.value.match(/^#[a-z0-9]+$/i)) {
 			const resp = await fetch("/queryfriend", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"username": event.target.value})});
 			const r = await resp.json();
 			console.log(r);
@@ -125,14 +148,11 @@ const ChatMenu = () => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
 		console.log(event.target.value);
-		if (matchReg(event.target.value, /^@[a-z0-9]+$/i)) {
+		if (event.target.value.match(/^@[a-z0-9]+$/i)) {
 			const resp = await fetch("/querychannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelid": event.target.value})});
 			const r = await resp.json();
 			console.log(r);
 		}
-	}
-	const matchReg = (text, regex) => {
-		return text.match(regex);
 	}
 	return(<div id="chat-menu">
 		<div id="friend-search-box">
