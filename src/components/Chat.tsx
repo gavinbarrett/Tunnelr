@@ -66,7 +66,7 @@ const Channel = ({sender, id}) => {
 			// store most recent message id
 			updateLastMessage(last[0]);
 			// update displayed messages
-			updateChannelMessages(allmessages);
+			updateChannelMessages(allmessages.reverse());
 		}
 	}
 	const sendMessage = async () => {
@@ -80,14 +80,20 @@ const Channel = ({sender, id}) => {
 		const resp = await fetch(`/getupdatedmessages/?roomID=${id}&lastmessage=${lastMessage}`, {method: "GET"});
 		const r = await resp.json();
 		console.log(r["status"]);
-		const latest = r["status"][0][1];
-		console.log(`Latest: ${latest}`);
-		updateChannelMessages(channelMessages => [...channelMessages, ...latest]);
-		updateLastMessage(latest[0][0]);
-		console.log(lastMessage);
-		console.log(channelMessages);
-		console.log(`Channel messages: ${channelMessages}`);
-		console.log(r);
+		// messages are up to date
+		if (r["status"] === "failed") return;
+		else {
+			console.log("Updating message");
+			// new messages received from the server
+			const latest = r["status"][0][1];
+			console.log(`Latest: ${latest}`);
+			updateChannelMessages(channelMessages => [...latest.reverse(), ...channelMessages]);
+			updateLastMessage(latest[0][0]);
+			console.log(lastMessage);
+			console.log(channelMessages);
+			console.log(`Channel messages: ${channelMessages}`);
+			console.log(r);
+		}
 	}
 	const changeMessage = event => {
 		updateMessage(event.target.value);
@@ -97,6 +103,7 @@ const Channel = ({sender, id}) => {
 			{channelMessages.length ? channelMessages.map(elem => {
 				return <div className="message-snippet">{elem[1][1]}</div>
 			}) : 'No messages found.'}
+			<div id="anchor"></div>
 		</div>
 		<div id="inputbox">
 			<textarea placeholder={"Input your chat here"} onChange={changeMessage} value={message}/>
@@ -134,6 +141,8 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 }
 
 const ChatMenu = () => {
+	const [friendSearchList, updateFriendSearchList] = React.useState([]);
+	const [channelSearchList, updateChannelSearchList] = React.useState([]);
 	const queryFriend = async event => {
 		// FIXME: validate input
 		// FIXME: if valid, send to server to query db
@@ -142,6 +151,8 @@ const ChatMenu = () => {
 			const resp = await fetch("/queryfriend", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"username": event.target.value})});
 			const r = await resp.json();
 			console.log(r);
+			if (r["status"] === "failed") return;
+			else updateFriendSearchList(r["status"]);
 		}
 	}
 	const queryChannel = async event => {
@@ -152,19 +163,31 @@ const ChatMenu = () => {
 			const resp = await fetch("/querychannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelid": event.target.value})});
 			const r = await resp.json();
 			console.log(r);
+			if (r["status"] === "failed") return;
+			else updateChannelSearchList(r["status"]);
 		}
 	}
 	return(<div id="chat-menu">
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="friend-search" onChange={queryFriend}/>
+				<input list="friend-search-list" className="search-box" id="friend-search" onChange={queryFriend}/>
+				<datalist id="friend-search-list">
+					{friendSearchList.length ? friendSearchList.map(elem => {
+						return <option value={elem.username}/>;
+					}) : ''}
+				</datalist>
 			</div>
 		</div>
 		<div id="channel-search-box">
 			<p className="search-title">{"search for channels"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="channel-search" onChange={queryChannel}/>
+				<input list="channel-search-list" className="search-box" id="channel-search" onChange={queryChannel}/>
+				<datalist id="channel-search-list">
+					{channelSearchList.length ? channelSearchList.map(elem => {
+						return <option value={elem.channelname}/>;
+					}) : ''}
+				</datalist>
 			</div>
 		</div>
 	</div>);
