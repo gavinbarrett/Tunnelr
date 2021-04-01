@@ -47,7 +47,6 @@
 	transition: all 0.5s ease-in-out;
 	display: flex;
 	align-items: center;
-	background: green;
 }
 
 .add-channelexpanded {
@@ -55,7 +54,8 @@
 	height: 12vh;
 	display: flex;
 	align-items: center;
-	background: green;
+	background: black;
+	color: white;
 	font-size: 1.5rem;
 	cursor: default;
 	padding-left: 2vw;
@@ -63,11 +63,23 @@
 }
 
 .add-channelexpanded:hover {
-	background: blue;
+	background: #7209B7;
+	color: white;
 }
 
 .add-channelexpanded > * {
 	cursor: default;
+}
+
+.channel-banner {
+	width: 20vw;
+	height: 8vh;
+	background: #ffffff;
+	border-radius: 40px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #7209B7;
 }
 
 .prompt {
@@ -100,7 +112,7 @@
 	height: 100%;
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-evenly;
 	align-items: center;
 }
 
@@ -108,14 +120,14 @@
 	width: 40vw;
 	border: 0;
 	border-radius: 35px;
-	padding: 0.5rem;
+	padding: 1rem;
 	font-size: 1.25rem;
 	outline: none;
 }
 
 #form > label {
 	font-family: 'Inconsolata', monospace;
-	font-size: 1.5rem;
+	font-size: 1.75rem;
 }
 
 #form > select {
@@ -211,12 +223,12 @@
 }
 
 .chatmenu {
-	background: yellow;
+	background: black;
+	color: white;
 }
 
 .addchannel {
-	background: magenta;
-	color: white;
+	background: black;
 }
 
 #message-box {

@@ -10,18 +10,28 @@ header {
 }
 
 #header-links {
-	width: 20vw;
+	width: 30vw;
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
 }
 
 #header-links > a {
+	width: 15vw;
+	height: 10vh;
 	text-decoration: none;
 	color: white;
 	display: flex;
+	justify-content: center;
+	align-items: center;
 	font-size: 1.5rem;
-	margin-right: 3vw;
+	overflow-x: hidden;
+	transition: all 0.5s ease-in-out;
+}
+
+#header-links > a:hover {
+	background: black;
+	cursor: default;
 }
 
 #home-link {

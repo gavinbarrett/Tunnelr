@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { LandingPage } from './components/LandingPage';
 import { SignUp } from './components/SignUp';
 import { SignIn } from './components/SignIn';
+import { Account } from './components/Account';
 import { Chat } from './components/Chat';
 import './components/sass/App.scss';
 
@@ -30,11 +31,12 @@ const App = () => {
 		}
 	}
 	return (<div className="app-wrapper">
-		<Header loggedIn={loggedIn}/>
+		<Header user={user} loggedIn={loggedIn}/>
 		<Router.Switch>
 			<Router.Route path="/" exact render={() => <LandingPage loggedIn={loggedIn}/>}/>
 			<Router.Route path="/signup" render={() => <SignUp/>}/>
 			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
+			<Router.Route path="/account" render={() => <Account/>}/>
 			<Router.Route path="/chat">
 				{loggedIn ? <Chat user={"gavunb"}/> : <Router.Redirect to="/signin"/>}
 			</Router.Route>

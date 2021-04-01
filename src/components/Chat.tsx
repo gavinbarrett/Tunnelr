@@ -133,7 +133,11 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 	return (<div className={`channel-bar ${expanded}`}>
 		<div id="box" onClick={alter}>{">"}</div>
 		<div className={`add-channel${expanded} chatmenu`} onClick={upHome}>{"Chat Menu"}</div>
-		<div className={`add-channel${expanded} addchannel`} onClick={upPrompt}>{"+ Add Channel"}</div>
+		<div className={`add-channel${expanded} addchannel`} onClick={upPrompt}>
+			<div className="channel-banner">
+				{"+ Add Channel"}
+			</div>
+		</div>
 		{userChannels.length ? userChannels.map((elem, idx) => {
 			return <div key={idx} className={`add-channel${expanded}`} onClick={upPage(elem.channelname)}>{elem.channelname}</div>
 		}) : ''}

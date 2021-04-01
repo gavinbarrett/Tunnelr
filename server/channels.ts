@@ -15,7 +15,7 @@ export const addChannel = async (req, res) => {
 		// ensure channel doesn't already exist
 		const exists = await checkForChannel(channelName);
 		console.log(exists.rows);
-		if (exists.rows.length !== 0) {
+		if (exists && exists.rows.length !== 0) {
 			console.log("Channel already exists");
 			res.send(JSON.stringify({"status": "failed"}));
 		} else {
@@ -52,7 +52,8 @@ export const getMessages = async (req, res) => {
 	const p = new URLSearchParams(uobj.search);
 	const roomid = p.get("roomID");
 	const allMessages = await db.xread(roomid, 0);
-	res.send(JSON.stringify({"status": allMessages[0]}));
+	if (!allMessages || allMessages.length === 0) res.send(JSON.stringify({"status": "failed"}));
+	else res.send(JSON.stringify({"status": allMessages[0]}));
 }
 
 export const getUpdatedMessages = async (req, res) => {
@@ -65,7 +66,8 @@ export const getUpdatedMessages = async (req, res) => {
 	console.log(`messageid: ${messageid}`);
 	const newMessages = await db.xread(channelName, messageid);
 	console.log(newMessages);
-	res.send(JSON.stringify({"status": newMessages}));
+	if (!newMessages || newMessages.length === 0) res.send(JSON.stringify({"status": "failed"}));
+	else res.send(JSON.stringify({"status": newMessages}));
 }
 
 export const queryChannel = async (req, res) => {
