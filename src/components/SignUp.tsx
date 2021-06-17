@@ -1,12 +1,14 @@
 import * as React from 'react';
+import * as Router from 'react-router-dom';
 import { Footer } from './Footer';
 import './sass/SignUp.scss';
 
-export const SignUp = () => {
+export const SignUp = ({updateLoggedIn, updateUser}) => {
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const [rePassword, updateRePassword] = React.useState('');
 	const [email, updateEmail] = React.useState('');
+	const pageHistory = Router.useHistory();
 	const userRegex = /^[a-z0-9]+$/i;
 	const emailRegex = /^[a-z0-9]+@\.[a-z]$/i;
 
@@ -15,7 +17,10 @@ export const SignUp = () => {
 		if (await validCredentials()) {
 			const resp = await fetch("/signup", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password, "email": email})});
 			const r = await resp.json();
-			console.log(r);
+			if (r["status"] === "failed") return;
+			updateLoggedIn(true);
+			updateUser(r["status"]);
+			pageHistory.push("/");
 		} else {
 			// FIXME: update the Error component with the correct error
 			console.log("Credentials are not valid");
@@ -39,13 +44,13 @@ export const SignUp = () => {
 	return (<><div id="signup-wrapper">
 		<div id="signup-box">
 			<div id="signup-title"></div>
-			<label for="username">Username</label>
+			<label htmlFor="username">Username</label>
 			<input name="username" placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
-			<label for="password">Password</label>
+			<label htmlFor="password">Password</label>
 			<input name="password" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updatePassword(e.target.value)}/>
-			<label for="rePassword">Re-enter Password</label>
+			<label htmlFor="rePassword">Re-enter Password</label>
 			<input name="rePassword" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updateRePassword(e.target.value)}/>
-			<label for="email">Email</label>
+			<label hmltFor="email">Email</label>
 			<input name="email" placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
 			<button onClick={attemptSignUp}>{"Sign Up"}</button>
 		</div>

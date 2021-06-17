@@ -2,17 +2,17 @@ import * as db from './databaseFunctions';
 
 export const queryFriend = async (req, res) => {
 	const { username } = req.body;
-	console.log(username);
+	console.log(`In QF: ${username}`);
 	// FIXME: input validation
-	const userReg = /^[a-z0-9]{4,32}$/i;
-	const user = username.substring(1);
-	if (!user.match(userReg)) {
+	const userReg = /^[a-z0-9]{2,32}$/i;
+	if (!username.match(userReg)) {
 		res.send(JSON.stringify({"status": "failed"}));
 	} else {
 		// query the user
 		const query = 'select username from users where username ~* $1';
-		const values = [user];
+		const values = [username];
 		const users = await db.query(query, values);
+		console.log(`Users: ${users}`);
 		if (!users) {
 			res.send(JSON.stringify({"status": "failed"}));
 		} else {

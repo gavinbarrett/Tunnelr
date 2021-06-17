@@ -96,6 +96,15 @@ export const signUserUp = async (req, res) => {
 			// if the user doesn't exist, attempt to sign them up
 			const userAdded = addUser(user, pass, email);
 			if (userAdded) {
+				console.log(`Signing up new user ${user}`);
+				const id = await createSessionID();
+				const clientData = {
+					user: user,
+					sessionid: id
+				};
+				// set session id
+				db.set(id, user, 'EX', expiry);
+				res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
 				res.send(JSON.stringify({"status": user}));
 			} else {
 				res.send(JSON.stringify({"status": "failed"}));

@@ -1,0 +1,86 @@
+.prompt {
+	opacity: 0%;
+	position: absolute;
+	width: 100vw;
+	height: 90vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: rgba(255, 255, 255, 0.8);
+	pointer-events: none;
+	z-index: 3;
+	transition: all 0.3s ease-in-out;
+}
+
+.prompt-box {
+	opacity: 0%;
+	width: 70vw;
+	height: 80vh;
+	background: #7209B7;
+	border-radius: 35px;
+	pointer-events: none;
+	z-index: 4;
+	transition: all 0.3s ease-in-out;
+}
+
+.prompt-box > #form {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+#form > input {
+	width: 40vw;
+	border: 0;
+	border-radius: 35px;
+	padding: 1rem;
+	font-size: 1.25rem;
+	outline: none;
+}
+
+#form > label {
+	font-family: 'Inconsolata', monospace;
+	font-size: 1.75rem;
+}
+
+#form > select {
+	appearance: none;
+	width: 15vw;
+	height: 10vh;
+	font-size: 1rem;
+	border: 0;
+	border-radius: 35px;
+	padding: 1rem;
+	background: red;
+	color: white;
+}
+
+#form > button {
+	width: 20vw;
+	height: 8vh;
+	border: 0;
+	color: #f0efeb;
+	background: blue;
+	border-radius: 35px;
+}
+
+#exit {
+	width: 3rem;
+	height: 3rem;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: absolute;
+	left: 90%;
+	top: 5%;
+	font-size: 2rem;
+	transition: all 0.15s ease-in-out;
+}
+
+#exit:hover {
+	cursor: default;
+	font-size: 2.5rem;
+}

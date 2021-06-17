@@ -34,9 +34,9 @@ const App = () => {
 		<Header user={user} loggedIn={loggedIn}/>
 		<Router.Switch>
 			<Router.Route path="/" exact render={() => <LandingPage loggedIn={loggedIn}/>}/>
-			<Router.Route path="/signup" render={() => <SignUp/>}/>
+			<Router.Route path="/signup" render={() => <SignUp updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
 			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
-			<Router.Route path="/account" render={() => <Account/>}/>
+			<Router.Route path="/account" render={() => <Account user={user}/>}/>
 			<Router.Route path="/chat">
 				{loggedIn ? <Chat user={"gavunb"}/> : <Router.Redirect to="/signin"/>}
 			</Router.Route>

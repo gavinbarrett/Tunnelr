@@ -6,6 +6,7 @@ import * as db from './server/databaseFunctions';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, loadChannels, queryChannel } from './server/channels';
 import { queryFriend } from './server/friends';
+import { loadAccount } from './server/accounts';
 import * as url from 'url';
 import * as WebSocket from 'ws';
 
@@ -28,6 +29,7 @@ app.post('/signin', signUserIn);
 /* authenticated functions */
 app.get('/getsession', authenticateUser, retrieveSession);
 app.get('/loadchannels', authenticateUser, loadChannels);
+app.get('/loadaccount', authenticateUser, loadAccount);
 app.get('/getmessages', authenticateUser, getMessages);
 app.get('/getupdatedmessages', authenticateUser, getUpdatedMessages);
 app.post('/queryfriend', authenticateUser, queryFriend);
@@ -48,8 +50,6 @@ wss.on('connection', async (ws:WebSocket, req) => {
 		console.log(`Receiving message on channel ${roomid}`);
 		const { sender, message } = JSON.parse(data.toString('utf-8'));
 		db.xadd(roomid, message, sender);
-		//console.log(parsed);
-		//const { sender, message } = data.data;
 		console.log(`${sender} sent:> ${message}`);
 	});
 	ws.on('close', () => {

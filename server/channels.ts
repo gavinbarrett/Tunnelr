@@ -4,6 +4,7 @@ import * as db from './databaseFunctions';
 
 export const addChannel = async (req, res) => {
 	const { channelName, access, credentials } = req.body;
+	const user = req.cookies.sessionID.user;
 	console.log(`Channel Name: ${channelName}`);
 	console.log(`Access level: ${access}`);
 	// FIXME: perform input validation on access and credentials fields
@@ -22,7 +23,14 @@ export const addChannel = async (req, res) => {
 			const added = insertNewChannel(channelName, access, credentials);
 			if (added) {
 				console.log(`Channel ${channelName} added.`);
-				res.send(JSON.stringify({"status": "success"}));
+				// FIXME: add user to channel
+				const ir = await insertNewMember(channelName, user);
+				if (!ir) {
+					console.log('Could not add member to channel.');
+					res.send(JSON.stringify({"status": "success"}));
+				} else {
+					res.send(JSON.stringify({"status": "success"}));
+				}
 			} else {
 				console.log(`Couldn't add channel.`);
 				res.send(JSON.stringify({"status": "failed"}));
@@ -39,6 +47,7 @@ export const loadChannels = async (req, res) => {
 		const query = 'select channelname from members where username=$1';
 		const values = [user];
 		const channels = await db.query(query, values);
+		console.log(`Channels: ${channels.rows}`);
 		if (channels && channels.rows.length !== 0)
 			res.send(JSON.stringify({"status": channels.rows}));
 		else
@@ -103,6 +112,19 @@ const insertNewChannel = async (channelName, access, credentials) => {
 		else return true;
 	} catch (err) {
 		console.log(`Error adding channel: ${err}`);
+		return false;
+	}
+}
+
+const insertNewMember = async (channelname, user) => {
+	const values = [channelname, user];
+	const query = `insert into members (channelname, username) values ($1, $2)`;
+	try {
+		const added = await db.query(query, values);
+		if (!added) return false;
+		return true;
+	} catch(err) {
+		console.log(`Error adding member to channel: ${err}`);
 		return false;
 	}
 }
