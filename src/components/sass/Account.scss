@@ -104,6 +104,8 @@ img#profile {
 	width: 80vw;
 	height: 90vh;
 	background: coral;
+	display: flex;
+	flex-direction: column;
 }
 
 #homepage {
@@ -124,4 +126,55 @@ img#profile {
 	display: flex;
 	align-items: center;
 	padding-left: 1rem;
+}
+
+#joined-date {
+	width: 25vw;
+	height: 10vh;
+	text-align: center;
+	color: white;
+	border: 0;
+	font-family: 'Inconsolata', monospace;
+	font-size: 1.5rem;
+	margin: 1.25rem;
+}
+
+#account-controller {
+	display: flex;
+	flex-direction: column;
+	padding-left: 10vw;
+}
+
+#account-controller > button {
+	width: 25vw;
+	height: 10vh;
+	text-align: center;
+	color: white;
+	border: 0;
+	border-radius: 25px;
+	font-family: 'Inconsolata', monospace;
+	font-size: 1.2rem;
+	margin: 0.6em;
+}
+
+button#change-password {
+	background: navy;
+}
+
+button#change-profile {
+	background: navy;
+}
+
+button#leave-channel {
+	background: navy;
+}
+
+button#delete-channel {
+	background: red;
+	font-weight: bold;
+}
+
+button#delete-account {
+	background: red;
+	font-weight: bold;
 }

@@ -54,6 +54,8 @@ const Selector = ({updateSelf, name, user}) => {
 const HomePage = ({name, user}) => {
 	React.useEffect(() => {
 		console.log(`Name: ${name}\nUser: ${user.user}`);
+		// FIXME: grab account info - profile pic, joined date, and friends list
+		// make an endpoint at /get_account_info/${user}
 	}, []);
 	return (<div id="account-wrapper">
 		<div id="account-home">
@@ -76,12 +78,29 @@ const HomePage = ({name, user}) => {
 	</div>);
 }
 
-const Settings = name => {
-	return (<div id="settings-page">
-		{"settings"}
+const JoinedDate = ({date}) => {
+	return (<div id="joined-date">
+		{date}
 	</div>);
 }
 
-const FriendStatus = (name, friend) => {
+const AccountController = () => {
+	return (<div id="account-controller">
+		<button id="change-password">{"Change Password"}</button>
+		<button id="change-profile">{"Change Profile"}</button>
+		<button id="leave-channel">{"Leave Channel"}</button>
+		<button id="delete-channel">{"Delete Channel"}</button>
+		<button id="delete-account">{"Delete Account"}</button>
+	</div>);
+}
+
+const Settings = name => {
+	return (<div id="settings-page">
+		<JoinedDate date={'XX-XX-XXXX'}/>
+		<AccountController/>
+	</div>);
+}
+
+const FriendStatus = ({name, friend}) => {
 	return (<div id="befriend">{"Add Friend"}</div>);
 }
