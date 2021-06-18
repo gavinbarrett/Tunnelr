@@ -134,7 +134,10 @@ export const Chat = ({user}) => {
 	}
 
 	const setSocket = id => {
-		if (wsocket.current) wsocket.current.close()
+		if (wsocket.current) {
+			wsocket.current.close();
+			console.log('Closed websocket connection.');
+		}
 		console.log(`Opening channel: ${id}`);
 		wsocket.current = new WebSocket(`ws://192.168.1.98:8080/?roomID=${id}`);
 		console.log(`Channel ${id} established.`);

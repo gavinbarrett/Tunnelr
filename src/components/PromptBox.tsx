@@ -6,13 +6,19 @@ export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
 	const [privacy, updatePrivacy] = React.useState('Private');
 	const [credentials, updateCredentials] = React.useState('');
 	const addChannel = async () => {
-		//if (!channelName.match(/^@[a-z0-9]{5,32}$/)) return;
+		if (!channelName.match(/^@[a-z0-9]{5,32}$/)) return;
 		const resp = await fetch("/addchannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelName": channelName, "access": privacy, "credentials": credentials})});
 		const r = await resp.json();
 		console.log(r["status"]);
 		if (r["status"] === "success") {
+			// load the new channel
 			loadChannels();
+			// hide the prompt box
 			updatePrompt('');
+			// reset channel variables
+			updateChannelName('');
+			updatePrivacy('Private');
+			updateCredentials('');
 		}
 	}
 	const up = event => {
@@ -32,15 +38,15 @@ export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
 		<div className={`prompt-box ${showing}`}>
 			<div id="form">
 				<label htmlFor="channelname">{"Channel Name"}</label>
-				<input name="channelname" onChange={up}/>
+				<input name="channelname" onChange={up} value={channelName}/>
 				<label htmlFor="authreq">{"Auth Requirements"}</label>
-				<select name="authreq" onChange={upPriv}>
+				<select name="authreq" onChange={upPriv} value={privacy}>
 					<option>{"Private"}</option>
 					<option>{"Public"}</option>
 				</select>
 				{(privacy === 'Private') ?
 					<><label htmlFor="credentials">{"Access code"}</label>
-					<input name="credentials" onChange={upCred}/></> : ''
+					<input name="credentials" onChange={upCred} value={credentials}/></> : ''
 				}
 				<button onClick={addChannel}>{"Create Channel"}</button>
 			</div>

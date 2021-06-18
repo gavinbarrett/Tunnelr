@@ -15,11 +15,14 @@
 	border-radius: 10px;
 	display: flex;
 	flex-direction: column-reverse;
+	justify-content: center;
+	align-items: center;
 	overflow-y: scroll;
 	overflow-anchor: auto;
 }
 
 .message-snippet {
+	width: 62vw;
 	background: #ADD8E6;
 	border-radius: 15px;
 	padding: 1.5rem;
@@ -39,4 +42,16 @@ button#sendmessage {
 	width: 10vw;
 	height: 8vh;
 	border-radius: 15px;
+}
+
+#no-messages {
+	width: 45vw;
+	height: 60vh;
+	color: black;
+	font-family: 'Inconsolata', monospace;
+	font-size: 3rem;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }

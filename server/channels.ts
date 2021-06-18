@@ -61,7 +61,8 @@ export const getMessages = async (req, res) => {
 	const p = new URLSearchParams(uobj.search);
 	const roomid = p.get("roomID");
 	const allMessages = await db.xread(roomid, 0);
-	if (!allMessages || allMessages.length === 0) res.send(JSON.stringify({"status": "failed"}));
+	console.log(`Got messages: ${allMessages}`);
+	if (!allMessages || allMessages.length === 0) res.send(JSON.stringify({"status": "none"}));
 	else res.send(JSON.stringify({"status": allMessages[0]}));
 }
 
@@ -74,7 +75,7 @@ export const getUpdatedMessages = async (req, res) => {
 	console.log(`channelName: ${channelName}`);
 	console.log(`messageid: ${messageid}`);
 	const newMessages = await db.xread(channelName, messageid);
-	console.log(newMessages);
+	console.log(`Messages: ${newMessages}`);
 	if (!newMessages || newMessages.length === 0) res.send(JSON.stringify({"status": "failed"}));
 	else res.send(JSON.stringify({"status": newMessages}));
 }
@@ -142,10 +143,6 @@ const hashChannelCredentials = async pass => {
 			}
 		})
 	});
-}
-
-const getUserChannels = async user => {
-	
 }
 
 export const checkForChannel = async channelName => {

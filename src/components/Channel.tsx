@@ -8,18 +8,16 @@ export const Channel = ({sender, id, wsocket}) => {
 
 	React.useEffect(() => {
 		getChannelMessages();
-        return () => {
-            // close websocket connection
-            wsocket.current.close();
-        }
-	}, []);
+	}, [id]);
 	const getChannelMessages = async () => {
 		console.log("grabbing messages");
 		const resp = await fetch(`/getmessages/?roomID=${id}`, {method: "GET"});
 		const r = await resp.json();
 		console.log(r["status"]);
-		if (r["status"] === "failed") return;
-		else {
+		if (r["status"] === "none") {
+			updateLastMessage('0');
+			updateChannelMessages([]);
+		} else {
 			const allmessages = r["status"][1];
 			const last = allmessages[allmessages.length - 1];
 			// store most recent message id
@@ -61,12 +59,19 @@ export const Channel = ({sender, id, wsocket}) => {
 		<div id="message-box">
 			{channelMessages.length ? channelMessages.map((elem, index) => {
 				return <div key={index} className="message-snippet">{elem[1][1]}</div>
-			}) : 'No messages found.'}
+			}) : <NoMessages/>}
 			<div id="anchor"></div>
 		</div>
 		<div id="inputbox">
 			<textarea placeholder={"Write your message here"} onChange={changeMessage} value={message}/>
 			<button id="sendmessage" onClick={sendMessage}>{"Send"}</button>
 		</div>
+	</div>);
+}
+
+const NoMessages = () => {
+	return (<div id="no-messages">
+		<p>{"No messages found."}</p>
+		<p>{"Be the first one!"}</p>
 	</div>);
 }

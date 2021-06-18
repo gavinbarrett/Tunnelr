@@ -41,5 +41,5 @@ export const xadd = (channelName, message, sender) => {
 }
 
 export const xread = (channelName, id) => {
-	return redisClient.xread("BLOCK", 10000, "STREAMS", channelName, id);
+	return redisClient.xread("BLOCK", 10, "STREAMS", channelName, id);
 }

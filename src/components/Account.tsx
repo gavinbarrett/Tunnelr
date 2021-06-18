@@ -5,6 +5,7 @@ import './sass/Account.scss';
 
 export const Account = user => {
 	const [name, updateName] = React.useState('');
+	const [self, updateSelf] = React.useState(true);
 	const loc = useLocation();
 
 	React.useEffect(() => {
@@ -15,49 +16,45 @@ export const Account = user => {
 			updateName(username);
 		} else
 			return;
-		if (username === user.user)
+		//updatePage(<HomePage name={name} user={user.user}/>);
+		if (username === user.user) {
+			// FIXME: retrieve self data
 			console.log(`Usernames match.`);
-		else
+		} else {
+			// FIXME: retrieve another's data
 			console.log(`Usernames do not match.`);
+		}
 	}, []);
 
 	return (<><div id="account-page">
 		<div id="side">
+			{name === user.user ? <Selector updateSelf={updateSelf} name={name} user={user}/> : ''}
 		</div>
-		<div id="account-wrapper">
-			<div id="account-home">
-				<div id="account-name">
-					{name}
-				</div>
-				<div id="account-pic">
-					<div id="pic-container">
-						<img id="profile" src=""></img>
-					</div>
-				</div>
-				<div id="account-date">{"Joined XX-XX-XX"}</div>
-				{/*name != user ? <FriendStatus name={name} friend={user}/> : ''*/}
-			</div>
-			<div id="account-friends">
-				<div id="friends-list">
-					{"Friends"}
-				</div>
-			</div>
-		</div>);
+		{self ? <HomePage name={name} user={user}/> : <Settings name={name}/>}
 	</div>
 	<Footer/></>);
 }
 
-const Selector = (page, updatePage, name, user) => {
-	return (<><div id="homepage" onClick={() => updatePage(<HomePage name={name} user={user}/>)}>
+const FriendsList = () => {
+	return (<div id="friends-list">
+	{"Friends"}
+	</div>);
+}
+
+const Selector = ({updateSelf, name, user}) => {
+	return (<><div id="homepage" onClick={() => updateSelf(true)}>
 		{"Home Page"}
 	</div>
-	<div id="settings" onClick={() => updatePage(<Settings name={name}/>)}>
+	<div id="settings" onClick={() => updateSelf(false)}>
 		{"Settings"}
 	</div>
 	</>);
 }
 
-const HomePage = (name, user) => {
+const HomePage = ({name, user}) => {
+	React.useEffect(() => {
+		console.log(`Name: ${name}\nUser: ${user.user}`);
+	}, []);
 	return (<div id="account-wrapper">
 		<div id="account-home">
 			<div id="account-name">
@@ -69,7 +66,7 @@ const HomePage = (name, user) => {
 				</div>
 			</div>
 			<div id="account-date">{"Joined XX-XX-XX"}</div>
-			{/*name != user ? <FriendStatus name={name} friend={user}/> : ''*/}
+			{name != user.user ? <FriendStatus name={name} friend={user}/> : ''}
 		</div>
 		<div id="account-friends">
 			<div id="friends-list">
