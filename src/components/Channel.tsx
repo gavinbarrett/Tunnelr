@@ -1,12 +1,13 @@
 import * as React from 'react';
 import './sass/Channel.scss';
 
-export const Channel = ({sender, id, wsocket}) => {
+export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 	const [message, updateMessage] = React.useState('');
 	const [channelMessages, updateChannelMessages] = React.useState([]);
 	const [lastMessage, updateLastMessage] = React.useState('0');
 
 	React.useEffect(() => {
+		console.log(`Sender: ${sender}`);
 		getChannelMessages();
 	}, [id]);
 	const getChannelMessages = async () => {
@@ -55,10 +56,11 @@ export const Channel = ({sender, id, wsocket}) => {
 	const changeMessage = event => {
 		updateMessage(event.target.value);
 	}
-	return (<div className="channel">
+	return (<div className={`channel ${minimized}`}>
 		<div id="message-box">
 			{channelMessages.length ? channelMessages.map((elem, index) => {
-				return <div key={index} className="message-snippet">{elem[1][1]}</div>
+				console.log(`Elem: ${channelMessages}`);
+				return <div key={index} className="message-snippet"><p>{elem[1][1]}</p><p>{elem[1][3]}</p></div>
 			}) : <NoMessages/>}
 			<div id="anchor"></div>
 		</div>

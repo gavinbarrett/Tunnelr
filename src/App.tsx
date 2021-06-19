@@ -38,7 +38,7 @@ const App = () => {
 			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
 			<Router.Route path="/account" render={() => <Account user={user}/>}/>
 			<Router.Route path="/chat">
-				{loggedIn ? <Chat user={"gavunb"}/> : <Router.Redirect to="/signin"/>}
+				{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}
 			</Router.Route>
 		</Router.Switch>
 	</div>);

@@ -15,7 +15,7 @@
 	transition: all 0.5s ease-in-out;
 }
 
-#chat-menu {
+.chat-menu {
 	width: 95vw;
 	height: 90vh;
 	background: coral;
@@ -27,6 +27,10 @@
 	width: 35vw;
 	overflow-y: scroll;
 	scrollbar-width: thin;
+}
+
+.minimized {
+	width: 65vw;
 }
 
 #box {
@@ -173,7 +177,7 @@
 }
 
 #inputbox {
-	width: 72vw;
+	width: 100%;
 	height: 15vh;
 	display: flex;
 }

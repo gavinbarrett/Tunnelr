@@ -16,7 +16,6 @@ export const Account = user => {
 			updateName(username);
 		} else
 			return;
-		//updatePage(<HomePage name={name} user={user.user}/>);
 		if (username === user.user) {
 			// FIXME: retrieve self data
 			console.log(`Usernames match.`);
@@ -55,8 +54,13 @@ const HomePage = ({name, user}) => {
 	React.useEffect(() => {
 		console.log(`Name: ${name}\nUser: ${user.user}`);
 		// FIXME: grab account info - profile pic, joined date, and friends list
-		// make an endpoint at /get_account_info/${user}
-	}, []);
+		grabUserInfo(name);
+	}, [name]);
+	const grabUserInfo = async name => {
+		const resp = await fetch(`/loaduserinfo`, {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"account": name})});
+		const r = resp.json();
+		console.log(`r: ${r}`);
+	}
 	return (<div id="account-wrapper">
 		<div id="account-home">
 			<div id="account-name">

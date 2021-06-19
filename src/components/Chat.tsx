@@ -4,13 +4,15 @@ import { Channel } from './Channel';
 import { PromptBox } from './PromptBox';
 import './sass/Chat.scss';
 
-const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket}) => {
+const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket, minimized, updateMinimized}) => {
 	const [id, updateID] = React.useState();
+
 	React.useEffect(() => {}, []);
 
 	const alter = () => {
 		// toggle expanding sidebar on and off
 		expanded.length ? updateExpanded('') : updateExpanded('expanded');
+		expanded.length ? updateMinimized('minimized') : updateMinimized('');
 	}
 	const upPrompt = () => {
 		// toggle 
@@ -20,14 +22,14 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 	const upPage = value => () => {
 		if (expanded.length) {
 			// display the channel page
-			updatePage(<Channel sender={user} id={value} wsocket={wsocket}/>);
+			updatePage(<Channel sender={user} id={value} wsocket={wsocket} minimized={minimized} updateMinimized={updateMinimized}/>);
 			// open a websocket on the {value} channel
 			setSocket(value);
 		}
 	}
 	const upHome = () => {
 		if (expanded.length)
-			updatePage(<ChatMenu/>);
+			updatePage(<ChatMenu minimized={minimized} updateMinimized={updateMinimized}/>);
 	}
 	return (<div className={`channel-bar ${expanded}`}>
 		<div id="box" onClick={alter}>{">"}</div>
@@ -43,7 +45,7 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 	</div>);
 }
 
-const ChatMenu = () => {
+const ChatMenu = ({minimized, updateMinimized}) => {
 	const [friendSearchList, updateFriendSearchList] = React.useState([]);
 	const [channelSearchList, updateChannelSearchList] = React.useState([]);
 	const history = useHistory();
@@ -85,7 +87,7 @@ const ChatMenu = () => {
 		history.push(`/account/${user}`);
 	}
 
-	return(<div id="chat-menu">
+	return(<div className={`chat-menu ${minimized}`}>
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
 			<div className="search-box-wrapper">
@@ -116,8 +118,9 @@ export const Chat = ({user}) => {
 	const [expanded, updateExpanded] = React.useState('');
 	const [prmpt, updatePrompt] = React.useState('');
 	const [userChannels, updateUserChannels] = React.useState([]);
-	const [page, updatePage] = React.useState(<ChatMenu/>);
 	const [channelID, updateChannelID] = React.useState('');
+	const [minimized, updateMinimized] = React.useState('');
+	const [page, updatePage] = React.useState(<ChatMenu minimized={minimized} updateMinimized={updateMinimized}/>);
 	const wsocket = React.useRef(null);
 
 	React.useEffect(() => {
@@ -149,7 +152,7 @@ export const Chat = ({user}) => {
 		that we're passing down the app
 	*/
 	return (<div id="chat-wrapper">
-		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user} setSocket={setSocket} wsocket={wsocket}/>
+		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user} setSocket={setSocket} wsocket={wsocket} minimized={minimized} updateMinimized={updateMinimized}/>
 			{page}
 		<PromptBox showing={prmpt} updatePrompt={updatePrompt} loadChannels={loadUserChannels}/>
 	</div>);
