@@ -9,7 +9,15 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 	React.useEffect(() => {
 		console.log(`Sender: ${sender}`);
 		getChannelMessages();
+		establishWSocket();
 	}, [id]);
+
+	const establishWSocket = async () => {
+		wsocket.current.onopen = () => console.log('Opening socket connection.');
+		wsocket.current.onmessage = message => console.log(`Message received: ${message.data}`);
+		wsocket.current.onclose = () => console.log('Closing socket connection.');
+	}
+	
 	const getChannelMessages = async () => {
 		console.log("grabbing messages");
 		const resp = await fetch(`/getmessages/?roomID=${id}`, {method: "GET"});

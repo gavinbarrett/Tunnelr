@@ -6,10 +6,10 @@ import './sass/Chat.scss';
 
 const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket, minimized, updateMinimized}) => {
 	const [id, updateID] = React.useState();
-
+	const [activeChannel, updateActiveChannel] = React.useState('');
 	React.useEffect(() => {}, []);
 
-	const alter = () => {
+	const switchPage = () => {
 		// toggle expanding sidebar on and off
 		expanded.length ? updateExpanded('') : updateExpanded('expanded');
 		expanded.length ? updateMinimized('minimized') : updateMinimized('');
@@ -32,11 +32,11 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 			updatePage(<ChatMenu minimized={minimized} updateMinimized={updateMinimized}/>);
 	}
 	return (<div className={`channel-bar ${expanded}`}>
-		<div id="box" onClick={alter}>{">"}</div>
+		<div id="box" onClick={switchPage}>{">"}</div>
 		<div className={`add-channel${expanded} chatmenu`} onClick={upHome}>{"Chat Menu"}</div>
 		<div className={`add-channel${expanded} addchannel`} onClick={upPrompt}>
 			<div className="channel-banner">
-				{"+ Add Channel"}
+				{"+ New Channel"}
 			</div>
 		</div>
 		{userChannels.length ? userChannels.map((elem, idx) => {
@@ -81,12 +81,10 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 			else updateChannelSearchList(r["status"]);
 		}
 	}
-
 	const showUser = user => {
 		console.log(`Showing ${user}`);
 		history.push(`/account/${user}`);
 	}
-
 	return(<div className={`chat-menu ${minimized}`}>
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
@@ -142,6 +140,7 @@ export const Chat = ({user}) => {
 			console.log('Closed websocket connection.');
 		}
 		console.log(`Opening channel: ${id}`);
+		// establish websocket connection
 		wsocket.current = new WebSocket(`ws://192.168.1.98:8080/?roomID=${id}`);
 		console.log(`Channel ${id} established.`);
 	}
