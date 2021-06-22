@@ -13,10 +13,11 @@ export const SignIn = ({updateLoggedIn, updateUser}) => {
 		if (await validCredentials()) {
 			const resp = await fetch("/signin", { method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password}) });
 			const r = await resp.json();
-			console.log(r);
+			console.log(r["status"]);
 			if (r["status"] !== "failed") {
 				console.log(`Logging in as ${r["status"]}`);
 				updateLoggedIn(true);
+				//console.log(`Log in status: ${Object.getOwnPropertyNames(r["status"])}`);
 				updateUser(r["status"]);
 				history.push("/");
 			}

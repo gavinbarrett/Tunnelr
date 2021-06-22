@@ -1,9 +1,10 @@
 import * as React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { Footer } from './Footer';
+import '../../dist/blank.png'
 import './sass/Account.scss';
 
-export const Account = user => {
+export const Account = ({user, updateUser, updateLoggedIn}) => {
 	const [name, updateName] = React.useState('');
 	const [self, updateSelf] = React.useState(true);
 	const loc = useLocation();
@@ -11,7 +12,7 @@ export const Account = user => {
 	React.useEffect(() => {
 		const username = loc.pathname.split('/')[2];
 		// FIXME: download user's account data
-		console.log(`Username: ${username}\nUser: ${user.user}`);
+		console.log(`Username: ${username}\nUser: ${user}`);
 		if (username) {
 			updateName(username);
 		} else
@@ -27,7 +28,7 @@ export const Account = user => {
 
 	return (<><div id="account-page">
 		<div id="side">
-			{name === user.user ? <Selector updateSelf={updateSelf} name={name} user={user}/> : ''}
+			{name === user ? <Selector updateSelf={updateSelf} updateUser={updateUser} updateLoggedIn={updateLoggedIn} name={name} user={user}/> : ''}
 		</div>
 		{self ? <HomePage name={name} user={user}/> : <Settings name={name}/>}
 	</div>
@@ -40,26 +41,54 @@ const FriendsList = () => {
 	</div>);
 }
 
-const Selector = ({updateSelf, name, user}) => {
-	return (<><div id="homepage" onClick={() => updateSelf(true)}>
+const Selector = ({updateSelf, updateUser, updateLoggedIn, name, user}) => {
+	const hist = useHistory();
+	const logUserOut = async () => {
+		console.log(`Logging out ${user.user}`);
+		const resp = await fetch('/logout', {method: "GET"});
+		const r = await resp.json();
+		console.log(r);
+		if (r["status"] === "logged out") {
+			// log user out of front end
+			updateUser('');
+			updateLoggedIn(false);
+			document.cookie = "";
+			// return to the landing page
+			hist.push('/');
+		}
+	}
+
+	return (<div id="self-sidebar"><div id="homepage" onClick={() => updateSelf(true)}>
 		{"Home Page"}
 	</div>
 	<div id="settings" onClick={() => updateSelf(false)}>
 		{"Settings"}
 	</div>
-	</>);
+	<div id="logout" onClick={logUserOut}>
+		{"Log Out"}
+	</div>
+	</div>);
 }
 
 const HomePage = ({name, user}) => {
+	const [initRender, updateInitRender] = React.useState(true);
+	const [joinedDate, updateJoinedDate] = React.useState(null);
 	React.useEffect(() => {
 		console.log(`Name: ${name}\nUser: ${user.user}`);
 		// FIXME: grab account info - profile pic, joined date, and friends list
-		grabUserInfo(name);
+		if (!initRender)
+			grabUserInfo(name);
+		else
+			updateInitRender(false);
+		return () => {
+			updateInitRender(true);
+		}
 	}, [name]);
 	const grabUserInfo = async name => {
-		const resp = await fetch(`/loaduserinfo`, {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"account": name})});
-		const r = resp.json();
-		console.log(`r: ${r}`);
+		const resp = await fetch(`/loaduserinfo/?name=${name}`, {method: 'GET'});
+		const r = await resp.json();
+		console.log(`r: ${r["joined"]}`);
+		updateJoinedDate(r["joined"]);
 	}
 	return (<div id="account-wrapper">
 		<div id="account-home">
@@ -68,11 +97,11 @@ const HomePage = ({name, user}) => {
 			</div>
 			<div id="account-pic">
 				<div id="pic-container">
-					<img id="profile" src=""></img>
+					<img id="profile" src="blank.png"></img>
 				</div>
 			</div>
-			<div id="account-date">{"Joined XX-XX-XX"}</div>
-			{name != user.user ? <FriendStatus name={name} friend={user}/> : ''}
+			<div id="account-date">{`Joined: ${joinedDate}`}</div>
+			{name != user ? <FriendStatus name={name} friend={user}/> : ''}
 		</div>
 		<div id="account-friends">
 			<div id="friends-list">

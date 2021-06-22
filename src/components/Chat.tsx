@@ -85,6 +85,10 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 		console.log(`Showing ${user}`);
 		history.push(`/account/${user}`);
 	}
+	const showChannel = channel => {
+		console.log(channel);
+		history.push(`/channel/${channel}`);
+	}
 	return(<div className={`chat-menu ${minimized}`}>
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
@@ -103,7 +107,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 				<input list="channel-search-list" className="search-box" id="channel-search" onChange={queryChannel}/>
 				<div id="channel-search-list">
 					{channelSearchList.length ? channelSearchList.map(elem => {
-						return <p className={"channel-sugg"}>{elem.channelname}</p>;
+						return <p className={"channel-sugg"} onClick={() => showChannel(elem.channelname)}>{elem.channelname}</p>;
 					}) : ''}
 				</div>
 			</div>

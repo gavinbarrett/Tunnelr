@@ -36,8 +36,9 @@ export const exists = id => {
 	return redisClient.exists(id);
 }
 
-export const xadd = (channelName, message, sender) => {
-	return redisClient.xadd(channelName, "*", "message", message, "sender", sender)
+export const xadd = (channelName, payload) => {
+	return redisClient.xadd(channelName, "*", "payload", payload)
+	//return redisClient.xadd(channelName, "*", "message", message, "sender", sender)
 }
 
 export const xread = (channelName, id) => {

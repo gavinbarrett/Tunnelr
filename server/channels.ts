@@ -55,6 +55,16 @@ export const loadChannels = async (req, res) => {
 	}
 }
 
+export const loadChannelInfo = async (req, res) => {
+	const channelName = req.query.channelname;
+	const exists = await checkForChannel(channelName);
+	const { channelname, accesslevel } = exists.rows[0];
+	const payload = `{"name": "${channelname}", "access": "${accesslevel}"}`;
+	console.log(payload);
+	// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
+	res.send(payload);
+}
+
 export const getMessages = async (req, res) => {
 	const uobj = url.parse(req.url);
 	const pathname = uobj.pathname;

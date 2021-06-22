@@ -8,58 +8,47 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 
 	React.useEffect(() => {
 		console.log(`Sender: ${sender}`);
-		getChannelMessages();
+		//getChannelMessages();
 		establishWSocket();
 	}, [id]);
 
 	const establishWSocket = async () => {
-		wsocket.current.onopen = () => console.log('Opening socket connection.');
-		wsocket.current.onmessage = message => console.log(`Message received: ${message.data}`);
-		wsocket.current.onclose = () => console.log('Closing socket connection.');
-	}
-	
-	const getChannelMessages = async () => {
-		console.log("grabbing messages");
-		const resp = await fetch(`/getmessages/?roomID=${id}`, {method: "GET"});
-		const r = await resp.json();
-		console.log(r["status"]);
-		if (r["status"] === "none") {
-			updateLastMessage('0');
-			updateChannelMessages([]);
-		} else {
-			const allmessages = r["status"][1];
-			const last = allmessages[allmessages.length - 1];
-			// store most recent message id
-			updateLastMessage(last[0]);
-			// update displayed messages
-			updateChannelMessages(allmessages.reverse());
+		wsocket.current.onopen = () => {
+			// FIXME: request data from channel
+			console.log('Opening socket connection.');
 		}
+		wsocket.current.onmessage = message => {
+			console.log(`Message received: ${message.data}`);
+			let payload = JSON.parse(message.data);
+			if (!payload) {
+				updateLastMessage('0');
+				updateChannelMessages([]);
+				return;
+			}
+			let p = payload[0];
+			// l[0][0] is the channel name; l[0][1] is the id and message payload
+			// p[0] is name of channel
+			// array of messages
+			const cd = p[1];
+			// last message
+			let last = cd[cd.length - 1];
+
+			console.log('Last message:');
+			console.log(`ID: ${last[0]}`);
+			if (last[0] != lastMessage) {
+				updateLastMessage(last[0]);
+				updateChannelMessages(channelMessages => [...cd.reverse(), ...channelMessages]);
+			}
+		}
+		wsocket.current.onclose = () => console.log('Closing socket connection.');
 	}
 	const sendMessage = async () => {
 		console.log('Firing sendmessage');
 		if (message === '') return;
 		// send message to the websocket server
-		wsocket.current.send(JSON.stringify({"sender": sender, "message": message}));
+		wsocket.current.send(JSON.stringify({"sender": sender, "message": message, "lastid": lastMessage}));
 		// clear the chat box
 		updateMessage('');
-		// FIXME: keep track of last message id and use it to pull all new messages
-		const resp = await fetch(`/getupdatedmessages/?roomID=${id}&lastmessage=${lastMessage}`, {method: "GET"});
-		const r = await resp.json();
-		console.log(r["status"]);
-		// messages are up to date
-		if (r["status"] === "failed") return;
-		else {
-			console.log("Updating message");
-			// new messages received from the server
-			const latest = r["status"][0][1];
-			console.log(`Latest: ${latest}`);
-			updateChannelMessages(channelMessages => [...latest.reverse(), ...channelMessages]);
-			updateLastMessage(latest[0][0]);
-			console.log(lastMessage);
-			console.log(channelMessages);
-			console.log(`Channel messages: ${channelMessages}`);
-			console.log(r);
-		}
 	}
 	const changeMessage = event => {
 		updateMessage(event.target.value);
@@ -67,8 +56,10 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 	return (<div className={`channel ${minimized}`}>
 		<div id="message-box">
 			{channelMessages.length ? channelMessages.map((elem, index) => {
-				console.log(`Elem: ${channelMessages}`);
-				return <div key={index} className="message-snippet"><p>{elem[1][1]}</p><p>{elem[1][3]}</p></div>
+				// interpret the UNIX timestamp in Pacific Time
+				let time = new Date(parseInt(elem[0]));
+				let data = JSON.parse(elem[1][1]);
+				return <div key={index} className="message-snippet"><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p>{data.sender}</p></p></div>
 			}) : <NoMessages/>}
 			<div id="anchor"></div>
 		</div>

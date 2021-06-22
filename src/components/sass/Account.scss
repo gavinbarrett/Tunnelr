@@ -108,7 +108,7 @@ img#profile {
 	flex-direction: column;
 }
 
-#homepage {
+#self-sidebar > * {
 	width: 100%;
 	height: 20vh;
 	font-family: 'Inconsolata', monospace;
@@ -116,16 +116,12 @@ img#profile {
 	display: flex;
 	align-items: center;
 	padding-left: 1rem;
+	transition: all 0.5s ease-in;
 }
 
-#settings {
-	width: 100%;
-	height: 20vh;
-	font-family: 'Inconsolata', monospace;
-	font-size: 1.5rem;
-	display: flex;
-	align-items: center;
-	padding-left: 1rem;
+#self-sidebar > *:hover {
+	background: purple;
+	transition: all 0.5s ease-in;
 }
 
 #joined-date {
