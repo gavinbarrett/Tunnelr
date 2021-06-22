@@ -1,7 +1,6 @@
 #chat-wrapper {
 	width: 100vw;
 	height: 90vh;
-	background: orange;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -184,8 +183,7 @@
 }
 
 #inputbox > textarea {
-	width: 60vw;
-	height: 8vh;
+	width: 100%;
 	font-size: 1.5rem;
 	resize: none;
 	border: none;
