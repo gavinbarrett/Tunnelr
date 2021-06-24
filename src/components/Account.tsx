@@ -1,34 +1,30 @@
+import { load } from 'dotenv/types';
 import * as React from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Footer } from './Footer';
 import './sass/Account.scss';
 
-export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfile}) => {
-	const [name, updateName] = React.useState('');
+export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfile, loc}) => {
+	const [name, updateName] = React.useState(null);
 	const [self, updateSelf] = React.useState(true);
 	const [initRender, updateInitRender] = React.useState(true);
 	const [joinedDate, updateJoinedDate] = React.useState(null);
 	const [friendsList, updateFriendsList] = React.useState([]);
-	const loc = useLocation();
 	React.useEffect(() => {
+		loadAccount();
+	}, [name]);
+	const loadAccount = async () => {
 		const username = loc.pathname.split('/')[2];
 		// FIXME: download user's account data
-		console.log(`Username: ${username}\nUser: ${user}`);
+		console.log(`Username: ${username}`);
 		if (username) {
 			updateName(username);
+			grabUserInfo(username);
 		} else
 			return;
-		console.log(`Name: ${name}\nUser: ${user.user}`);
-		// FIXME: grab account info - profile pic, joined date, and friends list
-		if (!initRender)
-			grabUserInfo(name);
-		else
-			updateInitRender(false);
-		return () => {
-			updateInitRender(true);
-		}
-	}, [name]);
+	}
 	const grabUserInfo = async name => {
+		console.log(`Grabbing ${name}`);
 		const resp = await fetch(`/loaduserinfo/?name=${name}`, {method: 'GET'});
 		const r = await resp.json();
 		const created_date = r["created_at"].split(' ');
@@ -37,20 +33,33 @@ export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfil
 		updateJoinedDate(date.join(' '));
 		const profilepic = r['profile'];
 		// set profile picture
-		if (profilepic) updateProfile(`data:image/png;base64,${profilepic}`);
+		(profilepic == "null") ? updateProfile('images/blank.png') : updateProfile(`data:image/png;base64,${profilepic}`);
+		if (!r['friends']) return;
+		updateFriendsList(r['friends']);
 	}
 	return (<><div id="account-page">
 		<div id="side">
 			{name === user ? <Selector updateSelf={updateSelf} updateUser={updateUser} updateLoggedIn={updateLoggedIn} name={name} user={user}/> : ''}
 		</div>
-		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} profile={profile}/> : <Settings name={name}/>}
+		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} profile={profile} updateName={updateName}/> : <Settings name={name}/>}
 	</div>
 	<Footer/></>);
 }
 
-const FriendsList = ({friendsList}) => {
+const FriendsList = ({friendsList, updateName}) => {
+	const history = useHistory();
+	const showUser = async user => {
+		updateName(user);
+		history.push(`/account/${user}`);
+	}
 	return (<div id="friends-list">
-		{"Friends"}
+		<p id="friends-header">{"Friends"}</p>
+		<div id="friend-wrapper">
+			{friendsList.length ? friendsList.map((elem, id) => {
+				console.log(elem);
+				return <p className="friend-slide" onClick={() => showUser(elem.case)}>{elem.case}</p>
+			}) : <p id="no-friends">{"No Friends"}</p>}
+		</div>
 	</div>);
 }
 
@@ -82,7 +91,7 @@ const Selector = ({updateSelf, updateUser, updateLoggedIn, name, user}) => {
 	</div>);
 }
 
-const HomePage = ({name, user, joinedDate, friendsList, profile}) => {
+const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) => {
 	return (<div id="account-wrapper">
 		<div id="account-home">
 			<div id="account-name">
@@ -97,7 +106,7 @@ const HomePage = ({name, user, joinedDate, friendsList, profile}) => {
 			{name != user ? <FriendStatus name={name} friend={user}/> : ''}
 		</div>
 		<div id="account-friends">
-			<FriendsList friendsList={friendsList}/>
+			<FriendsList friendsList={friendsList} updateName={updateName}/>
 		</div>
 	</div>);
 }

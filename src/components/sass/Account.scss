@@ -87,10 +87,31 @@ img#profile {
 }
 
 #friends-list {
-	width: 18vw;
+	width: 22vw;
 	height: 65vh;
+	display: flex;
+	flex-direction: column;
 	border-radius: 30px;
 	background: magenta;
+}
+
+#friends-header {
+	width: 100%;
+	height: 10%;
+	text-align: center;
+	font-size: 1.2rem;
+	font-family: 'Tahoma', sans-serif;
+}
+
+#friend-wrapper {
+	display: flex;
+	flex-direction: column;
+	overflow-y: scroll;
+}
+
+.friend-slide {
+	margin-left: 1rem;
+	font-family: 'Tahoma', sans-serif;
 }
 
 #befriend {
