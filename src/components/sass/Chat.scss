@@ -18,9 +18,9 @@
 .chat-menu {
 	width: 95vw;
 	height: 90vh;
-	background: coral;
 	display: flex;
 	flex-direction: column;
+	font-family: 'Tahoma', sans-serif;
 }
 
 .expanded {
@@ -49,6 +49,7 @@
 	transition: all 0.5s ease-in-out;
 	display: flex;
 	align-items: center;
+	font-family: 'Inconsolata', monospace;
 }
 
 .add-channelexpanded {
@@ -61,6 +62,7 @@
 	font-size: 1.5rem;
 	cursor: default;
 	padding-left: 2vw;
+	font-family: 'Inconsolata', monospace;
 	transition: all 0.75s ease-in-out;
 }
 
@@ -91,7 +93,7 @@
 
 #friend-search-box {
 	height: 45vh;
-	background: maroon;
+	background: #f3e2f5;
 }
 
 #friend-search-list {
@@ -108,8 +110,19 @@
 
 .friend-sugg {
 	width: 30vw;
-	height: 6vh;
 	background: purple;
+	color: white;
+	margin: 1rem;
+	font-size: 1.5rem;
+}
+
+.friend-box {
+	display: flex;
+}
+
+.friend-box-add {
+	background: green;
+	border-radius: 50%;
 	color: white;
 }
 
@@ -134,7 +147,8 @@
 
 #channel-search-box {
 	height: 45vh;
-	background: teal;
+	background: #490249;
+	color: white;
 }
 
 .search-title {

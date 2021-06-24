@@ -13,6 +13,7 @@ import './components/sass/App.scss';
 const App = () => {
 	const [user, updateUser] = React.useState('');
 	const [loggedIn, updateLoggedIn] = React.useState(false);
+	const [profile, updateProfile] = React.useState('images/blank.png');
 	const hist = Router.useHistory();
 	React.useEffect(() => {
 		// try to retrieve prior session
@@ -37,7 +38,7 @@ const App = () => {
 			<Router.Route path="/" exact render={() => <LandingPage loggedIn={loggedIn}/>}/>
 			<Router.Route path="/signup" render={() => <SignUp updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
 			<Router.Route path="/signin" render={() => <SignIn updateLoggedIn={updateLoggedIn} updateUser={updateUser}/>}/>
-			<Router.Route path="/account" render={() => <Account user={user} updateUser={updateUser} updateLoggedIn={updateLoggedIn}/>}/>
+			<Router.Route path="/account" render={() => <Account user={user} updateUser={updateUser} updateLoggedIn={updateLoggedIn} profile={profile} updateProfile={updateProfile}/>}/>
 			<Router.Route path="/channel" render={() => <ChannelPage user={user} loggedIn={loggedIn}/>}/>
 			<Router.Route path="/chat">
 				{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}

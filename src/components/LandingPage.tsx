@@ -5,7 +5,7 @@ import './sass/LandingPage.scss';
 
 const LandingText = () => {
 	return (<div id="landing-text">
-		{"Type securely with Tunnelr"}
+		<p id="landing-tag">{"Type securely with Tunnelr"}</p>
 	</div>);
 }
 

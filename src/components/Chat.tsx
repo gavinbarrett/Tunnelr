@@ -7,8 +7,6 @@ import './sass/Chat.scss';
 const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket, minimized, updateMinimized}) => {
 	const [id, updateID] = React.useState();
 	const [activeChannel, updateActiveChannel] = React.useState('');
-	React.useEffect(() => {}, []);
-
 	const switchPage = () => {
 		// toggle expanding sidebar on and off
 		expanded.length ? updateExpanded('') : updateExpanded('expanded');
@@ -89,6 +87,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 		console.log(channel);
 		history.push(`/channel/${channel}`);
 	}
+	const addFriendFromSuggestions = async () => {} 
 	return(<div className={`chat-menu ${minimized}`}>
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
@@ -96,7 +95,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 				<input className="search-box" id="friend-search" onChange={queryFriend}/>
 				<div id="friend-search-list">
 					{friendSearchList.length ? friendSearchList.map(elem => {
-						return <p className="friend-sugg" onClick={() => showUser(elem.username)}>{elem.username}</p>;
+						return <div className="friend-box"><p className="friend-sugg" onClick={() => showUser(elem.username)}>{elem.username}</p><p className={"friend-box-add"} onClick={addFriendFromSuggestions}>{"+"}</p></div>;
 					}) : ''}
 				</div>
 			</div>
