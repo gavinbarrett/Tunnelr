@@ -6,8 +6,9 @@ import * as db from './server/databaseFunctions';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { queryFriend } from './server/friends';
-import { loadUserInfo, logUserOut } from './server/accounts';
+import { loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
 import * as url from 'url';
+import * as multer from 'multer';
 import * as WebSocket from 'ws';
 
 const wss = new WebSocket.Server({ port: 8080 });
@@ -18,11 +19,13 @@ const app = express();
 dotenv.config();
 
 // parse json
-app.use(express.json());
+app.use(express.json({limit: '100mb'}));
 // parse cookies
 app.use(cookieParser(process.env.SERVERSEC));
-
+const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.static('dist'));
+
+
 app.post('/signup', signUserUp);
 app.post('/signin', signUserIn);
 
@@ -42,7 +45,9 @@ app.get('/getupdatedmessages', authenticateUser, getUpdatedMessages);
 // load channel info
 app.get('/loadchannelinfo', authenticateUser, loadChannelInfo);
 // load user info
-app.get(`/loaduserinfo`, authenticateUser, loadUserInfo);
+app.get('/loaduserinfo', authenticateUser, loadUserInfo);
+// change a user's profile picture
+app.put('/uploaduserprofile', upload.single('profile'), authenticateUser, uploadUserProfile);
 // search for friends based on a regex
 app.post('/queryfriend', authenticateUser, queryFriend);
 // search for channels based on a regex

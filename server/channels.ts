@@ -3,10 +3,11 @@ import * as bcrypt from 'bcrypt';
 import * as db from './databaseFunctions';
 
 export const addChannel = async (req, res) => {
-	const { channelName, access, credentials } = req.body;
+	const { channelName, access, credentials, mode } = req.body;
 	const user = req.cookies.sessionID.user;
 	console.log(`Channel Name: ${channelName}`);
 	console.log(`Access level: ${access}`);
+	console.log(`Mode: ${mode}`);
 	// FIXME: perform input validation on access and credentials fields
 	// perform input validation
 	const reg = /^@[a-z0-9]{5,32}$/i;
@@ -20,7 +21,7 @@ export const addChannel = async (req, res) => {
 			console.log("Channel already exists");
 			res.send(JSON.stringify({"status": "failed"}));
 		} else {
-			const added = insertNewChannel(channelName, access, credentials);
+			const added = insertNewChannel(channelName, access, credentials, mode);
 			if (added) {
 				console.log(`Channel ${channelName} added.`);
 				// FIXME: add user to channel
@@ -58,8 +59,8 @@ export const loadChannels = async (req, res) => {
 export const loadChannelInfo = async (req, res) => {
 	const channelName = req.query.channelname;
 	const exists = await checkForChannel(channelName);
-	const { channelname, accesslevel } = exists.rows[0];
-	const payload = `{"name": "${channelname}", "access": "${accesslevel}"}`;
+	const { channelname, accesslevel, accessmode, created_at } = exists.rows[0];
+	const payload = `{"name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
 	console.log(payload);
 	// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
 	res.send(payload);
@@ -110,12 +111,17 @@ export const queryChannel = async (req, res) => {
 	}
 }
 
-const insertNewChannel = async (channelName, access, credentials) => {
+const insertNewChannel = async (channelName, access, credentials, mode) => {
 	// hash credentials
 	const hashed = await hashChannelCredentials(credentials);
 	console.log(hashed);
-	const query = 'insert into channels (channelName, accessLevel, credentials) values ($1, $2, $3)'
-	const values = [channelName, access, hashed];
+	let accessmode = '';
+	if (access === 'Private') {
+		if (mode === 'Password') accessmode = 'PSK';
+		else accessmode = 'ACL';
+	}
+	const query = 'insert into channels (channelName, accessLevel, credentials, accessmode) values ($1, $2, $3, $4)'
+	const values = [channelName, access, hashed, accessmode];
 	try {
 		const added = await db.query(query, values);
 		if (!added) return false;

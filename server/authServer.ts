@@ -9,7 +9,9 @@ export const authenticateUser = async (req, res, next) => {
 	if (!req.cookies.sessionID) {
 		res.status(401).send(JSON.stringify({"status": "failed"}));
 	} else {
+		console.log(req.cookies.sessionID);
 		const user = req.cookies.sessionID.user;
+		console.log(`User: ${user}`);
 		const id = req.cookies.sessionID.sessionid;
 		const keys = db.exists(id);
 		// FIXME: ensure queried user is associated with Redis entry
