@@ -43,20 +43,30 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 		wsocket.current.onclose = () => console.log('Closing socket connection.');
 	}
 	const sendMessage = async () => {
+		// send a message to the channel
 		console.log('Firing sendmessage');
 		if (message === '') return;
+		console.log(`Message: ${message}`);
 		// send message to the websocket server
 		wsocket.current.send(JSON.stringify({"sender": sender, "message": message, "lastid": lastMessage}));
 		// clear the chat box
 		updateMessage('');
 	}
 	const changeMessage = event => {
-		updateMessage(event.target.value);
+		updateMessage(event.target.value.replace(/^\n|\n$/g, ''));
+	}
+	const checkForEnter = event => {
+		// send the message upon keying the Enter button
+		if (event.keyCode === 13) { 
+			sendMessage();
+			updateMessage('');
+		}
 	}
 	return (<div className={`channel ${minimized}`}>
 		<div id="message-box">
 			{channelMessages.length ? channelMessages.map((elem, index) => {
 				// interpret the UNIX timestamp in Pacific Time
+				console.log(`elem: ${elem[0]}`);
 				let time = new Date(parseInt(elem[0]));
 				let data = JSON.parse(elem[1][1]);
 				return <div key={index} className="message-snippet"><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p>{data.sender}</p></p></div>
@@ -64,7 +74,7 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 			<div id="anchor"></div>
 		</div>
 		<div id="inputbox">
-			<textarea placeholder={"Write your message here"} onChange={changeMessage} value={message}/>
+			<textarea placeholder={"Write your message here"} onKeyDown={checkForEnter} onChange={changeMessage} value={message}/>
 			<button id="sendmessage" onClick={sendMessage}>{"Send"}</button>
 		</div>
 	</div>);

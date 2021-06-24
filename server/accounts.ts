@@ -9,18 +9,26 @@ const alphaSpaceRegex = /^[a-z0-9\s]+$/i; // alphanumeric + space
 export const loadUserInfo = async (req, res) => {
     const name = req.query.name;
     console.log(`Username: ${name}`);
-    const query = 'select * from users where username=$1';
+    let query = 'select * from users where username=$1';
     const values = [name];
-    const data = await db.query(query, values);
-    const { created_at, profile } = data.rows[0];
+    let data = await db.query(query, values);
+
+	const created_at = data.rows.length ? data.rows[0].created_at : null;
+	const profile = data.rows.length ? data.rows[0].profile : null;
+
+	// construct query for finding all friends
+	query = `select friend2 as friend from friendships where friend1=$1 and status='Friended' intersect select friend1 from friendships where friend2=$1 and status='Friended'`;
+	data = await db.query(query, values);
+	let friends = JSON.stringify(data.rows);
+	console.log(`Friends: ${friends}`);
 	console.log(`Created at: ${created_at}`);
     if (!profile) {
-        const date = `{"created_at": "${created_at}", "profile": "${null}"}`;
+        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}}`;
         res.send(date);
     } else {
         // read user's profile from the disk
         const pic = await readProfileFromDisk(profile);
-        const date = `{"created_at": "${created_at}", "profile": "${pic}"}`;
+        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}}`;
         res.send(date);
     }
 }

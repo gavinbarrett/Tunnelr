@@ -144,7 +144,7 @@ export const Chat = ({user}) => {
 		}
 		console.log(`Opening channel: ${id}`);
 		// establish websocket connection
-		wsocket.current = new WebSocket(`ws://192.168.1.98:8080/?roomID=${id}`);
+		wsocket.current = new WebSocket(`ws://192.168.1.101:8080/?roomID=${id}`);
 		console.log(`Channel ${id} established.`);
 	}
 

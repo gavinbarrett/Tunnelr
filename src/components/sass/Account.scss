@@ -93,6 +93,7 @@ img#profile {
 	flex-direction: column;
 	border-radius: 30px;
 	background: magenta;
+	scrollbar-width: thin;
 }
 
 #friends-header {
@@ -115,9 +116,21 @@ img#profile {
 }
 
 #befriend {
-	width: 10vw;
+	width: 45vw;
+	height: 10vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	background: purple;
 	color: white;
+}
+
+#befriend-button {
+	width: 15vw;
+	border-radius: 25px;
+	color: coral;
+	font-family: 'Tahoma', sans-serif;
+	border: 0;
 }
 
 #settings-page {

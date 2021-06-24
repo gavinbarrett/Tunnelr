@@ -5,7 +5,22 @@ import * as db from './databaseFunctions';
 const expiry: number = 60 * 60 // 60 minutes
 
 export const authenticateUser = async (req, res, next) => {
-	/* Check for user */
+	/* Authenticate the user's session ID against the cache */
+	if (!req.cookies.sessionID) {
+		res.status(401).send(JSON.stringify({"status": "failed"}));
+	} else {
+		console.log(req.cookies.sessionID);
+		const user = req.cookies.sessionID.user;
+		console.log(`User: ${user}`);
+		const id = req.cookies.sessionID.sessionid;
+		const keys = db.exists(id);
+		// FIXME: ensure queried user is associated with Redis entry
+		keys ? next() : res.status(401).send(JSON.stringify({"status": "failed"}));
+	}
+}
+
+export const authenticateUserForUser = async (req, res, next) => {
+	/* Authenticate the user's session ID against the cache for one of the user's resources */
 	if (!req.cookies.sessionID) {
 		res.status(401).send(JSON.stringify({"status": "failed"}));
 	} else {

@@ -7,12 +7,11 @@ import './sass/Account.scss';
 export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfile, loc}) => {
 	const [name, updateName] = React.useState(null);
 	const [self, updateSelf] = React.useState(true);
-	const [initRender, updateInitRender] = React.useState(true);
 	const [joinedDate, updateJoinedDate] = React.useState(null);
 	const [friendsList, updateFriendsList] = React.useState([]);
 	React.useEffect(() => {
 		loadAccount();
-	}, [name]);
+	}, [loc]);
 	const loadAccount = async () => {
 		const username = loc.pathname.split('/')[2];
 		// FIXME: download user's account data
@@ -20,8 +19,7 @@ export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfil
 		if (username) {
 			updateName(username);
 			grabUserInfo(username);
-		} else
-			return;
+		}
 	}
 	const grabUserInfo = async name => {
 		console.log(`Grabbing ${name}`);
@@ -57,7 +55,7 @@ const FriendsList = ({friendsList, updateName}) => {
 		<div id="friend-wrapper">
 			{friendsList.length ? friendsList.map((elem, id) => {
 				console.log(elem);
-				return <p className="friend-slide" onClick={() => showUser(elem.case)}>{elem.case}</p>
+				return <p className="friend-slide" onClick={() => showUser(elem.friend)}>{elem.friend}</p>
 			}) : <p id="no-friends">{"No Friends"}</p>}
 		</div>
 	</div>);
@@ -118,7 +116,14 @@ const JoinedDate = ({date}) => {
 }
 
 const AccountController = () => {
-	const changePassword = async () => {}
+	const startPasswordChange = async () => {
+		// add prompt box component, wait for user input and grab the new password
+		// perform input validation
+		// send password to the server and remove the prompt component
+	}
+	const changePassword = async () => {
+		//const resp = await fetch('/changepassword', {method: 'POST'});
+	}
 	const changeProfile = async event => {
 		const file = event.target.files[0];
 		if (!file) return;
@@ -135,7 +140,7 @@ const AccountController = () => {
 	const deleteChannel = async () => {}
 	const deleteAccount = async () => {}
 	return (<div id="account-controller">
-		<button id="change-password">{"Change Password"}</button>
+		<button id="change-password" onClick={startPasswordChange}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
 		<button id="leave-channel">{"Leave Channel"}</button>
@@ -151,5 +156,12 @@ const Settings = name => {
 }
 
 const FriendStatus = ({name, friend}) => {
-	return (<div id="befriend">{"Add Friend"}</div>);
+	const sendFriendRequest = () => {
+
+	}
+	return (<div id="befriend">
+		<button id="befriend-button">
+			{"Add Friend"}
+		</button>
+	</div>);
 }
