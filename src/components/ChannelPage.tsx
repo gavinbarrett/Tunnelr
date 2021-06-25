@@ -44,6 +44,7 @@ export const ChannelPage = ({user, loggedIn}) => {
     </>);
 }
 
+// need to know if current user is a member of the channel
 const JoinButton = () => {
     return (<div id="joinbutton">
         {"Join"}

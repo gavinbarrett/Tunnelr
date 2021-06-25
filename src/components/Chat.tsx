@@ -92,7 +92,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
 			<div className="search-box-wrapper">
-				<input className="search-box" id="friend-search" onChange={queryFriend}/>
+				<input className="search-box" id="friend-search" placeholder={'e.g. beatbox99'} onChange={queryFriend}/>
 				<div id="friend-search-list">
 					{friendSearchList.length ? friendSearchList.map(elem => {
 						return <div className="friend-box"><p className="friend-sugg" onClick={() => showUser(elem.username)}>{elem.username}</p><p className={"friend-box-add"} onClick={addFriendFromSuggestions}>{"+"}</p></div>;
@@ -103,7 +103,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 		<div id="channel-search-box">
 			<p className="search-title">{"search for channels"}</p>
 			<div className="search-box-wrapper">
-				<input list="channel-search-list" className="search-box" id="channel-search" onChange={queryChannel}/>
+				<input list="channel-search-list" className="search-box" id="channel-search" placeholder={'e.g. @meadowpeak'} onChange={queryChannel}/>
 				<div id="channel-search-list">
 					{channelSearchList.length ? channelSearchList.map(elem => {
 						return <p className={"channel-sugg"} onClick={() => showChannel(elem.channelname)}>{elem.channelname}</p>;
@@ -144,7 +144,7 @@ export const Chat = ({user}) => {
 		}
 		console.log(`Opening channel: ${id}`);
 		// establish websocket connection
-		wsocket.current = new WebSocket(`ws://192.168.1.101:8080/?roomID=${id}`);
+		wsocket.current = new WebSocket(`ws://192.168.1.102:8080/?roomID=${id}`);
 		console.log(`Channel ${id} established.`);
 	}
 

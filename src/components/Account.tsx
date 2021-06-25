@@ -1,6 +1,6 @@
 import { load } from 'dotenv/types';
 import * as React from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { Footer } from './Footer';
 import './sass/Account.scss';
 
@@ -101,7 +101,7 @@ const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) =>
 				</div>
 			</div>
 			<div id="account-date">{`Joined: ${joinedDate}`}</div>
-			{name != user ? <FriendStatus name={name} friend={user}/> : ''}
+			{name != user ? <FriendStatus name={name} friend={user} friendsList={friendsList}/> : ''}
 		</div>
 		<div id="account-friends">
 			<FriendsList friendsList={friendsList} updateName={updateName}/>
@@ -115,13 +115,16 @@ const JoinedDate = ({date}) => {
 	</div>);
 }
 
-const AccountController = () => {
+const AccountController = ({activePrompt, updateActivePrompt, updatePrompt}) => {
 	const startPasswordChange = async () => {
 		// add prompt box component, wait for user input and grab the new password
 		// perform input validation
 		// send password to the server and remove the prompt component
+		changePassword();
 	}
 	const changePassword = async () => {
+		updateActivePrompt('visible-prompt');
+		updatePrompt(<ChangePassword activePrompt={activePrompt}/>);
 		//const resp = await fetch('/changepassword', {method: 'POST'});
 	}
 	const changeProfile = async event => {
@@ -134,34 +137,88 @@ const AccountController = () => {
 		console.log(resp);
 		const r = await resp.json();
 		console.log(r);
-		// FIXME: pull new profile picture
+		// FIXME: pull new profile picture - actually return it from the server
 	}
-	const leaveChannel = async () => {}
+	const leaveChannel = async () => {
+		updateActivePrompt('visible-prompt');
+		updatePrompt(<LeaveChannel activePrompt={activePrompt}/>);
+	}
 	const deleteChannel = async () => {}
 	const deleteAccount = async () => {}
 	return (<div id="account-controller">
 		<button id="change-password" onClick={startPasswordChange}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
-		<button id="leave-channel">{"Leave Channel"}</button>
+		<button id="leave-channel" onClick={leaveChannel}>{"Leave Channel"}</button>
 		<button id="delete-channel">{"Delete Channel"}</button>
 		<button id="delete-account">{"Delete Account"}</button>
 	</div>);
 }
 
-const Settings = name => {
-	return (<div id="settings-page">
-		<AccountController/>
+const SettingsPrompt = ({activePrompt}) => {
+	return (<div className={`settings-prompt ${activePrompt}`}>
+		{"This is the prompt overlay"}
 	</div>);
 }
 
-const FriendStatus = ({name, friend}) => {
-	const sendFriendRequest = () => {
+const ChangePassword = ({activePrompt}) => {
+	const updateOldPass = async () => {}
+	const updateNewPass = async () => {}
+	const updateRetry = async () => {}
+	const tryNewPassword = async () => {}
+	return (<div className={`settings-prompt ${activePrompt}`}>
+		<label for="oldpw">{"Enter old password"}</label>
+		<input name="oldpw"/>
+		<label for="newpw">{"Enter new password"}</label>
+		<input name="newpw"/>
+		<label for="newpwretry">{"Retype new password"}</label>
+		<input name="newpwretry"/>
+		<button onClick={tryNewPassword}>{"Change Password"}</button>
+	</div>);
+}
 
-	}
+const LeaveChannel = ({activePrompt}) => {
+	const updateOldPass = async () => {}
+	const updateNewPass = async () => {}
+	const updateRetry = async () => {}
+	const tryNewPassword = async () => {}
+	return (<div className={`settings-prompt ${activePrompt}`}>
+		<label for="channelselect">{"Select a channel to leave"}</label>
+		<select name="channelselect">
+			<option value={"One"}>{"One"}</option>
+			<option value={"Two"}>{"Two"}</option>
+			<option value={"Three"}>{"Three"}</option>
+		</select>
+		<label for="">{"Enter the name of the channel"}</label>
+		<button onClick={tryNewPassword}>{"Change Password"}</button>
+	</div>);
+}
+
+const DeleteChannel = () => {}
+
+const DeleteAccount = () => {}
+
+const Settings = name => {
+	const [activePrompt, updateActivePrompt] = React.useState('');
+	const [prompt, updatePrompt] = React.useState(null);
+	return (<div id="settings-page">
+		<AccountController activePrompt={activePrompt} updateActivePrompt={updateActivePrompt} updatePrompt={updatePrompt}/>
+		{prompt}
+	</div>);
+}
+
+const FriendStatus = ({name, friend, friendsList}) => {
+	const [status, updateStatus] = React.useState('Befriend');
+	React.useEffect(() => {
+		friendsList.map((elem, id) => {
+			console.log(elem);
+			console.log(friend);
+			if (friend == elem['friend']) updateStatus('Friended \u2713');
+		});
+	}, [friendsList]);
 	return (<div id="befriend">
 		<button id="befriend-button">
-			{"Add Friend"}
+			{status}
 		</button>
 	</div>);
 }

@@ -59,7 +59,6 @@
 #account-date {
 	width: 45vw;
 	height: 10vh;
-	background: purple;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -111,7 +110,12 @@ img#profile {
 }
 
 .friend-slide {
+	margin: 0;
 	margin-left: 1rem;
+	display: flex;
+	align-items: center;
+	background: blue;
+	height: 2rem;
 	font-family: 'Tahoma', sans-serif;
 }
 
@@ -121,15 +125,17 @@ img#profile {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	background: purple;
-	color: white;
 }
 
 #befriend-button {
-	width: 15vw;
+	width: 14vw;
+	height: 8vh;
 	border-radius: 25px;
-	color: coral;
+	color: white;
+	background: purple;
+	font-size: 1.2rem;
 	font-family: 'Tahoma', sans-serif;
+	font-weight: bold;
 	border: 0;
 }
 
@@ -139,6 +145,32 @@ img#profile {
 	background: coral;
 	display: flex;
 	flex-direction: column;
+}
+
+.settings-prompt {
+	display: none;
+	transition: all 1s ease-in-out;
+}
+
+.settings-prompt > input {
+	width: 60vw;
+	height: 6vh;
+	margin: 1rem;
+	border: 0;
+	border-radius: 25px;
+}
+
+.visible-prompt {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	width: 80vw;
+	height: 90vh;
+	position: absolute;
+	background: rgb(109, 2, 109);
+	opacity: 80%;
+	transition: all 1s ease-in-out;
 }
 
 #self-sidebar > * {
