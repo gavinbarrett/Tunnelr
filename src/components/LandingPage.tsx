@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
 import { Footer } from './Footer';
+import { UserAuth } from '../UserAuth';
 import './sass/LandingPage.scss';
 
 const LandingText = () => {
@@ -18,7 +19,8 @@ const SignUp = ({loggedIn}) => {
 	</div>);
 }
 
-export const LandingPage = ({loggedIn}) => {
+export const LandingPage = () => {
+	const { loggedIn } = React.useContext(UserAuth);
 	return (<><div id="landing-page">
 		<LandingText/>
 		<SignUp loggedIn={loggedIn}/>

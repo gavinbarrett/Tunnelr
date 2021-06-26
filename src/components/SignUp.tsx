@@ -1,9 +1,11 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
 import { Footer } from './Footer';
+import { UserAuth } from '../UserAuth';
 import './sass/SignUp.scss';
 
-export const SignUp = ({updateLoggedIn, updateUser}) => {
+export const SignUp = () => {
+	const { updateLoggedIn, updateUser } = React.useContext(UserAuth);
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const [rePassword, updateRePassword] = React.useState('');

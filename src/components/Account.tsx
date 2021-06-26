@@ -2,9 +2,11 @@ import { load } from 'dotenv/types';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Footer } from './Footer';
+import { UserAuth } from '../UserAuth';
 import './sass/Account.scss';
 
-export const Account = ({user, updateUser, updateLoggedIn, profile, updateProfile, loc}) => {
+export const Account = () => {
+	const { user, updateUser, updateLoggedIn, profile, updateProfile, loc } = React.useContext(UserAuth);
 	const [name, updateName] = React.useState(null);
 	const [self, updateSelf] = React.useState(true);
 	const [joinedDate, updateJoinedDate] = React.useState(null);

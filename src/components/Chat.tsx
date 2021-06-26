@@ -140,19 +140,13 @@ export const Chat = ({user}) => {
 	const setSocket = id => {
 		if (wsocket.current) {
 			wsocket.current.close();
-			console.log('Closed websocket connection.');
+			console.log('Closed old websocket connection.');
 		}
 		console.log(`Opening channel: ${id}`);
 		// establish websocket connection
-		wsocket.current = new WebSocket(`ws://192.168.1.102:8080/?roomID=${id}`);
-		console.log(`Channel ${id} established.`);
+		wsocket.current = new WebSocket(`ws://192.168.1.110:8080/?roomID=${id}`);
+		console.log(`WebSocket channel ${id} established.`);
 	}
-
-	/* FIXME: 
-		We should use either the React Context API
-		or Redux to reduce the amount of props
-		that we're passing down the app
-	*/
 	return (<div id="chat-wrapper">
 		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user} setSocket={setSocket} wsocket={wsocket} minimized={minimized} updateMinimized={updateMinimized}/>
 			{page}
