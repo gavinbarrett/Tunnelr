@@ -1,6 +1,6 @@
 
 import * as url from 'url';
-import { checkForChannel } from './channels';
+import { checkForChannelExistence } from './channels';
 import * as db from './databaseFunctions';
 
 export const handleWSConnection = async (wsocket:WebSocket, req) => {
@@ -9,7 +9,7 @@ export const handleWSConnection = async (wsocket:WebSocket, req) => {
 	const pathname = uobj.pathname;
 	const p = new URLSearchParams(uobj.search);
 	const roomid = p.get("roomID");
-	const exists = await checkForChannel(roomid);
+	const exists = await checkForChannelExistence(roomid);
 	console.log(roomid);
 	// FIXME: extract the id of the last message
 	console.log(`Channel: ${exists.rows.length}`);

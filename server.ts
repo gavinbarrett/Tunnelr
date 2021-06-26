@@ -3,7 +3,7 @@ import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
-import { addChannel, checkForChannel, getMessages, getUpdatedMessages, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
+import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { findAllUserFriends, queryFriend } from './server/friends';
 import { loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
 import { handleWSConnection } from './server/websocketServer';
@@ -46,6 +46,11 @@ app.get('/findalluserfriends', authenticateUser, findAllUserFriends);
 app.get('/loadchannelinfo', authenticateUser, loadChannelInfo);
 // load user info
 app.get('/loaduserinfo', authenticateUser, loadUserInfo);
+// join a channel
+app.get('/joinchannel', authenticateUser, joinPublicChannel);
+app.post('/joinpskchannel', authenticateUser, joinPSKChannel);
+// leave a channel the user is subscribed to
+app.get('/leavechannel', authenticateUser, leaveChannel);
 // change a user's profile picture
 app.put('/uploaduserprofile', upload.single('profile'), authenticateUser, uploadUserProfile);
 // search for friends based on a regex

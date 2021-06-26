@@ -15,7 +15,7 @@ export const ChannelPage = () => {
     const [userCount, updateUserCount] = React.useState(null);
     const [displayLeave, updateDisplayLeave] = React.useState('');
     const [displayPassword, updateDisplayPassword] = React.useState('');
-    const [joinButton, updateJoinButton] = React.useState(<Join/>);
+    const [joinButton, updateJoinButton] = React.useState(<Join name={name} updateMemberStat={updateMemberStat}/>);
 
     const loc = useLocation();
     React.useEffect(() => {
@@ -44,24 +44,29 @@ export const ChannelPage = () => {
             <div id="channel-header">{name}</div>
             <div id="channel-access">{`Access Control: ${access}`}{"/"}{mode}</div>
             <div id="doc">{`Created on ${doc}`}</div>
-            <JoinButton access={access} mode={mode} memberStat={memberStat} updateMemberStat={updateMemberStat} updateDisplayLeave={updateDisplayLeave} updateDisplayPassword={updateDisplayPassword} joinButton={joinButton} updateJoinButton={updateJoinButton}/>
-            <LeavePrompt name={name} displayLeave={displayLeave} updateDisplayLeave={updateDisplayLeave} updateJoinButton={updateJoinButton}/>
-            <PasswordPrompt displayPassword={displayPassword} updateDisplayPassword={updateDisplayPassword}/>
+            <JoinButton name={name} access={access} mode={mode} memberStat={memberStat} updateMemberStat={updateMemberStat} updateDisplayLeave={updateDisplayLeave} updateDisplayPassword={updateDisplayPassword} joinButton={joinButton} updateJoinButton={updateJoinButton}/>
+            <LeavePrompt name={name} displayLeave={displayLeave} updateDisplayLeave={updateDisplayLeave} updateJoinButton={updateJoinButton} updateMemberStat={updateMemberStat}/>
+            <PasswordPrompt name={name} displayPassword={displayPassword} updateDisplayPassword={updateDisplayPassword}/>
         </div>
     <Footer/>
     </>);
 }
 
-const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton}) => {
+const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, updateMemberStat}) => {
     const [leaving, updateLeaving] = React.useState(false);
     const [channelName, updateChannelName] = React.useState('');
+    const [leaveError, updateLeaveError] = React.useState('');
     const leaveChannel = async () => {
         // leave a channel
         if (channelName != name) {
-            console.log('Channel names do not match.');
+            console.log('Channels do not match');
+            updateLeaveError('Channels do not match');
+            //setTimeout(updateLeaveError(''), 2000);
             return;
         } else if (!leaving) {
             console.log('Please check the box');
+            updateLeaveError('Please check the box');
+            //setTimeout(updateLeaveError(''), 2000);
             return;
         }
         console.log(`Submitting leave request.`);
@@ -71,15 +76,21 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton})
         if (r["status"] == "success") {
             updateDisplayLeave('');
             updateChannelName('');
-            updateJoinButton(<Join/>);
+            updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
             // FIXME: turn off prompt, update button to say Join again
         } else {
-            console.log('failed');
+            updateLeaveError('Failed to leave channel');
+            //setTimeout(updateLeaveError(''), 2000);
         }
     }
     return (<div className={`leave-prompt ${displayLeave}`}>
         <div id="exit-leave-prompt">
-            <p id="exit-leave" onClick={() => updateDisplayLeave('')}>{'\u2715'}</p>
+            {leaveError ? <p id={`leave-channel-error`}>{leaveError}</p> : ''}
+            <p id="exit-leave" onClick={() => {
+                updateDisplayLeave('');
+                updateLeaveError('');
+                updateLeaving(false);
+            }}>{'\u2715'}</p>
         </div>
         <div id="leave-q">{`Are you sure you want to leave ${name}?`}</div>
         <div id="leave-checkbox">
@@ -92,13 +103,33 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton})
     </div>);
 }
 
-const PasswordPrompt = ({displayPassword, updateDisplayPassword}) => {
+const PasswordPrompt = ({name, displayPassword, updateDisplayPassword}) => {
+    const [password, updatePassword] = React.useState('');
+    const [error, updateError] = React.useState('');
+    const joinPSKChannel = async () => {
+        if (!password.match(/[a-z0-9]{64}/i)) {
+            console.log('Password does not match regex.');
+            updateError('Password does not match regex');
+        }
+        // FIXME: regex match to input validate the password
+        const resp = await fetch('/joinpskchannel', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"password": password})});
+        const r = await resp.json();
+        console.log(r);
+        updatePassword('');
+    }
     return (<div className={`password-prompt ${displayPassword}`}>
+        <div id="password-prompt-exit">
+            {error ? <div id="psk-error">{error}</div> : ''}
+            <div id="exit-password">{"\u2715"}</div>
+        </div>
+        <div id="password-prompt-header">{`Please enter the password for ${name}`}</div>
+        <input id="password-input" type="text" onChange={event => updatePassword(event.target.value)}/>
+        <button id="add-psk-channel" onClick={joinPSKChannel}>{"Join Channel"}</button>
     </div>);
 }
 
 // need to know if current user is a member of the channel
-const JoinButton = ({access, mode, memberStat, updateMemberStat, updateDisplayLeave, updateDisplayPassword, joinButton, updateJoinButton}) => {
+const JoinButton = ({name, access, mode, memberStat, updateMemberStat, updateDisplayLeave, updateDisplayPassword, joinButton, updateJoinButton}) => {
     /*
         if memberStat is NOT, then we display a Join/Request Access button that, will change when clicked
         
@@ -118,7 +149,7 @@ const JoinButton = ({access, mode, memberStat, updateMemberStat, updateDisplayLe
                 if (mode == 'PSK') updateJoinButton(<EnterPassword updateDisplayPassword={updateDisplayPassword}/>);
                 else updateJoinButton(<RequestAccess/>);
             } else {
-                updateJoinButton(<Join/>);
+                updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
             }
         } else if (memberStat == 'PENDING') {
             updateJoinButton(<Pending/>);
@@ -131,11 +162,17 @@ const JoinButton = ({access, mode, memberStat, updateMemberStat, updateDisplayLe
     </div>);
 }
 
-const Join = () => {
+const Join = ({name, updateMemberStat}) => {
     const joinChannel = async () => {
         // subscribe a user to the currrent channel
+        const resp = await fetch(`/joinchannel?channel=${name}`, {method: 'GET'});
+        const r = await resp.json();
+        if (r["status"] == "success") {
+            console.log('Updating member');
+            updateMemberStat('MEMBER');
+        }
     }
-    return (<div id="join-button">
+    return (<div id="join-button" onClick={joinChannel}>
         {"Join Channel"}
     </div>);
 }

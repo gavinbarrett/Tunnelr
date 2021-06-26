@@ -151,7 +151,7 @@ const AccountController = ({activePrompt, updateActivePrompt, updatePrompt}) => 
 		<button id="change-password" onClick={startPasswordChange}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
-		<button id="leave-channel" onClick={leaveChannel}>{"Leave Channel"}</button>
+		{/*<button id="leave-channel" onClick={leaveChannel}>{"Leave Channel"}</button>*/}
 		<button id="delete-channel">{"Delete Channel"}</button>
 		<button id="delete-account">{"Delete Account"}</button>
 	</div>);
