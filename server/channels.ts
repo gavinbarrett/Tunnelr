@@ -1,5 +1,6 @@
 import * as url from 'url';
 import * as bcrypt from 'bcrypt';
+import { checkHashes } from './authServer';
 import * as db from './databaseFunctions';
 
 export const addChannel = async (req, res) => {
@@ -187,12 +188,39 @@ export const joinPublicChannel = async (req, res) => {
 }
 
 export const joinPSKChannel = async (req, res) => {
+	// join a channel protected with a pre-shared password
 	const { user } = req.cookies.sessionID;
-	// check for channel's existence and extract its access level/mode
-	// if it is PSK, extract password from req.body and check it against db pass
-	// if they match, add user to db
-	const query = '';
-	res.send(JSON.stringify({"status": "failed"}));
+	const { password, channelname } = req.body;
+	if (!password.match(/[a-z0-9]{0,64}/i)) {
+		res.send(JSON.stringify({"status": "failed"}));
+	} else {
+		// check for channel's existence and extract its access level/mode
+		// if it is PSK, extract password from req.body and check it against db pass
+		// if they match, add user to db
+		let query = 'select accesslevel, accessmode, credentials from channels where channelname=$1';
+		let values = [channelname];
+		const resp = await db.query(query, values);
+		if (resp && resp.rows) {
+			const { accesslevel, accessmode, credentials } = resp.rows[0];
+			if (accesslevel == "Private" && accessmode == "PSK") {
+				// FIXME: perform input validation on password; if valid, compare it to credentials
+				const hashes = await checkHashes(password, credentials);
+				if (hashes) {
+					// hashes match; user is authenticated. add a record in the members table
+					query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
+					values = [user, channelname, 'MEMBER'];
+					const r = await db.query(query, values);
+					res.send(JSON.stringify({"status": "success"}));
+				} else {
+					res.send(JSON.stringify({"status": "failed"}));
+				}
+			} else {
+				res.send(JSON.stringify({"status": "failed"}));
+			}
+		} else {
+			res.send(JSON.stringify({"status": "failed"}));
+		}
+	}
 }
 
 export const joinACLChannel = async (req, res) => {

@@ -48,6 +48,7 @@ app.get('/loadchannelinfo', authenticateUser, loadChannelInfo);
 app.get('/loaduserinfo', authenticateUser, loadUserInfo);
 // join a channel
 app.get('/joinchannel', authenticateUser, joinPublicChannel);
+// join a channel protected by a shared password
 app.post('/joinpskchannel', authenticateUser, joinPSKChannel);
 // leave a channel the user is subscribed to
 app.get('/leavechannel', authenticateUser, leaveChannel);

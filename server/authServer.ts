@@ -144,7 +144,7 @@ const checkForUser = async user => {
 	//else return false;
 }
 
-const checkHashes = async (password, hashed) => {
+export const checkHashes = async (password, hashed) => {
 	return new Promise(resolve => {
 		bcrypt.compare(password, hashed, (err, hash) => {
 			if (err) resolve(false);

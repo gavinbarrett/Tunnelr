@@ -240,6 +240,12 @@
 
 #request-access-button, #enter-password-button {
     background: red;
+    transition: all 0.2s ease-in-out;
+}
+
+#request-access-button:hover, #enter-password-button:hover {
+    background: rgb(197, 12, 12);
+    transition: all 0.2s ease-in-out;
 }
 
 #pending-button {
