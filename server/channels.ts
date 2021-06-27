@@ -180,6 +180,7 @@ export const joinPublicChannel = async (req, res) => {
 		query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
 		values = [user, channel, 'MEMBER'];
 		const r = await db.query(query, values);
+		// FIXME: increment the user_count in the channel table
 		console.log(`r: ${r}`);
 		res.send(JSON.stringify({"status": "success"}));
 	} else {
