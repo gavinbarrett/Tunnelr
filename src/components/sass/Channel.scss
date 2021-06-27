@@ -17,19 +17,52 @@
 	border: 0;
 	display: flex;
 	flex-direction: column-reverse;
-	align-items: center;
 	overflow-y: scroll;
 	overflow-anchor: auto;
 }
 
-.message-snippet {
+.received-message {
 	width: 62vw;
 	font-family: 'Inconsolata', monospace;
 	background: rgb(73, 2, 73);
 	border-radius: 15px;
 	padding: 1rem;
-	margin: 0.5rem;
+	margin: 1rem;
 	color: white;
+	margin-left: 10%;
+}
+
+.received-message::after {
+	content: "";
+	width: 0px;
+	height: 0px;
+	border-right: 20px solid transparent;
+	border-top: 20px solid rgb(73, 2, 73);
+	position: relative;
+	top: 70%;
+}
+
+.sent-message {
+	width: 62vw;
+	font-family: 'Inconsolata', monospace;
+	border-radius: 15px;
+	padding: 1rem;
+	margin: 1rem;
+	margin-left: 10%;
+	color: white;
+	background: #9232d1;
+	margin-left: 25%;
+}
+
+.sent-message::after {
+	content: "";
+	width: 0px;
+	height: 0px;
+	border-left: 20px solid transparent;
+	border-top: 20px solid #9232d1;
+	position: relative;
+	top: 70%;
+	left: 97.5%;
 }
 
 .message {
@@ -37,6 +70,7 @@
 	font-size: 1.7rem;
 	font-weight: bold;
 	margin: 0;
+	color: white;
 }
 
 .sender {
@@ -50,6 +84,10 @@
 
 .sender > p {
 	margin: 0;
+}
+
+.sent-message > .sender {
+	color: rgb(73, 2, 73);
 }
 
 #anchor {

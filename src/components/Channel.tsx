@@ -69,7 +69,8 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 				console.log(`elem: ${elem[0]}`);
 				let time = new Date(parseInt(elem[0]));
 				let data = JSON.parse(elem[1][1]);
-				return <div key={index} className="message-snippet"><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p>{data.sender}</p></p></div>
+				let cls = (data.sender == sender) ? 'sent-message' : 'received-message';
+				return <div key={index} className={`${cls}`}><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p>{data.sender}</p></p></div>
 			}) : <NoMessages/>}
 			<div id="anchor"></div>
 		</div>
