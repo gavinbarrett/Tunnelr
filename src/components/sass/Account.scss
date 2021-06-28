@@ -35,7 +35,6 @@
 #account-name {
 	width: 45vw;
 	height: 20vh;
-	background: blue;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -50,7 +49,6 @@
 #account-pic {
 	width: 45vw;
 	height: 50vh;
-	background: yellow;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -107,6 +105,8 @@ img#profile {
 	display: flex;
 	flex-direction: column;
 	overflow-y: scroll;
+	scrollbar-width: thin;
+	scrollbar-color: #d200d2;
 }
 
 .friend-slide {
@@ -142,7 +142,7 @@ img#profile {
 #settings-page {
 	width: 80vw;
 	height: 90vh;
-	background: coral;
+	background: #f3e2f5;
 	display: flex;
 	flex-direction: column;
 }
@@ -155,7 +155,7 @@ img#profile {
 .settings-prompt > input {
 	width: 60vw;
 	height: 6vh;
-	margin: 1rem;
+	margin: 0.5rem;
 	border: 0;
 	border-radius: 25px;
 }
@@ -169,7 +169,6 @@ img#profile {
 	height: 90vh;
 	position: absolute;
 	background: rgb(109, 2, 109);
-	opacity: 80%;
 	transition: all 1s ease-in-out;
 }
 
@@ -181,12 +180,23 @@ img#profile {
 	display: flex;
 	align-items: center;
 	padding-left: 1rem;
+	cursor: default;
 	transition: all 0.5s ease-in;
 }
 
 #self-sidebar > *:hover {
 	background: purple;
 	transition: all 0.5s ease-in;
+}
+
+#homepage {
+}
+
+#settings {
+
+}
+
+#logout {
 }
 
 #joined-date {
@@ -204,22 +214,29 @@ img#profile {
 	display: flex;
 	flex-direction: column;
 	padding-left: 10vw;
+	padding-top: 8vh;
 }
 
 #account-controller > button, label {
 	width: 25vw;
-	height: 10vh;
+	height: 8vh;
 	text-align: center;
 	color: white;
 	border: 0;
 	border-radius: 25px;
 	font-family: 'Inconsolata', monospace;
-	font-size: 1.2rem;
+	font-size: 1.5rem;
 	margin: 0.6em;
 }
 
 button#change-password {
 	background: navy;
+	transition: all 0.2s ease-in-out;
+}
+
+button#change-password:hover {
+	background: rgb(0, 0, 70);
+	transition: all 0.2s ease-in-out;
 }
 
 label#change-profile {
@@ -227,20 +244,39 @@ label#change-profile {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	transition: all 0.2s ease-in-out;
+}
+
+label#change-profile:hover {
+	background: rgb(0, 0, 70);
+	transition: all 0.2s ease-in-out;
 }
 
 button#leave-channel {
 	background: navy;
+	transition: all 0.2s ease-in-out;
 }
 
 button#delete-channel {
 	background: red;
 	font-weight: bold;
+	transition: all 0.2s ease-in-out;
+}
+
+button#delete-channel:hover {
+	background: rgb(177, 4, 4);
+	transition: all 0.2s ease-in-out;
 }
 
 button#delete-account {
 	background: red;
 	font-weight: bold;
+	transition: all 0.2s ease-in-out;
+}
+
+button#delete-account:hover {
+	background: rgb(177, 4, 4);
+	transition: all 0.2s ease-in-out;
 }
 
 #profile-uploader {

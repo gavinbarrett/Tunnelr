@@ -25,7 +25,7 @@
     width: 90vw;
     height: 10vh;
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
 }
 
@@ -92,22 +92,6 @@
     padding: 0.5rem;
     font-size: 1.8rem;
     border: 0;
-}
-
-#leave-channel-error {
-    width: 30vw;
-    height: 6vh;
-    background: coral;
-    color: red;
-    font-weight: bold;
-    font-family: 'Tahoma', sans-serif;
-    margin-right: 30vw;
-    padding: 0.25rem;
-    border-radius: 30px;
-    border: 2px solid red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .password-prompt {

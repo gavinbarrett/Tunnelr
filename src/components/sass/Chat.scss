@@ -98,10 +98,10 @@
 
 #friend-search-list {
 	width: 40vw;
+	max-height: 18vh;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	background: black;
+	background: navy;
 	position: relative;
 	overflow-y: scroll;
 	overflow-x: hidden;
@@ -110,7 +110,6 @@
 
 .friend-sugg {
 	width: 30vw;
-	background: purple;
 	color: white;
 	margin: 1rem;
 	font-size: 1.5rem;
@@ -118,6 +117,8 @@
 
 .friend-box {
 	display: flex;
+	border: 1px solid white;
+	cursor: default;
 }
 
 .friend-box-add {
@@ -133,6 +134,7 @@
 
 #channel-search-list {
 	width: 40vw;
+	max-height: 18vh;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -144,10 +146,12 @@
 }
 
 .channel-sugg {
-	width: 30vw;
-	height: 6vh;
-	background: purple;
+	width: 36vw;
+	height: 8vh;
+	font-size: 1.5rem;
+	margin: 0;
 	color: white;
+	border: 1px solid white;
 }
 
 #channel-search-box {
@@ -170,6 +174,7 @@
 
 .search-box-wrapper > input {
 	width: 40vw;
+	height: 8vh;
 	outline: none;
 }
 
@@ -182,7 +187,7 @@
 .search-box {
 	border: 0;
 	padding: 0.5rem;
-	border-radius: 25px;
+	border-radius: 35px;
 	font-size: 1.25rem;
 }
 

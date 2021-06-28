@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Channel } from './Channel';
 import { PromptBox } from './PromptBox';
+import { Footer } from './Footer';
 import './sass/Chat.scss';
 
 const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket, minimized, updateMinimized}) => {
@@ -147,9 +148,10 @@ export const Chat = ({user}) => {
 		wsocket.current = new WebSocket(`ws://192.168.1.110:8080/?roomID=${id}&user=${user}`);
 		console.log(`WebSocket channel ${id} established.`);
 	}
-	return (<div id="chat-wrapper">
+	return (<><div id="chat-wrapper">
 		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user} setSocket={setSocket} wsocket={wsocket} minimized={minimized} updateMinimized={updateMinimized}/>
 			{page}
 		<PromptBox showing={prmpt} updatePrompt={updatePrompt} loadChannels={loadUserChannels}/>
-	</div>);
+	</div>
+	<Footer/></>);
 }

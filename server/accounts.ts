@@ -1,10 +1,48 @@
 import * as fs from 'fs';
+import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as stream from 'stream';
+import { checkHashes, computeSaltedHashedPass } from './authServer';
 import * as db from './databaseFunctions';
 
 // regular expressions for database input validation
 const alphaSpaceRegex = /^[a-z0-9\s]+$/i; // alphanumeric + space
+
+export const changePassword = async (req, res) => {
+	const { oldpassword, newpassword } = req.body;
+	const { user } = req.cookies.sessionID;
+	console.log(`Received from ${user}:\nOld PW: ${oldpassword}\nNew PW: ${newpassword}`);
+	let query = 'select username, password from users where username=$1';
+	let values = [user];
+	const resp = await db.query(query, values);
+	if (resp && resp.rows) { 
+		// extract user credentials from the user table
+		const { username, password } = resp.rows[0];
+		console.log(resp.rows[0].username);
+		console.log(resp.rows[0].password);
+		const matched = await checkHashes(oldpassword, password);
+		if (matched) {
+			// user is authenticated; reset password
+			// run bcrypt on the newpassword
+			// construct an update query to update the user's record
+			const salted = await computeSaltedHashedPass(newpassword);
+			console.log(`Resetting password to salted password: ${salted}`);
+			query = 'update users set password=$1 where username=$2 and password=$3';
+			values = [salted, user, password];
+			const resp2 = await db.query(query, values);
+			console.log(resp2);
+			if (resp2 && resp2.rows) {
+				console.log(`Rows: ${resp2.rows}`);
+			}
+			res.send(JSON.stringify({"status": "success"}));
+		} else {
+			// user entered an incorrect password
+			res.send(JSON.stringify({"status": "failed"}));
+		}
+	} else {
+		res.send(JSON.stringify({"status": "failed"}));
+	}
+}
 
 export const loadUserInfo = async (req, res) => {
     const name = req.query.name;

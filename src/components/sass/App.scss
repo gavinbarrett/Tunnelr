@@ -12,3 +12,27 @@ html, body {
 	height: 100vh;
 	background: white;
 }
+
+.error-container {
+    width: 60vw;
+    height: 8vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.ui-error {
+    width: 30vw;
+    height: 6vh;
+    background: coral;
+    color: red;
+    font-weight: bold;
+    font-family: 'Tahoma', sans-serif;
+    //margin-right: 30vw;
+    padding: 0.25rem;
+    border-radius: 30px;
+    border: 2px solid red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

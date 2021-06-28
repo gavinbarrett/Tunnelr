@@ -85,8 +85,8 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, 
     }
     return (<div className={`leave-prompt ${displayLeave}`}>
         <div id="exit-leave-prompt">
-            {leaveError ? <p id={`leave-channel-error`}>{leaveError}</p> : ''}
-            <p id="exit-leave" onClick={() => {
+            {leaveError ? <p className={`ui-error`}>{leaveError}</p> : ''}
+            <p id="exit" onClick={() => {
                 updateDisplayLeave('');
                 updateLeaveError('');
                 updateChecked('');
@@ -123,7 +123,7 @@ const PasswordPrompt = ({name, displayPassword, updateDisplayPassword, updateMem
     return (<div className={`password-prompt ${displayPassword}`}>
         <div id="password-prompt-exit">
             {error ? <div id="psk-error">{error}</div> : ''}
-            <div id="exit-password" onClick={() => {
+            <div id="exit" onClick={() => {
                 updatePassword('');
                 updateDisplayPassword('');
             }}>{"\u2715"}</div>

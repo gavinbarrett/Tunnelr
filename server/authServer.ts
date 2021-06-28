@@ -167,7 +167,7 @@ const validateQueries = async (queries, regexes) => {
 	});
 }
 
-const computeSaltedHashedPass = async pass => {
+export const computeSaltedHashedPass = async pass => {
 	/* Generate a salted hash of the user submitted password */
 	const rounds = 10;
 	return new Promise((resolve, reject) => {

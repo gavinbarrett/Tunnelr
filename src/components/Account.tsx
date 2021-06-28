@@ -58,7 +58,7 @@ const FriendsList = ({friendsList, updateName}) => {
 			{friendsList.length ? friendsList.map((elem, id) => {
 				console.log(elem);
 				return <p className="friend-slide" onClick={() => showUser(elem.friend)}>{elem.friend}</p>
-			}) : <p id="no-friends">{"No Friends"}</p>}
+			}) : <p id="no-friends">{""}</p>}
 		</div>
 	</div>);
 }
@@ -117,17 +117,10 @@ const JoinedDate = ({date}) => {
 	</div>);
 }
 
-const AccountController = ({activePrompt, updateActivePrompt, updatePrompt}) => {
-	const startPasswordChange = async () => {
-		// add prompt box component, wait for user input and grab the new password
-		// perform input validation
-		// send password to the server and remove the prompt component
-		changePassword();
-	}
+const AccountController = ({passwordPrompt, updatePasswordPrompt, updatePrompt}) => {
 	const changePassword = async () => {
-		updateActivePrompt('visible-prompt');
-		updatePrompt(<ChangePassword activePrompt={activePrompt}/>);
-		//const resp = await fetch('/changepassword', {method: 'POST'});
+		updatePrompt(<ChangePassword passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt}/>);
+		updatePasswordPrompt('visible-prompt');
 	}
 	const changeProfile = async event => {
 		const file = event.target.files[0];
@@ -139,19 +132,14 @@ const AccountController = ({activePrompt, updateActivePrompt, updatePrompt}) => 
 		console.log(resp);
 		const r = await resp.json();
 		console.log(r);
-		// FIXME: pull new profile picture - actually return it from the server
-	}
-	const leaveChannel = async () => {
-		updateActivePrompt('visible-prompt');
-		updatePrompt(<LeaveChannel activePrompt={activePrompt}/>);
+		// FIXME: return profile pic from the server and load into view
 	}
 	const deleteChannel = async () => {}
 	const deleteAccount = async () => {}
 	return (<div id="account-controller">
-		<button id="change-password" onClick={startPasswordChange}>{"Change Password"}</button>
+		<button id="change-password" onClick={changePassword}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
-		{/*<button id="leave-channel" onClick={leaveChannel}>{"Leave Channel"}</button>*/}
 		<button id="delete-channel">{"Delete Channel"}</button>
 		<button id="delete-account">{"Delete Account"}</button>
 	</div>);
@@ -163,35 +151,57 @@ const SettingsPrompt = ({activePrompt}) => {
 	</div>);
 }
 
-const ChangePassword = ({activePrompt}) => {
-	const updateOldPass = async () => {}
-	const updateNewPass = async () => {}
-	const updateRetry = async () => {}
-	const tryNewPassword = async () => {}
-	return (<div className={`settings-prompt ${activePrompt}`}>
+const ChangePassword = ({passwordPrompt, updatePasswordPrompt}) => {
+	const [oldPass, updateOldPass] = React.useState('');
+	const [newPass, updateNewPass] = React.useState('');
+	const [retryPass, updateRetryPass] = React.useState('');
+	const [pwError, udpatePWError] = React.useState('');
+	const validPassword = pass => pass.match(/^[a-z0-9]{10,64}$/i);
+	const tryNewPassword = async () => {
+		console.log(`old: ${oldPass}\nnew: ${newPass}\nretry: ${retryPass}`);
+		if (oldPass == '') {
+			udpatePWError('Please enter your old password');
+			return;
+		} else if (newPass == '') {
+			udpatePWError('Please enter a new password');
+			return;
+		} else if (retryPass == '') {
+			udpatePWError('Please re-enter your new password');
+			return;
+		} else if (newPass != retryPass) {
+			udpatePWError('New passwords do not match');
+			return;
+		}
+		if (!validPassword(newPass)) {
+			udpatePWError('Invalid password [A-Z0-9]');
+			return;
+		}
+		const resp = await fetch('/changepassword', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"oldpassword": oldPass, "newpassword": newPass})});
+		const r = await resp.json();
+		if (r["status"] == "success") {
+			// successfully changed password; clear variables
+			clearVariables();
+		} else
+			udpatePWError('Could not change password');
+	}
+	const clearVariables = async () => {
+		updatePasswordPrompt('');
+		udpatePWError('');
+		updateOldPass('');
+		updateNewPass('');
+		updateRetryPass('');
+	}
+	return (<div className={`settings-prompt ${passwordPrompt}`}>
+		<div id="exit" onClick={clearVariables}>{"x"}</div>
+		<div className="error-container">
+			{pwError ? <div className="ui-error">{pwError}</div> : ''}
+		</div>
 		<label for="oldpw">{"Enter old password"}</label>
-		<input name="oldpw"/>
+		<input name="oldpw" onChange={event => updateOldPass(event.target.value)}/>
 		<label for="newpw">{"Enter new password"}</label>
-		<input name="newpw"/>
+		<input name="newpw" onChange={event => updateNewPass(event.target.value)}/>
 		<label for="newpwretry">{"Retype new password"}</label>
-		<input name="newpwretry"/>
-		<button onClick={tryNewPassword}>{"Change Password"}</button>
-	</div>);
-}
-
-const LeaveChannel = ({activePrompt}) => {
-	const updateOldPass = async () => {}
-	const updateNewPass = async () => {}
-	const updateRetry = async () => {}
-	const tryNewPassword = async () => {}
-	return (<div className={`settings-prompt ${activePrompt}`}>
-		<label for="channelselect">{"Select a channel to leave"}</label>
-		<select name="channelselect">
-			<option value={"One"}>{"One"}</option>
-			<option value={"Two"}>{"Two"}</option>
-			<option value={"Three"}>{"Three"}</option>
-		</select>
-		<label for="">{"Enter the name of the channel"}</label>
+		<input name="newpwretry" onChange={event => updateRetryPass(event.target.value)}/>
 		<button onClick={tryNewPassword}>{"Change Password"}</button>
 	</div>);
 }
@@ -201,11 +211,11 @@ const DeleteChannel = () => {}
 const DeleteAccount = () => {}
 
 const Settings = name => {
-	const [activePrompt, updateActivePrompt] = React.useState('');
+	const [passwordPrompt, updatePasswordPrompt] = React.useState('');
 	const [prompt, updatePrompt] = React.useState(null);
 	return (<div id="settings-page">
-		<AccountController activePrompt={activePrompt} updateActivePrompt={updateActivePrompt} updatePrompt={updatePrompt}/>
-		{prompt}
+		<AccountController passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt} updatePrompt={updatePrompt}/>
+		<ChangePassword passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt}/>
 	</div>);
 }
 
