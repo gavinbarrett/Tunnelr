@@ -8,25 +8,24 @@
 #side {
 	width: 20vw;
 	height: 90vh;
-	background: pink;
+	background: #7209b7;
 }
 
 #account-wrapper {
 	width: 80vw;
 	height: 90vh;
 	display: flex;
+	background: #f3e2f5;
 }
 
 #account-home {
 	width: 45vw;
 	height: 90vh;
-	background: orange;
 }
 
 #account-friends {
 	width: 35vw;
 	height: 90vh;
-	background: red;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -38,7 +37,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	color: white;
+	color: black;
 	font-size: 3rem;
 	font-family: 'Tahoma', sans-serif;
 	overflow-x: hidden;
@@ -62,7 +61,7 @@
 	align-items: center;
 	font-family: 'Inconsolata', monospace;
 	font-size: 2rem;
-	color: white;
+	color: black;
 }
 
 #friended-box {
@@ -89,7 +88,7 @@ img#profile {
 	display: flex;
 	flex-direction: column;
 	border-radius: 30px;
-	background: magenta;
+	background: #7209b7;
 	scrollbar-width: thin;
 }
 
@@ -99,6 +98,7 @@ img#profile {
 	text-align: center;
 	font-size: 1.2rem;
 	font-family: 'Tahoma', sans-serif;
+	color: white;
 }
 
 #friend-wrapper {
@@ -115,6 +115,7 @@ img#profile {
 	display: flex;
 	align-items: center;
 	background: blue;
+	color: white;
 	height: 2rem;
 	font-family: 'Tahoma', sans-serif;
 }
@@ -182,6 +183,7 @@ img#profile {
 	padding-left: 1rem;
 	cursor: default;
 	transition: all 0.5s ease-in;
+	color: white;
 }
 
 #self-sidebar > *:hover {
