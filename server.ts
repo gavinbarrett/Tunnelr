@@ -5,7 +5,7 @@ import * as dotenv from 'dotenv';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { findAllUserFriends, queryFriend } from './server/friends';
-import { changePassword, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
+import { changePassword, deleteAccount, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
 import { handleWSConnection } from './server/websocketServer';
 import * as multer from 'multer';
 import * as WebSocket from 'ws';
@@ -56,6 +56,7 @@ app.get('/leavechannel', authenticateUser, leaveChannel);
 app.put('/uploaduserprofile', upload.single('profile'), authenticateUser, uploadUserProfile);
 // change a user's password
 app.post('/changepassword', authenticateUser, changePassword);
+app.post('/deleteaccount', authenticateUser, deleteAccount);
 // search for friends based on a regex
 app.post('/queryfriend', authenticateUser, queryFriend);
 // search for channels based on a regex

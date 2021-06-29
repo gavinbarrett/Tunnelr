@@ -120,7 +120,7 @@ const PasswordPrompt = ({name, displayPassword, updateDisplayPassword, updateMem
             updateMemberStat('MEMBER');
         }
     }
-    return (<div className={`password-prompt ${displayPassword}`}>
+    return (<div className={`channel-password-prompt ${displayPassword}`}>
         <div id="password-prompt-exit">
             {error ? <div id="psk-error">{error}</div> : ''}
             <div id="exit" onClick={() => {
@@ -187,7 +187,7 @@ const RequestAccess = () => {
 }
 
 const EnterPassword = ({updateDisplayPassword}) => {
-    return (<div id="enter-password-button" onClick={() => updateDisplayPassword('password-prompt-displayed')}>
+    return (<div id="enter-password-button" onClick={() => updateDisplayPassword('channel-password-prompt-displayed')}>
         {"Enter Password"}
     </div>);
 }

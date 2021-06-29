@@ -18,6 +18,10 @@
 	background: #f3e2f5;
 }
 
+#account-wrapper > * {
+	cursor: default;
+}
+
 #account-home {
 	width: 45vw;
 	height: 90vh;
@@ -148,31 +152,6 @@ img#profile {
 	flex-direction: column;
 }
 
-.settings-prompt {
-	display: none;
-	transition: all 1s ease-in-out;
-}
-
-.settings-prompt > input {
-	width: 60vw;
-	height: 6vh;
-	margin: 0.5rem;
-	border: 0;
-	border-radius: 25px;
-}
-
-.visible-prompt {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	width: 80vw;
-	height: 90vh;
-	position: absolute;
-	background: rgb(109, 2, 109);
-	transition: all 1s ease-in-out;
-}
-
 #self-sidebar > * {
 	width: 100%;
 	height: 20vh;
@@ -187,19 +166,15 @@ img#profile {
 }
 
 #self-sidebar > *:hover {
-	background: purple;
+	background: #2e042e;
 	transition: all 0.5s ease-in;
 }
 
-#homepage {
-}
+#homepage {}
 
-#settings {
+#settings {}
 
-}
-
-#logout {
-}
+#logout {}
 
 #joined-date {
 	width: 25vw;
@@ -283,4 +258,16 @@ button#delete-account:hover {
 
 #profile-uploader {
 	display: none;
+}
+
+.settings-prompt {
+	transition: all 1s ease-in-out;
+}
+
+.settings-prompt > input {
+	width: 60vw;
+	height: 6vh;
+	margin: 0.5rem;
+	border: 0;
+	border-radius: 25px;
 }

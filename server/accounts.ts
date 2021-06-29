@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as stream from 'stream';
 import { checkHashes, computeSaltedHashedPass } from './authServer';
@@ -41,6 +40,53 @@ export const changePassword = async (req, res) => {
 		}
 	} else {
 		res.send(JSON.stringify({"status": "failed"}));
+	}
+}
+
+export const deleteAccount = async (req, res) => {
+	const { username, password } = req.body;
+	const { user } = req.cookies.sessionID;
+	console.log(`Username: '${username}'\nPassword: '${password}'\nUser: '${user}'`);
+	if (user != username) {
+		// a user is requesting deletion of another user's account; do not authorize
+		res.send(JSON.stringify({"status": "failed"}));
+	} else {
+		console.log(`Username: ${username}\nPassword: ${password}`);
+		console.log(user);
+
+		// pull user and credentials from the database
+		let query = 'select username, password from users where username=$1';
+		let values = [username];
+		const resp = await db.query(query, values);
+		if (resp && resp.rows && resp.rows.length) {
+			const hashed = resp.rows[0]["password"];
+			console.log(`Hashed: ${hashed}`);
+			//const computedPass = await computeSaltedHashedPass(password);
+			// compare the passwords. if they match, user is authenticated
+			const f = await checkHashes(password, hashed);
+			console.log(`F: ${f}`);
+			if (f) {
+				// found user
+				query = 'delete from users where username=$1';
+				// delte the user from the database
+				// FIXME: what else do we have to do? How do we handle their messages, channels, friends??
+				const r = await db.query(query, values);
+				if (r && r.rows) {
+					// user has been deleted; now delete the user session
+					const cookie = req.cookies.sessionID.sessionid;
+					if (db.exists(cookie)) db.del(cookie);
+					res.send(JSON.stringify({"status": "success"}));
+				} else {
+					console.log('Could not delete user');
+					res.send(JSON.stringify({"status": "failed"}));
+				}
+			} else {
+				res.send(JSON.stringify({"status": "failed"}));
+			}
+		} else {
+			// user doesn't exist
+			res.send(JSON.stringify({"status": "failed"}));
+		}
 	}
 }
 

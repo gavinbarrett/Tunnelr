@@ -1,6 +1,8 @@
 import { load } from 'dotenv/types';
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
+import { DeleteAccount } from './DeleteAccount';
+import { ChangePassword } from './ChangePassword';
 import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
 import './sass/Account.scss';
@@ -11,6 +13,7 @@ export const Account = () => {
 	const [self, updateSelf] = React.useState(true);
 	const [joinedDate, updateJoinedDate] = React.useState(null);
 	const [friendsList, updateFriendsList] = React.useState([]);
+	const history = useHistory();
 	React.useEffect(() => {
 		loadAccount();
 	}, [loc]);
@@ -27,7 +30,12 @@ export const Account = () => {
 		console.log(`Grabbing ${name}`);
 		const resp = await fetch(`/loaduserinfo/?name=${name}`, {method: 'GET'});
 		const r = await resp.json();
+		console.table(r);
 		const created_date = r["created_at"].split(' ');
+		if (created_date == "null") {
+			history.push(`/notfound`);
+		}
+		console.log(`Created Date: ${created_date}`);
 		const date = created_date.splice(1, 4);
 		// set joined date
 		updateJoinedDate(date.join(' '));
@@ -111,16 +119,9 @@ const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) =>
 	</div>);
 }
 
-const JoinedDate = ({date}) => {
-	return (<div id="joined-date">
-		{date}
-	</div>);
-}
-
-const AccountController = ({passwordPrompt, updatePasswordPrompt, updatePrompt}) => {
+const AccountController = ({updatePrompt}) => {
 	const changePassword = async () => {
-		updatePrompt(<ChangePassword passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt}/>);
-		updatePasswordPrompt('visible-prompt');
+		updatePrompt(<ChangePassword updatePrompt={updatePrompt}/>);
 	}
 	const changeProfile = async event => {
 		const file = event.target.files[0];
@@ -135,87 +136,23 @@ const AccountController = ({passwordPrompt, updatePasswordPrompt, updatePrompt})
 		// FIXME: return profile pic from the server and load into view
 	}
 	const deleteChannel = async () => {}
-	const deleteAccount = async () => {}
+	const deleteAccount = async () => {
+		updatePrompt(<DeleteAccount updatePrompt={updatePrompt}/>);
+	}
 	return (<div id="account-controller">
 		<button id="change-password" onClick={changePassword}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
 		<button id="delete-channel">{"Delete Channel"}</button>
-		<button id="delete-account">{"Delete Account"}</button>
+		<button id="delete-account" onClick={deleteAccount}>{"Delete Account"}</button>
 	</div>);
 }
 
-const SettingsPrompt = ({activePrompt}) => {
-	return (<div className={`settings-prompt ${activePrompt}`}>
-		{"This is the prompt overlay"}
-	</div>);
-}
-
-const ChangePassword = ({passwordPrompt, updatePasswordPrompt}) => {
-	const [oldPass, updateOldPass] = React.useState('');
-	const [newPass, updateNewPass] = React.useState('');
-	const [retryPass, updateRetryPass] = React.useState('');
-	const [pwError, udpatePWError] = React.useState('');
-	const validPassword = pass => pass.match(/^[a-z0-9]{10,64}$/i);
-	const tryNewPassword = async () => {
-		console.log(`old: ${oldPass}\nnew: ${newPass}\nretry: ${retryPass}`);
-		if (oldPass == '') {
-			udpatePWError('Please enter your old password');
-			return;
-		} else if (newPass == '') {
-			udpatePWError('Please enter a new password');
-			return;
-		} else if (retryPass == '') {
-			udpatePWError('Please re-enter your new password');
-			return;
-		} else if (newPass != retryPass) {
-			udpatePWError('New passwords do not match');
-			return;
-		}
-		if (!validPassword(newPass)) {
-			udpatePWError('Invalid password [A-Z0-9]');
-			return;
-		}
-		const resp = await fetch('/changepassword', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"oldpassword": oldPass, "newpassword": newPass})});
-		const r = await resp.json();
-		if (r["status"] == "success") {
-			// successfully changed password; clear variables
-			clearVariables();
-		} else
-			udpatePWError('Could not change password');
-	}
-	const clearVariables = async () => {
-		updatePasswordPrompt('');
-		udpatePWError('');
-		updateOldPass('');
-		updateNewPass('');
-		updateRetryPass('');
-	}
-	return (<div className={`settings-prompt ${passwordPrompt}`}>
-		<div id="exit" onClick={clearVariables}>{"x"}</div>
-		<div className="error-container">
-			{pwError ? <div className="ui-error">{pwError}</div> : ''}
-		</div>
-		<label for="oldpw">{"Enter old password"}</label>
-		<input name="oldpw" onChange={event => updateOldPass(event.target.value)}/>
-		<label for="newpw">{"Enter new password"}</label>
-		<input name="newpw" onChange={event => updateNewPass(event.target.value)}/>
-		<label for="newpwretry">{"Retype new password"}</label>
-		<input name="newpwretry" onChange={event => updateRetryPass(event.target.value)}/>
-		<button onClick={tryNewPassword}>{"Change Password"}</button>
-	</div>);
-}
-
-const DeleteChannel = () => {}
-
-const DeleteAccount = () => {}
-
-const Settings = name => {
-	const [passwordPrompt, updatePasswordPrompt] = React.useState('');
+const Settings = (name, ) => {
 	const [prompt, updatePrompt] = React.useState(null);
 	return (<div id="settings-page">
-		<AccountController passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt} updatePrompt={updatePrompt}/>
-		<ChangePassword passwordPrompt={passwordPrompt} updatePasswordPrompt={updatePasswordPrompt}/>
+		<AccountController updatePrompt={updatePrompt}/>
+		{prompt}
 	</div>);
 }
 

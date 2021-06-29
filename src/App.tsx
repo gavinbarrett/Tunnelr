@@ -8,6 +8,7 @@ import { SignIn } from './components/SignIn';
 import { Account } from './components/Account';
 import { ChannelPage } from './components/ChannelPage';
 import { Chat } from './components/Chat';
+import { NotFound } from './components/NotFound';
 import { UserAuth } from './UserAuth';
 import './components/sass/App.scss';
 
@@ -46,6 +47,10 @@ const App = () => {
 				<Router.Route path="/channel" render={() => <ChannelPage/>}/>
 				<Router.Route path="/chat">
 					{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}
+				</Router.Route>
+				<Router.Route path="/notfound" render={() => <NotFound/>}/>
+				<Router.Route path="/*">
+					<Router.Redirect to="/notfound"/>
 				</Router.Route>
 			</Router.Switch>
 		</UserAuth.Provider>
