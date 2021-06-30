@@ -36,7 +36,7 @@ export const Account = () => {
 			history.push(`/notfound`);
 		}
 		console.log(`Created Date: ${created_date}`);
-		const date = created_date.splice(1, 4);
+		const date = created_date.splice(1, 3);
 		// set joined date
 		updateJoinedDate(date.join(' '));
 		const profilepic = r['profile'];
