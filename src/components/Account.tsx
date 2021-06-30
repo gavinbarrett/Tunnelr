@@ -45,13 +45,12 @@ export const Account = () => {
 		if (!r['friends']) return;
 		updateFriendsList(r['friends']);
 	}
-	return (<><div id="account-page">
+	return (<div id="account-page">
 		<div id="side">
 			{name === user ? <Selector updateSelf={updateSelf} updateUser={updateUser} updateLoggedIn={updateLoggedIn} name={name} user={user}/> : ''}
 		</div>
-		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} profile={profile} updateName={updateName}/> : <Settings name={name}/>}
-	</div>
-	<Footer/></>);
+		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} profile={profile} updateName={updateName}/> : <Settings name={name} updateProfile={updateProfile}/>}
+	</div>);
 }
 
 const FriendsList = ({friendsList, updateName}) => {
@@ -119,12 +118,13 @@ const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) =>
 	</div>);
 }
 
-const AccountController = ({updatePrompt}) => {
+const AccountController = ({updatePrompt, updateProfile}) => {
 	const changePassword = async () => {
 		updatePrompt(<ChangePassword updatePrompt={updatePrompt}/>);
 	}
 	const changeProfile = async event => {
 		const file = event.target.files[0];
+		console.log(`Uploading file: ${file}`);
 		if (!file) return;
 		const formData = new FormData();
 		formData.append('profile', file);
@@ -133,6 +133,11 @@ const AccountController = ({updatePrompt}) => {
 		console.log(resp);
 		const r = await resp.json();
 		console.log(r);
+		if (r["status"] == "success" && r["profile"] != "null") {
+			const c = r["profile"];
+			console.log(`C: ${c}`);
+			updateProfile(`data:image/png;base64,${c}`);
+		}
 		// FIXME: return profile pic from the server and load into view
 	}
 	const deleteChannel = async () => {}
@@ -148,10 +153,10 @@ const AccountController = ({updatePrompt}) => {
 	</div>);
 }
 
-const Settings = (name, ) => {
+const Settings = ({name, updateProfile}) => {
 	const [prompt, updatePrompt] = React.useState(null);
 	return (<div id="settings-page">
-		<AccountController updatePrompt={updatePrompt}/>
+		<AccountController updatePrompt={updatePrompt} updateProfile={updateProfile}/>
 		{prompt}
 	</div>);
 }
@@ -165,8 +170,18 @@ const FriendStatus = ({name, friend, friendsList}) => {
 			if (friend == elem['friend']) updateStatus('Friended \u2713');
 		});
 	}, [friendsList]);
+	const changeFriendStatus = async () => {
+		if (status == 'Befriend') {
+			// add friend
+			const resp = await fetch(`/addfriend?friend=${name}`, {method: 'GET'});
+			const r = await resp.json();
+			console.log(r);
+		} else if (status == 'Friended \u2713') {
+			// remove friend
+		}
+	}
 	return (<div id="befriend">
-		<button id="befriend-button">
+		<button id="befriend-button" onClick={changeFriendStatus}>
 			{status}
 		</button>
 	</div>);

@@ -131,14 +131,15 @@ export const uploadUserProfile = async (req, res) => {
 		// save profile photo on disk
 		// FIXME: programmatically set image file extension
 		const written = await writeProfileToDisk(hash, image, 'jpg');
-        console.log(`user: ${user}`);
+		const profile = await readProfileFromDisk(hash);
+        console.log(`Image: ${image}`);
 		// insert hash into the document table
 		const result = await insertProfileIntoDB(user, hash);
 		console.log(`Written: ${written}\nResult: ${result}`);
 		if (written && result) {
-			res.send(JSON.stringify({"status": "success"}));
+			res.send(JSON.stringify({"status": "success", "profile": profile}));
 		 } else {
-			 res.send(JSON.stringify({"status": "null"}));
+			 res.send(JSON.stringify({"status": "null", "profile": "null"}));
 		 }
 	} catch (error) {
 		console.log(`Error uploading file: ${error}`);

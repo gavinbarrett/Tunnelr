@@ -4,7 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
 import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
-import { findAllUserFriends, queryFriend } from './server/friends';
+import { addFriend, findAllUserFriends, queryFriend } from './server/friends';
 import { changePassword, deleteAccount, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
 import { handleWSConnection } from './server/websocketServer';
 import * as multer from 'multer';
@@ -48,6 +48,8 @@ app.get('/loadchannelinfo', authenticateUser, loadChannelInfo);
 app.get('/loaduserinfo', authenticateUser, loadUserInfo);
 // join a channel
 app.get('/joinchannel', authenticateUser, joinPublicChannel);
+// add a friend
+app.get('/addfriend', authenticateUser, addFriend);
 // join a channel protected by a shared password
 app.post('/joinpskchannel', authenticateUser, joinPSKChannel);
 // leave a channel the user is subscribed to

@@ -1,3 +1,9 @@
+#delete-account-warning {
+	font-size: 2.5rem;
+	color: white;
+	font-family: 'Tahoma', sans-serif;
+}
+
 .delete-account-prompt {
 	display: flex;
 	flex-direction: column;
@@ -6,6 +12,6 @@
 	width: 80vw;
 	height: 90vh;
 	position: absolute;
-	background: rgb(109, 2, 109);
+	background: #7209b7;
 	transition: all 1s ease-in-out;
 }
