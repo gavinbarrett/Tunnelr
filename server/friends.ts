@@ -3,33 +3,30 @@ import * as db from './databaseFunctions';
 export const addFriend = async (req, res) => {
 	const { friend } = req.query;
 	const { user } = req.cookies.sessionID;
-	//const values = ['Friended', ];
 	let query = 'select * from friendships where friend1=$1 and friend2=$2';
 	let values = [user, friend];
-	// 
+	// check for friendship relation
 	const resp = await db.query(query, values);
 	if (resp && resp.rows && resp.rows.length) {
-		// relation exists. use update query
+		// relation exists; use update query
 		query = 'update friendships set status=$1 where friend1=$2 and friend2=$3';
 		values = ['Friended', user, friend];
-		console.log(`User: ${user}\nFriend: ${friend}`);
+		// add friended status
 		const r = await db.query(query, values);
-		console.log('Updating friendship relation.');
-		res.send(JSON.stringify({"status": "success"}));
+		res.send(JSON.stringify({"status": "success", "friendstatus": "None"}));
 	} else {
 		// relation doesn't exist; insert relation
 		query = 'insert into friendships (friend1, friend2, status) values ($1, $2, $3)';
 		values = [user, friend, 'Friended'];
+		// add friended status
 		const r = await db.query(query, values);
-		console.log('Creating friendship relation.');
-		res.send(JSON.stringify({"status": "success"}));
+		res.send(JSON.stringify({"status": "success", "friendstatus": "None"}));
 	}
 }
 
 export const queryFriend = async (req, res) => {
 	// search the user database for friends
 	const { username } = req.body;
-	console.log(`In QF: ${username}`);
 	// FIXME: input validation
 	const userReg = /^[a-z0-9]{2,32}$/i;
 	if (!username.match(userReg)) {

@@ -20,7 +20,16 @@ const App = () => {
 	const loc = Router.useLocation();
 	React.useEffect(() => {
 		// try to retrieve prior session
-		getSession();
+		//getSession();
+		const w = window.sessionStorage.getItem("data");
+		if (w) {
+			console.log(`Retrieved session data: ${w}`);
+			const { user, loggedin } = JSON.parse(w);
+			console.log(`Session store contained: ${user}\n${loggedin}`);
+		} else {
+			console.log(`Setting session data`);
+			getSession();
+		}
 	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});

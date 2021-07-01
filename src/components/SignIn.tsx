@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
+import { updateDataStore } from './dataStore';
 import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
 import './sass/SignIn.scss';
@@ -17,6 +18,9 @@ export const SignIn = () => {
 			const r = await resp.json();
 			console.log(r["status"]);
 			if (r["status"] !== "failed") {
+				let user = r["status"];
+				let logged = true;
+				updateDataStore("data", JSON.stringify({"user": user, "loggedin": logged}));
 				console.log(`Logging in as ${r["status"]}`);
 				updateLoggedIn(true);
 				//console.log(`Log in status: ${Object.getOwnPropertyNames(r["status"])}`);

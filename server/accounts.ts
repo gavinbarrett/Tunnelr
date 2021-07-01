@@ -53,7 +53,6 @@ export const deleteAccount = async (req, res) => {
 	} else {
 		console.log(`Username: ${username}\nPassword: ${password}`);
 		console.log(user);
-
 		// pull user and credentials from the database
 		let query = 'select username, password from users where username=$1';
 		let values = [username];

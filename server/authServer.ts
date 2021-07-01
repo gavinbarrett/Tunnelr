@@ -2,7 +2,7 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import * as db from './databaseFunctions';
 
-const expiry: number = 60 * 60 // 60 minutes
+const expiry: number = 60 * 60 // 60 minute session
 
 export const authenticateUser = async (req, res, next) => {
 	/* Authenticate the user's session ID against the cache */
@@ -79,6 +79,7 @@ export const signUserIn = async (req, res) => {
 			if (matched) {
 				console.log(`Signing in ${user}`);
 				const id = await createSessionID();
+				// FIXME: check for profile picture, friends, channels
 				const clientData = {
 					user: user,
 					sessionid: id
@@ -121,6 +122,7 @@ export const signUserUp = async (req, res) => {
 				};
 				// set session id
 				db.set(id, user, 'EX', expiry);
+				// set cookie data
 				res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
 				res.send(JSON.stringify({"status": user}));
 			} else {
