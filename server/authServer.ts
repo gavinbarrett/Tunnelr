@@ -89,13 +89,15 @@ export const authenticate = async (user, pass, res) => {
 			console.log(`Signing in ${user}`);
 			// FIXME: check for profile picture, friends, channels
 			let query = 'select username, profile, created_at from users where username=$1';
-			const values = [user];
+			let values = [user];
 			const userData = await db.query(query, values);
-			query = `select friend2 as friend from friendships where friend1=$1 and status='Friended' intersect select friend1 from friendships where friend2=$1 and status='Friended'`;
+			query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
+			values = [user, user];
 			console.log(userData.rows);
 			const friends = await db.query(query, values);
 			console.log(friends.rows);
 			query = 'select channelname from members where username=$1';
+			values = [user];
 			const channels = await db.query(query, values);
 			console.log(channels.rows);
 

@@ -3,24 +3,28 @@ import * as db from './databaseFunctions';
 export const addFriend = async (req, res) => {
 	const { friend } = req.query;
 	const { user } = req.cookies.sessionID;
-	let query = 'select * from friendships where friend1=$1 and friend2=$2';
-	let values = [user, friend];
+	let query = 'select * from friendships where friend2=$1 and friend1=$2 and status=$3';
+	let values = [user, friend, 'Pending'];
 	// check for friendship relation
 	const resp = await db.query(query, values);
 	if (resp && resp.rows && resp.rows.length) {
-		// relation exists; use update query
-		query = 'update friendships set status=$1 where friend1=$2 and friend2=$3';
+		// pending friendship relation exists; use update query
+
+		// FIXME: update f1
+		query = 'update friendships set status=$1 where friend2=$2 and friend1=$3';
 		values = ['Friended', user, friend];
 		// add friended status
 		const r = await db.query(query, values);
-		res.send(JSON.stringify({"status": "success", "friendstatus": "None"}));
+		query = 'insert into friendships (friend1, friend2, status) values ($1, $2, $3)';
+		values = [user, friend, 'Friended'];
+		res.send(JSON.stringify({"status": "success", "friendstatus": "Friended"}));
 	} else {
 		// relation doesn't exist; insert relation
 		query = 'insert into friendships (friend1, friend2, status) values ($1, $2, $3)';
-		values = [user, friend, 'Friended'];
+		values = [user, friend, 'Pending'];
 		// add friended status
 		const r = await db.query(query, values);
-		res.send(JSON.stringify({"status": "success", "friendstatus": "None"}));
+		res.send(JSON.stringify({"status": "success", "friendstatus": "Pending"}));
 	}
 }
 
@@ -53,8 +57,8 @@ export const findAllUserFriends = async (req, res) => {
 	/* retrieve all friends of a user */
 	const { username } = req.body;
 	console.log(`Username: ${username}`);
-	const query = `select friend2 from friendships where friend1=$1 and status='Friended' intersect select friend1 from friendships where friend2=$1 and status='Friended'`;
-	const values = [username];
+	const query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
+	const values = [username, username];
 	const resp = await db.query(query, values);
 	console.log(resp.rows);
 	res.send(JSON.stringify({"status": "success"}));

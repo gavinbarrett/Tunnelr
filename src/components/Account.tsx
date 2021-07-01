@@ -12,6 +12,8 @@ export const Account = () => {
 	const [self, updateSelf] = React.useState(true);
 	const [joinedDate, updateJoinedDate] = React.useState(null);
 	const [friendsList, updateFriendsList] = React.useState([]);
+	const [pendingFriendsList, updatePendingFriendsList] = React.useState([]);
+
 	const history = useHistory();
 	React.useEffect(() => {
 		loadAccount();
@@ -20,6 +22,7 @@ export const Account = () => {
 		const username = loc.pathname.split('/')[2];
 		// FIXME: download user's account data
 		console.log(`Username: ${username}`);
+		// if the user is looking at their own account, we should have already pulled data from the store and loaded it into the user, profile, joined, etc variables
 		if (username) {
 			updateName(username);
 			grabUserInfo(username);
@@ -42,13 +45,16 @@ export const Account = () => {
 		// set profile picture
 		(profilepic == "null") ? updateProfile('images/blank.png') : updateProfile(`data:image/png;base64,${profilepic}`);
 		if (!r['friends']) return;
+		console.log('pending');
+		console.log(r['pending']);
+		updatePendingFriendsList(r['pending']);
 		updateFriendsList(r['friends']);
 	}
 	return (<div id="account-page">
 		<div id="side">
 			{name === user ? <Selector updateSelf={updateSelf} updateUser={updateUser} updateLoggedIn={updateLoggedIn} name={name} user={user}/> : ''}
 		</div>
-		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} profile={profile} updateName={updateName}/> : <Settings name={name} updateProfile={updateProfile}/>}
+		{self ? <HomePage name={name} user={user} joinedDate={joinedDate} friendsList={friendsList} updateFriendsList={updateFriendsList} profile={profile} updateName={updateName} pendingFriendsList={pendingFriendsList}/> : <Settings name={name} updateProfile={updateProfile}/>}
 	</div>);
 }
 
@@ -62,7 +68,6 @@ const FriendsList = ({friendsList, updateName}) => {
 		<p id="friends-header">{"Friends"}</p>
 		<div id="friend-wrapper">
 			{friendsList.length ? friendsList.map((elem, id) => {
-				console.log(elem);
 				return <p className="friend-slide" onClick={() => showUser(elem.friend)}>{elem.friend}</p>
 			}) : <p id="no-friends">{""}</p>}
 		</div>
@@ -97,7 +102,7 @@ const Selector = ({updateSelf, updateUser, updateLoggedIn, name, user}) => {
 	</div>);
 }
 
-const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) => {
+const HomePage = ({name, user, joinedDate, friendsList, updateFriendsList, profile, updateName, pendingFriendsList}) => {
 	return (<div id="account-wrapper">
 		<div id="account-home">
 			<div id="account-name">
@@ -109,7 +114,7 @@ const HomePage = ({name, user, joinedDate, friendsList, profile, updateName}) =>
 				</div>
 			</div>
 			<div id="account-date">{`Joined: ${joinedDate}`}</div>
-			{name != user ? <FriendStatus name={name} friend={user} friendsList={friendsList}/> : ''}
+			{name != user ? <FriendStatus name={name} friend={user} friendsList={friendsList} updateFriendsList={updateFriendsList} pendingFriendsList={pendingFriendsList}/> : ''}
 		</div>
 		<div id="account-friends">
 			<FriendsList friendsList={friendsList} updateName={updateName}/>
@@ -160,7 +165,7 @@ const Settings = ({name, updateProfile}) => {
 	</div>);
 }
 
-const FriendStatus = ({name, friend, friendsList}) => {
+const FriendStatus = ({name, friend, friendsList, updateFriendsList, pendingFriendsList}) => {
 	const [status, updateStatus] = React.useState('Befriend');
 	React.useEffect(() => {
 		friendsList.map((elem, id) => {
@@ -168,16 +173,25 @@ const FriendStatus = ({name, friend, friendsList}) => {
 			console.log(friend);
 			if (friend == elem['friend']) updateStatus('Friended \u2713');
 		});
-	}, [friendsList]);
+		console.log(`PendingFriends: ${pendingFriendsList}`);
+		pendingFriendsList && pendingFriendsList.map((elem, id) => {
+			if (friend == elem['pendingfriend']) updateStatus('Pending');
+		});
+	}, [friendsList, pendingFriendsList]);
 	const changeFriendStatus = async () => {
 		if (status == 'Befriend') {
 			// add friend
 			const resp = await fetch(`/addfriend?friend=${name}`, {method: 'GET'});
 			const r = await resp.json();
 			console.log(r);
+			updateStatus(r['friendstatus']);
+			if (r['friendstatus'] == 'Friended') {
+				updateFriendsList([...friendsList, {"friend": friend}]);
+			}
+			// FIXME if the friendstatus is now `Friended`, add the friend to the friendsList
 		} else if (status == 'Friended \u2713') {
 			// remove friend
-		}
+		} else if (status == 'Pending') return;
 	}
 	return (<div id="befriend">
 		<button id="befriend-button" onClick={changeFriendStatus}>

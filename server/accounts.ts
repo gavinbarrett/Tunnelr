@@ -90,30 +90,38 @@ export const deleteAccount = async (req, res) => {
 }
 
 export const loadUserInfo = async (req, res) => {
+	const { user } = req.cookies.sessionID;
     const name = req.query.name;
     console.log(`Username: ${name}`);
     let query = 'select * from users where username=$1';
     let values = [name];
     let data = await db.query(query, values);
-
 	const created_at = data.rows.length ? data.rows[0].created_at : null;
 	const profile = data.rows.length ? data.rows[0].profile : null;
-
 	// construct query for finding all friends
-	query = `select friend2 as friend from friendships where friend1=$1 and status='Friended' intersect select friend1 from friendships where friend2=$1 and status='Friended'`;
+	query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
+	console.log(`Checking for ${name}`);
+	values = [name, name];
 	data = await db.query(query, values);
+	console.log(`Data:`);
+	console.log(data);
 	let friends = JSON.stringify(data.rows);
 	console.log(`Friends: ${friends}`);
+	//query = "select friend2 as pendingfriend from friendships where friend1=$1 and status='Pending' union select friend1 from friendships where friend2=$2 and status='Pending'";
+	query = "select friend2 from friendships where friend1=$1 and friend2=$2 and status='Pending'";
+	values = [user, name];
+	const pending = await db.query(query, values);
 	console.log(`Created at: ${created_at}`);
 	query = 'select channelname from members where username=$1';
+	values = [name];
 	const channels = await db.query(query, values);
 	if (!profile) {
-        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}, "channels": ${JSON.stringify(channels)}}`;
+        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
         res.send(date);
     } else {
         // read user's profile from the disk
         const pic = await readProfileFromDisk(profile);
-        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "channels": ${JSON.stringify(channels)}}`;
+        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
         res.send(date);
     }
 }
