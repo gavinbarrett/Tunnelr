@@ -4,7 +4,7 @@ import * as db from './databaseFunctions';
 
 const expiry: number = 60 * 60 // 60 minute session
 
-export const authenticateUser = async (req, res, next) => {
+export const authorizeUser = async (req, res, next) => {
 	/* Authenticate the user's session ID against the cache */
 	if (!req.cookies.sessionID) {
 		res.status(401).send(JSON.stringify({"status": "failed"}));
@@ -34,12 +34,24 @@ export const authenticateUserForUser = async (req, res, next) => {
 	}
 }
 
+const establishSession = async (user, res) => {
+	const id = await createSessionID();
+	const clientData = {
+		user: user,
+		sessionid: id
+	};
+	// set session id
+	db.set(id, user, 'EX', expiry);
+	// set cookie data
+	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
+	res.send(JSON.stringify({"status": user}));
+}
+
 export const retrieveSession = async (req, res) => {
 	/* Retrieve user session */
 	if (req.cookies.sessionID) {
 		//console.log("Trying to retrieve");
 		const { user, sessionid } = req.cookies.sessionID;
-		//console.log(`User: ${user}\nSessionID: ${sessionid}`);
 		const session = await checkForSession(sessionid);
 		console.log(`Session: ${session}`);
 		if (session)
@@ -65,72 +77,66 @@ const checkForSession = async id => {
 	}
 }
 
-export const signUserIn = async (req, res) => {
-	const { user, pass } = req.body;
-	if (await validateQueries([user, pass], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i])) {
-		// check database for username
-		const added = await checkForUser(user);
-		if (added.rows.length !== 0) {	// return failed sign up attempt if user already exists
-			// extract hashed password
-			const hashed = added.rows[0].password;
-			// FIXME: validate bcrypt
-			const matched = await checkHashes(pass, hashed);
-			console.log(matched);
-			if (matched) {
-				console.log(`Signing in ${user}`);
-				const id = await createSessionID();
-				// FIXME: check for profile picture, friends, channels
-				const clientData = {
-					user: user,
-					sessionid: id
-				};
-				// set session id
-				db.set(id, user, 'EX', expiry);
-				res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
-				res.send(JSON.stringify({"status": user}));
-				// FIXME set cookie to return to user
-			} else {
-				console.log("failed");
-				res.send(JSON.stringify({"status": "failed"}));
-			}
-		} else {		// 
+export const authenticate = async (user, pass, res) => {
+	const added = await checkForUser(user);
+	if (added.rows.length !== 0) {	// return failed sign up attempt if user already exists
+		// extract hashed password
+		const hashed = added.rows[0].password;
+		// FIXME: validate bcrypt
+		const matched = await checkHashes(pass, hashed);
+		console.log(matched);
+		if (matched) {
+			console.log(`Signing in ${user}`);
+			// FIXME: check for profile picture, friends, channels
+			let query = 'select username, profile, created_at from users where username=$1';
+			const values = [user];
+			const userData = await db.query(query, values);
+			query = `select friend2 as friend from friendships where friend1=$1 and status='Friended' intersect select friend1 from friendships where friend2=$1 and status='Friended'`;
+			console.log(userData.rows);
+			const friends = await db.query(query, values);
+			console.log(friends.rows);
+			query = 'select channelname from members where username=$1';
+			const channels = await db.query(query, values);
+			console.log(channels.rows);
+
+			// FIXME: check for profile; if it exists, read it from disk
+			// send all data to the client
+			establishSession(user, res);
+			// FIXME set cookie to return to user
+		} else
 			res.send(JSON.stringify({"status": "failed"}));
-		}
 	} else {
 		res.send(JSON.stringify({"status": "failed"}));
 	}
+}
+
+export const signUserIn = async (req, res) => {
+	const { user, pass } = req.body;
+	if (await validQueries([user, pass], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i]))
+		authenticate(user, pass, res);
+	else
+		res.send(JSON.stringify({"status": "failed"}));
 }
 
 export const signUserUp = async (req, res) => {
 	/* Attempt to sign the user up */
 	const { user, pass, email } = req.body;
 	// attempt to sign user up if credentials are valid
-	if (await validateQueries([user, pass, email], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i, /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i])) {
+	if (await validQueries([user, pass, email], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i, /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i])) {
 		// check database for username
 		const added = await checkForUser(user);
 		if (added.rows.length !== 0)	// return failed sign up attempt if user already exists
 			res.send(JSON.stringify({"status": "failed"}));
 		else {		// 
 			// if the user doesn't exist, attempt to sign them up
-			const userAdded = addUser(user, pass, email);
-			if (userAdded) {
+			if (addUser(user, pass, email)) {
 				console.log(`Signing up new user ${user}`);
-				const id = await createSessionID();
-				const clientData = {
-					user: user,
-					sessionid: id
-				};
-				// set session id
-				db.set(id, user, 'EX', expiry);
-				// set cookie data
-				res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
+				// establish session
+				establishSession(user, res);
 				res.send(JSON.stringify({"status": user}));
 			} else {
 				res.send(JSON.stringify({"status": "failed"}));
 			}
-			// FIXME: generate a user session id
-
-			// FIXME: set the session id in the cookie and return it along with a successful status code
 		}
 	} else {
 		res.send(JSON.stringify({"status": "failed"}));
@@ -155,7 +161,7 @@ export const checkHashes = async (password, hashed) => {
 	});
 }
 
-const validateQueries = async (queries, regexes) => {
+const validQueries = async (queries, regexes) => {
 	/* Ensure the query string passes the regex validation */
 	return new Promise(resolve => {
 		queries.map((value, idx) => {

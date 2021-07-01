@@ -2,7 +2,7 @@
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
-import { authenticateUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
+import { authorizeUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { addFriend, findAllUserFriends, queryFriend } from './server/friends';
 import { changePassword, deleteAccount, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
@@ -24,7 +24,6 @@ app.use(cookieParser(process.env.SERVERSEC));
 const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.static('dist'));
 
-
 app.post('/signup', signUserUp);
 app.post('/signin', signUserIn);
 
@@ -32,39 +31,39 @@ app.post('/signin', signUserIn);
 authenticated functions 
 */
 // retrieve user session
-app.get('/getsession', authenticateUser, retrieveSession);
+app.get('/getsession', authorizeUser, retrieveSession);
 // log user out of Tunnelr
-app.get('/logout', authenticateUser, logUserOut);
+app.get('/logout', authorizeUser, logUserOut);
 // load user channels
-app.get('/loadchannels', authenticateUser, loadChannels);
+app.get('/loadchannels', authorizeUser, loadChannels);
 // get messages from channel - ** FIXME: check user against channel access controls **
-app.get('/getmessages', authenticateUser, getMessages);
+app.get('/getmessages', authorizeUser, getMessages);
 // get updated messages from channel
-app.get('/getupdatedmessages', authenticateUser, getUpdatedMessages);
-app.get('/findalluserfriends', authenticateUser, findAllUserFriends);
+app.get('/getupdatedmessages', authorizeUser, getUpdatedMessages);
+app.get('/findalluserfriends', authorizeUser, findAllUserFriends);
 // load channel info
-app.get('/loadchannelinfo', authenticateUser, loadChannelInfo);
+app.get('/loadchannelinfo', authorizeUser, loadChannelInfo);
 // load user info
-app.get('/loaduserinfo', authenticateUser, loadUserInfo);
+app.get('/loaduserinfo', authorizeUser, loadUserInfo);
 // join a channel
-app.get('/joinchannel', authenticateUser, joinPublicChannel);
+app.get('/joinchannel', authorizeUser, joinPublicChannel);
 // add a friend
-app.get('/addfriend', authenticateUser, addFriend);
+app.get('/addfriend', authorizeUser, addFriend);
 // join a channel protected by a shared password
-app.post('/joinpskchannel', authenticateUser, joinPSKChannel);
+app.post('/joinpskchannel', authorizeUser, joinPSKChannel);
 // leave a channel the user is subscribed to
-app.get('/leavechannel', authenticateUser, leaveChannel);
+app.get('/leavechannel', authorizeUser, leaveChannel);
 // change a user's profile picture
-app.put('/uploaduserprofile', upload.single('profile'), authenticateUser, uploadUserProfile);
+app.put('/uploaduserprofile', upload.single('profile'), authorizeUser, uploadUserProfile);
 // change a user's password
-app.post('/changepassword', authenticateUser, changePassword);
-app.post('/deleteaccount', authenticateUser, deleteAccount);
+app.post('/changepassword', authorizeUser, changePassword);
+app.post('/deleteaccount', authorizeUser, deleteAccount);
 // search for friends based on a regex
-app.post('/queryfriend', authenticateUser, queryFriend);
+app.post('/queryfriend', authorizeUser, queryFriend);
 // search for channels based on a regex
-app.post('/querychannel', authenticateUser, queryChannel);
+app.post('/querychannel', authorizeUser, queryChannel);
 // create a new channel - ** FIXME: change name to createchannel **
-app.post('/addchannel', authenticateUser, addChannel);
+app.post('/addchannel', authorizeUser, addChannel);
 
 wss.on('connection', handleWSConnection);
 

@@ -3,7 +3,6 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { DeleteAccount } from './DeleteAccount';
 import { ChangePassword } from './ChangePassword';
-import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
 import './sass/Account.scss';
 
@@ -148,7 +147,7 @@ const AccountController = ({updatePrompt, updateProfile}) => {
 		<button id="change-password" onClick={changePassword}>{"Change Password"}</button>
 		<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 		<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>
-		<button id="delete-channel">{"Delete Channel"}</button>
+		{/*<button id="delete-channel">{"Delete Channel"}</button>*/}
 		<button id="delete-account" onClick={deleteAccount}>{"Delete Account"}</button>
 	</div>);
 }

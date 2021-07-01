@@ -16,25 +16,32 @@ const App = () => {
 	const [user, updateUser] = React.useState('');
 	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const [profile, updateProfile] = React.useState('images/blank.png');
+	//const dataLog = React.useReducer();
 	// FIXME once a user logs in, store their name, joined date, list of channels and friends, and profile pic
 	const loc = Router.useLocation();
 	React.useEffect(() => {
 		// try to retrieve prior session
-		//getSession();
-		const w = window.sessionStorage.getItem("data");
-		if (w) {
-			console.log(`Retrieved session data: ${w}`);
-			const { user, loggedin } = JSON.parse(w);
+		getSession();
+		const sessionData = window.sessionStorage.getItem("data");
+		if (sessionData) {
+			console.log(`Retrieved session data: ${sessionData}`);
+			const { user, loggedin } = JSON.parse(sessionData);
+			console.log(`Updating user to ${user}`);
+			//updateUser(user);
+			//updateLoggedIn(true);
 			console.log(`Session store contained: ${user}\n${loggedin}`);
-		} else {
+		} 
+		/*
+		else {
 			console.log(`Setting session data`);
 			getSession();
-		}
+		}*/
 	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
 		// FIXME: ajax should return the user's profile picture, friends list, joined channels, and joined date
 		const r = await resp.json();
+		console.log(r);
 		if (r["status"] === "failed") {
 			// FIXME: couldn't reauth session, dont log user back in
 			console.log("No session exists; please log in.");

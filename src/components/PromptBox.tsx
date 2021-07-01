@@ -54,7 +54,7 @@ export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
 					'' :
 					<select onChange={upMode} value={mode}>
 						<option>{"Password"}</option>
-						<option>{"Access Control List"}</option>
+						{/*<option>{"Access Control List"}</option>*/}
 					</select>}
 				</div>
 				{(privacy === 'Private') ?

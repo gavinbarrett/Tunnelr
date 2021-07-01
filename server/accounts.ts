@@ -93,7 +93,7 @@ export const loadUserInfo = async (req, res) => {
     const name = req.query.name;
     console.log(`Username: ${name}`);
     let query = 'select * from users where username=$1';
-    const values = [name];
+    let values = [name];
     let data = await db.query(query, values);
 
 	const created_at = data.rows.length ? data.rows[0].created_at : null;
@@ -105,13 +105,15 @@ export const loadUserInfo = async (req, res) => {
 	let friends = JSON.stringify(data.rows);
 	console.log(`Friends: ${friends}`);
 	console.log(`Created at: ${created_at}`);
-    if (!profile) {
-        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}}`;
+	query = 'select channelname from members where username=$1';
+	const channels = await db.query(query, values);
+	if (!profile) {
+        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}, "channels": ${JSON.stringify(channels)}}`;
         res.send(date);
     } else {
         // read user's profile from the disk
         const pic = await readProfileFromDisk(profile);
-        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}}`;
+        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "channels": ${JSON.stringify(channels)}}`;
         res.send(date);
     }
 }
