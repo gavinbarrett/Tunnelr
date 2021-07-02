@@ -2,7 +2,7 @@
 import * as express from 'express';
 import * as cookieParser from 'cookie-parser';
 import * as dotenv from 'dotenv';
-import { authorizeUser, retrieveSession, signUserUp, signUserIn } from './server/authServer';
+import { authorizeUser, retrieveSession, signUserUp, signUserIn, verifyAccount } from './server/authServer';
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { addFriend, findAllUserFriends, queryFriend } from './server/friends';
 import { changePassword, deleteAccount, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
@@ -25,14 +25,8 @@ const upload = multer({ storage: multer.memoryStorage() });
 app.use(express.static('dist'));
 
 app.post('/signup', signUserUp);
+app.get('/verifyaccount', verifyAccount);
 app.post('/signin', signUserIn);
-
-app.get('/verifyaccount', (req, res) => {
-	console.log('Attempting to verify an account sent to an email link.');
-	const { user } = req.query;
-	console.log(`Verifying ${user}`);
-	res.status(200).send('Thank you');
-});
 
 /* 
 authenticated functions 

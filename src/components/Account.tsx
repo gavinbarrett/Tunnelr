@@ -185,9 +185,8 @@ const FriendStatus = ({name, friend, friendsList, updateFriendsList, pendingFrie
 			const r = await resp.json();
 			console.log(r);
 			updateStatus(r['friendstatus']);
-			if (r['friendstatus'] == 'Friended') {
-				updateFriendsList([...friendsList, {"friend": friend}]);
-			}
+			// update friend list
+			if (r['friendstatus'] == 'Friended') updateFriendsList([...friendsList, {"friend": friend}]);
 			// FIXME if the friendstatus is now `Friended`, add the friend to the friendsList
 		} else if (status == 'Friended \u2713') {
 			// remove friend

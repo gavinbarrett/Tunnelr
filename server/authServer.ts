@@ -1,8 +1,11 @@
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import * as dotenv from 'dotenv';
+import * as nodemailer from 'nodemailer';
 import * as db from './databaseFunctions';
 
 const expiry: number = 60 * 60 // 60 minute session
+dotenv.config();
 
 export const authorizeUser = async (req, res, next) => {
 	/* Authenticate the user's session ID against the cache */
@@ -120,6 +123,11 @@ export const signUserIn = async (req, res) => {
 		res.send(JSON.stringify({"status": "failed"}));
 }
 
+// send email with nodemailer to the user's email
+// add user x to the users table but give them Verified(x) = 'Pending'
+// send user back to the landing page, and give them a message telling them to verify by email
+// on 
+
 export const signUserUp = async (req, res) => {
 	/* Attempt to sign the user up */
 	const { user, pass, email } = req.body;
@@ -132,10 +140,15 @@ export const signUserUp = async (req, res) => {
 		else {		// 
 			// if the user doesn't exist, attempt to sign them up
 			if (addUser(user, pass, email)) {
-				console.log(`Signing up new user ${user}`);
+				console.log(`Signing up new user ${user}. Awaiting verification.`);
+				const sent = sendMail(user, email);
 				// establish session
-				establishSession(user, res);
-				res.send(JSON.stringify({"status": user}));
+				// establishSession(user, res);
+				if (sent) {
+					res.send(JSON.stringify({"status": user}));
+				} else {
+					res.send(JSON.stringify({"status": "failed"}));
+				}
 			} else {
 				res.send(JSON.stringify({"status": "failed"}));
 			}
@@ -145,13 +158,60 @@ export const signUserUp = async (req, res) => {
 	}
 }
 
+const sendMail = async (user, email) => {
+	const transporter = nodemailer.createTransport({
+		service: 'gmail',
+		auth: {
+			user: process.env.MAILADDRESS,
+			pass: process.env.MAILPW,
+		}
+	});
+	console.log(process.env.MAILADDRESS);
+	console.log(process.env.MAILPW);
+	let mailConfig = {
+		from: process.env.MAIL,
+		to: email,
+		subject: 'Verification Required for Tunnelr',
+		html: `<p>Please click <a href="http://localhost:5555/verifyaccount?user=${user}">here</a> to verify your account</p>`
+	};
+	transporter.sendMail(mailConfig, (err, info) => {
+		if (err) {
+			console.log(`Error sending email: ${err}`);
+			return true;
+		} else {
+			console.log(`Mail sent: ${info.response}`);
+			return false;
+		}
+	});
+}
+
+export const verifyAccount = async (req, res) => {
+	console.log('Attempting to verify an account sent to an email link.');
+	const { user } = req.query;
+	console.log(`Verifying ${user}`);
+	let query = 'select username from users where username=$1 and verified=$2';
+	let values = [user, 'No'];
+	const resp = await db.query(query, values);
+	if (resp && resp.rows) {
+		// need to verify user
+		query = 'update users set verified=$1 where username=$2';
+		values = ['Verified', user];
+		const r = await db.query(query, values);
+		if (r && r.rows) {
+			res.status(200).redirect('/');
+		} else {
+			res.status(200).send('Could not verify');
+		}
+	} else {
+		res.status(200).send('Already verified');
+	}
+}
+
 const checkForUser = async user => {
 	/* Check the database for the existence of a user */
 	const query = 'select * from users where username=$1';
 	const values = [user];
 	return await db.query(query, values);
-	//if (rows.rows.length !== 0) return true;
-	//else return false;
 }
 
 export const checkHashes = async (password, hashed) => {
