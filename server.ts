@@ -27,6 +27,13 @@ app.use(express.static('dist'));
 app.post('/signup', signUserUp);
 app.post('/signin', signUserIn);
 
+app.get('/verifyaccount', (req, res) => {
+	console.log('Attempting to verify an account sent to an email link.');
+	const { user } = req.query;
+	console.log(`Verifying ${user}`);
+	res.status(200).send('Thank you');
+});
+
 /* 
 authenticated functions 
 */

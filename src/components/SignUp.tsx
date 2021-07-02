@@ -20,12 +20,12 @@ export const SignUp = () => {
 		if (await validCredentials()) {
 			const resp = await fetch("/signup", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password, "email": email})});
 			const r = await resp.json();
-			if (r["status"] === "failed") return;
-			const user = r["status"];
-			let logged = true;
-			updateLoggedIn(true);
-			updateUser(r["status"]);
-			updateDataStore("data", JSON.stringify({"user": user, "loggedin": logged}));
+			if (r["status"] === "failed") return; // FIXME: throw error
+			//const user = r["status"];
+			//let logged = true;
+			//updateLoggedIn(true);
+			//updateUser(r["status"]);
+			//updateDataStore("data", JSON.stringify({"user": user, "loggedin": logged}));
 			pageHistory.push("/");
 		} else {
 			// FIXME: update the Error component with the correct error
