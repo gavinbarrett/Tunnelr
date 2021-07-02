@@ -19,11 +19,14 @@ const SignUp = ({loggedIn}) => {
 	</div>);
 }
 
-export const LandingPage = () => {
+export const LandingPage = ({landingMessage}) => {
 	const { loggedIn } = React.useContext(UserAuth);
-	return (<><div id="landing-page">
-		<LandingText/>
-		<SignUp loggedIn={loggedIn}/>
+	return (<><div id="landing-box">
+		<div id="landing-message">{landingMessage}</div>
+		<div id="landing-page">
+			<LandingText/>
+			<SignUp loggedIn={loggedIn}/>
+		</div>
 	</div>
 	<Footer/></>);
 }

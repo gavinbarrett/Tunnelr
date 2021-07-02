@@ -1,6 +1,24 @@
-#landing-page {
+#landing-box {
 	width: 100vw;
 	height: 90vh;
+	display: flex;
+	flex-direction: column;
+}
+
+#landing-message {
+	width: 100vw;
+	height: 10vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-size: 1.5rem;
+	font-family: 'Tahoma', sans-serif;
+	color: black;
+}
+
+#landing-page {
+	width: 100vw;
+	height: 80vh;
 	background: white;
 	display: flex;
 }

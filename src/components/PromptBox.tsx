@@ -9,9 +9,7 @@ export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
 	const addChannel = async () => {
 		if (!channelName.match(/^@[a-z0-9]{5,32}$/)) return;
 		const resp = await fetch("/addchannel", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"channelName": channelName, "access": privacy, "credentials": credentials, "mode": mode})});
-		const r = await resp.json();
-		console.log(r["status"]);
-		if (r["status"] === "success") {
+		if (resp.status == 200) {
 			// load the new channel
 			loadChannels();
 			// hide the prompt box
@@ -22,22 +20,10 @@ export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
 			updateCredentials('');
 		}
 	}
-	const up = event => {
-		console.log(event.target.value);
-		updateChannelName(event.target.value);
-	}
-	const upPriv = event => {
-		console.log(event.target.value);
-		updatePrivacy(event.target.value);
-	}
-	const upCred = event => {
-		console.log(event.target.value);
-		updateCredentials(event.target.value);
-	}
-	const upMode = event => {
-		console.log(`Mode: ${event.target.value}`);
-		updateMode(event.target.value);
-	}
+	const up = event => updateChannelName(event.target.value);
+	const upPriv = event => updatePrivacy(event.target.value);
+	const upCred = event => updateCredentials(event.target.value);
+	const upMode = event => updateMode(event.target.value);
 	return (<div className={`prompt ${showing}`}>
 		<div id="exit" onClick={() => updatePrompt('')}>{"\u2715"}</div>
 		<div className={`prompt-box ${showing}`}>

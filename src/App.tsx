@@ -16,6 +16,7 @@ const App = () => {
 	const [user, updateUser] = React.useState('');
 	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const [profile, updateProfile] = React.useState('images/blank.png');
+	const [landingMessage, updateLandingMessage] = React.useState('');
 	//const dataLog = React.useReducer();
 	// FIXME once a user logs in, store their name, joined date, list of channels and friends, and profile pic
 	const loc = Router.useLocation();
@@ -27,37 +28,27 @@ const App = () => {
 			console.log(`Retrieved session data: ${sessionData}`);
 			const { user, loggedin } = JSON.parse(sessionData);
 			console.log(`Updating user to ${user}`);
-			//updateUser(user);
-			//updateLoggedIn(true);
 			console.log(`Session store contained: ${user}\n${loggedin}`);
 		} 
-		/*
-		else {
-			console.log(`Setting session data`);
-			getSession();
-		}*/
 	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
 		// FIXME: ajax should return the user's profile picture, friends list, joined channels, and joined date
-		const r = await resp.json();
-		console.log(r);
-		if (r["status"] === "failed") {
+		if (resp.status == 200) {
+			const r = await resp.json();
 			// FIXME: couldn't reauth session, dont log user back in
 			console.log("No session exists; please log in.");
-		} else {
-			// FIXME: log user into the ui
 			console.log('Logging user back into their session');
 			updateLoggedIn(true);
-			updateUser(r["status"]);
+			updateUser(r["user"]);
 		}
 	}
 	return (<div className="app-wrapper">
 		<UserAuth.Provider value={{user, updateUser, loggedIn, updateLoggedIn, profile, updateProfile, loc}}>
 			<Header user={user} loggedIn={loggedIn}/>
 			<Router.Switch>
-				<Router.Route path="/" exact render={() => <LandingPage/>}/>
-				<Router.Route path="/signup" render={() => <SignUp/>}/>
+				<Router.Route path="/" exact render={() => <LandingPage landingMessage={landingMessage}/>}/>
+				<Router.Route path="/signup" render={() => <SignUp updateLandingMessage={updateLandingMessage}/>}/>
 				<Router.Route path="/signin" render={() => <SignIn/>}/>
 				<Router.Route path="/account" render={() => <Account/>}/>
 				<Router.Route path="/channel" render={() => <ChannelPage/>}/>

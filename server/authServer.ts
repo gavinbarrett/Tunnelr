@@ -47,7 +47,7 @@ const establishSession = async (user, res) => {
 	db.set(id, user, 'EX', expiry);
 	// set cookie data
 	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
-	res.send(JSON.stringify({"status": user}));
+	res.status(200).send(JSON.stringify({"user": user}));
 }
 
 export const retrieveSession = async (req, res) => {
@@ -58,13 +58,11 @@ export const retrieveSession = async (req, res) => {
 		const session = await checkForSession(sessionid);
 		console.log(`Session: ${session}`);
 		if (session)
-			res.send(JSON.stringify({"status": user}));
+			res.status(200).send(JSON.stringify({"user": user}));
 		else
-			res.send(JSON.stringify({"status": "failed"}));
-	} else {
-		//console.log("No cookies found.");
-		res.send(JSON.stringify({"status": "failed"}));
-	}
+			res.status(400).end();
+	} else
+		res.status(400).end();
 }
 
 const checkForSession = async id => {
@@ -109,9 +107,9 @@ export const authenticate = async (user, pass, res) => {
 			establishSession(user, res);
 			// FIXME set cookie to return to user
 		} else
-			res.send(JSON.stringify({"status": "failed"}));
+			res.status(400).send(JSON.stringify({"status": "failed"}));
 	} else {
-		res.send(JSON.stringify({"status": "failed"}));
+		res.status(400).send(JSON.stringify({"status": "failed"}));
 	}
 }
 
@@ -120,7 +118,7 @@ export const signUserIn = async (req, res) => {
 	if (await validQueries([user, pass], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i]))
 		authenticate(user, pass, res);
 	else
-		res.send(JSON.stringify({"status": "failed"}));
+		res.status(400).send(JSON.stringify({"status": "failed"}));
 }
 
 // send email with nodemailer to the user's email
@@ -142,19 +140,17 @@ export const signUserUp = async (req, res) => {
 			if (addUser(user, pass, email)) {
 				console.log(`Signing up new user ${user}. Awaiting verification.`);
 				const sent = sendMail(user, email);
-				// establish session
-				// establishSession(user, res);
 				if (sent) {
-					res.send(JSON.stringify({"status": user}));
+					res.status(200).send(JSON.stringify({"user": user}));
 				} else {
-					res.send(JSON.stringify({"status": "failed"}));
+					res.send(JSON.stringify({"user": "failed"}));
 				}
 			} else {
-				res.send(JSON.stringify({"status": "failed"}));
+				res.send(JSON.stringify({"user": "failed"}));
 			}
 		}
 	} else {
-		res.send(JSON.stringify({"status": "failed"}));
+		res.send(JSON.stringify({"user": "failed"}));
 	}
 }
 

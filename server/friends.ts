@@ -9,7 +9,6 @@ export const addFriend = async (req, res) => {
 	const resp = await db.query(query, values);
 	if (resp && resp.rows && resp.rows.length) {
 		// pending friendship relation exists; use update query
-
 		// FIXME: update f1
 		query = 'update friendships set status=$1 where friend2=$2 and friend1=$3';
 		values = ['Friended', user, friend];
@@ -17,14 +16,14 @@ export const addFriend = async (req, res) => {
 		const r = await db.query(query, values);
 		query = 'insert into friendships (friend1, friend2, status) values ($1, $2, $3)';
 		values = [user, friend, 'Friended'];
-		res.send(JSON.stringify({"status": "success", "friendstatus": "Friended"}));
+		res.status(200).send(JSON.stringify({"friendstatus": "Friended"}));
 	} else {
 		// relation doesn't exist; insert relation
 		query = 'insert into friendships (friend1, friend2, status) values ($1, $2, $3)';
 		values = [user, friend, 'Pending'];
 		// add friended status
 		const r = await db.query(query, values);
-		res.send(JSON.stringify({"status": "success", "friendstatus": "Pending"}));
+		res.status(200).send(JSON.stringify({"friendstatus": "Pending"}));
 	}
 }
 

@@ -33,14 +33,11 @@ export const changePassword = async (req, res) => {
 			if (resp2 && resp2.rows) {
 				console.log(`Rows: ${resp2.rows}`);
 			}
-			res.send(JSON.stringify({"status": "success"}));
-		} else {
-			// user entered an incorrect password
-			res.send(JSON.stringify({"status": "failed"}));
-		}
-	} else {
-		res.send(JSON.stringify({"status": "failed"}));
-	}
+			res.status(200).end();
+		} else	
+			res.status(400).end(); // user entered an incorrect password
+	} else
+		res.status(400).end();
 }
 
 export const deleteAccount = async (req, res) => {
@@ -49,7 +46,7 @@ export const deleteAccount = async (req, res) => {
 	console.log(`Username: '${username}'\nPassword: '${password}'\nUser: '${user}'`);
 	if (user != username) {
 		// a user is requesting deletion of another user's account; do not authorize
-		res.send(JSON.stringify({"status": "failed"}));
+		res.status(403).end();
 	} else {
 		console.log(`Username: ${username}\nPassword: ${password}`);
 		console.log(user);
@@ -74,17 +71,16 @@ export const deleteAccount = async (req, res) => {
 					// user has been deleted; now delete the user session
 					const cookie = req.cookies.sessionID.sessionid;
 					if (db.exists(cookie)) db.del(cookie);
-					res.send(JSON.stringify({"status": "success"}));
+					res.status(200).end();
 				} else {
 					console.log('Could not delete user');
-					res.send(JSON.stringify({"status": "failed"}));
+					res.status(400).end();
 				}
-			} else {
-				res.send(JSON.stringify({"status": "failed"}));
-			}
+			} else
+				res.status(403).end();
 		} else {
 			// user doesn't exist
-			res.send(JSON.stringify({"status": "failed"}));
+			res.status(400).end();
 		}
 	}
 }
@@ -117,12 +113,12 @@ export const loadUserInfo = async (req, res) => {
 	const channels = await db.query(query, values);
 	if (!profile) {
         const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
-        res.send(date);
+        res.status(200).send(date);
     } else {
         // read user's profile from the disk
         const pic = await readProfileFromDisk(profile);
         const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
-        res.send(date);
+        res.status(200).send(date);
     }
 }
 
@@ -145,14 +141,13 @@ export const uploadUserProfile = async (req, res) => {
 		// insert hash into the document table
 		const result = await insertProfileIntoDB(user, hash);
 		console.log(`Written: ${written}\nResult: ${result}`);
-		if (written && result) {
-			res.send(JSON.stringify({"status": "success", "profile": profile}));
-		 } else {
-			 res.send(JSON.stringify({"status": "null", "profile": "null"}));
-		 }
+		if (written && result)
+			res.status(200).send(JSON.stringify({"profile": profile}));
+		else
+			res.status(400).end();
 	} catch (error) {
 		console.log(`Error uploading file: ${error}`);
-		res.send(JSON.stringify({"status": "failed"}));
+		res.status(400).end();
 	}
 }
 
@@ -235,7 +230,7 @@ export const logUserOut = async (req, res) => {
     // delete user session
     if (db.exists(cookie)) db.del(cookie);
     // return status code
-    res.send(JSON.stringify({"status": "logged out"}));
+    res.status(200).end();
 }
 
 const hashFile = async (file) => {

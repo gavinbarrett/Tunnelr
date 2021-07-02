@@ -27,8 +27,7 @@ export const ChangePassword = ({updatePrompt}) => {
 			return;
 		}
 		const resp = await fetch('/changepassword', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"oldpassword": oldPass, "newpassword": newPass})});
-		const r = await resp.json();
-		if (r["status"] == "success") {
+		if (resp.status == 200) {
 			// successfully changed password; clear variables
 			clearVariables();
 		} else

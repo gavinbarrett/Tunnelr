@@ -16,7 +16,6 @@ export const ChannelPage = () => {
     const [displayLeave, updateDisplayLeave] = React.useState('');
     const [displayPassword, updateDisplayPassword] = React.useState('');
     const [joinButton, updateJoinButton] = React.useState(<Join name={name} updateMemberStat={updateMemberStat}/>);
-
     const loc = useLocation();
     React.useEffect(() => {
         console.log('Loaded channel page.');
@@ -28,6 +27,7 @@ export const ChannelPage = () => {
     const getChannelInfo = async channelName => {
         console.log('Getting info.');
         const resp = await fetch(`/loadchannelinfo/?channelname=${channelName}`, {method: 'GET'});
+        if (resp.status != 200) return;
         const r = await resp.json();
         // format channel creation date
         let created_date = r["created_at"].split(" ");
@@ -38,7 +38,6 @@ export const ChannelPage = () => {
         updateAccess(r["access"]);
         updateMode(r["mode"]);
         updateMemberStat(r["memberstat"]);
-        console.log(r);
     }
     return (<><div id="channel-page">
             <div id="channel-header">{name}</div>
@@ -67,21 +66,15 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, 
             updateLeaveError('Please check the box');
             return;
         }
-        console.log(`Submitting leave request.`);
         const resp = await fetch(`/leavechannel?channel=${name}`, {method: 'GET'});
-        const r = await resp.json();
-        console.log(r);
-        if (r["status"] == "success") {
-            console.log('clearing');
+        if (resp.status == 200) {
             updateDisplayLeave('');
             updateChannelName('');
             updateChecked('');
             updateMemberStat('NOT');
             updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
-            // FIXME: turn off prompt, update button to say Join again
-        } else {
+        } else
             updateLeaveError('Failed to leave channel');
-        }
     }
     return (<div className={`leave-prompt ${displayLeave}`}>
         <div id="exit-leave-prompt">
@@ -113,9 +106,8 @@ const PasswordPrompt = ({name, displayPassword, updateDisplayPassword, updateMem
         if (!password.match(/[a-z0-9]{0,64}/i)) updateError('Password does not match regex');
         // FIXME: regex match to input validate the password
         const resp = await fetch('/joinpskchannel', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"password": password, "channelname": name})});
-        const r = await resp.json();
         updatePassword('');
-        if (r["status"] == "success") {
+        if (resp.status == 200) {
             updateDisplayPassword('');
             updateMemberStat('MEMBER');
         }
@@ -157,11 +149,10 @@ const JoinButton = ({name, access, mode, memberStat, updateMemberStat, updateDis
             } else {
                 updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
             }
-        } else if (memberStat == 'PENDING') {
+        } else if (memberStat == 'PENDING')
             updateJoinButton(<Pending/>);
-        } else if (memberStat == 'MEMBER') {
+        else if (memberStat == 'MEMBER')
             updateJoinButton(<Joined updateDisplayLeave={updateDisplayLeave}/>);
-        }
     }, [access, mode, memberStat]);
     return (<div id="join">
         {joinButton}
@@ -172,8 +163,7 @@ const Join = ({name, updateMemberStat}) => {
     const joinChannel = async () => {
         // subscribe a user to the currrent channel
         const resp = await fetch(`/joinchannel?channel=${name}`, {method: 'GET'});
-        const r = await resp.json();
-        if (r["status"] == "success") updateMemberStat('MEMBER');
+        if (resp.status == 200) updateMemberStat('MEMBER');
     }
     return (<div id="join-button" onClick={joinChannel}>
         {"Join Channel"}

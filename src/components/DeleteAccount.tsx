@@ -30,8 +30,7 @@ export const DeleteAccount = ({updatePrompt}) => {
             return;
         }
         const resp = await fetch('/deleteaccount', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"username": username, "password": password})});
-        const r = await resp.json();
-        if (r["status"] == "success") {
+        if (resp.status == 200) {
             // log user out, reset all variables, return to the landing page
             updateUser('');
             updateLoggedIn(false);

@@ -8,7 +8,6 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 
 	React.useEffect(() => {
 		console.log(`Sender: ${sender}`);
-		//getChannelMessages();
 		establishWSocket();
 	}, [id]);
 
@@ -66,7 +65,6 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 		<div id="message-box">
 			{channelMessages.length ? channelMessages.map((elem, index) => {
 				// interpret the UNIX timestamp in Pacific Time
-				console.log(`elem: ${elem[0]}`);
 				let time = new Date(parseInt(elem[0]));
 				let data = JSON.parse(elem[1][1]);
 				let cls = (data.sender == sender) ? 'sent-message' : 'received-message';

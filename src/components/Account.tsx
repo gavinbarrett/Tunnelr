@@ -81,7 +81,7 @@ const Selector = ({updateSelf, updateUser, updateLoggedIn, name, user}) => {
 		const resp = await fetch('/logout', {method: "GET"});
 		const r = await resp.json();
 		console.log(r);
-		if (r["status"] === "logged out") {
+		if (resp.status == 200) {
 			// log user out of front end
 			updateUser('');
 			updateLoggedIn(false);
@@ -135,9 +135,8 @@ const AccountController = ({updatePrompt, updateProfile}) => {
 		// try to upload profile picture
 		const resp = await fetch('/uploaduserprofile', {method: 'PUT', body: formData});
 		console.log(resp);
-		const r = await resp.json();
-		console.log(r);
-		if (r["status"] == "success" && r["profile"] != "null") {
+		if (resp.status == 200) {
+			const r = await resp.json();
 			const c = r["profile"];
 			console.log(`C: ${c}`);
 			updateProfile(`data:image/png;base64,${c}`);

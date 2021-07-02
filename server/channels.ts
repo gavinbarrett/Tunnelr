@@ -12,16 +12,16 @@ export const addChannel = async (req, res) => {
 	// FIXME: perform input validation on access and credentials fields
 	// perform input validation
 	const reg = /^@[a-z0-9]{5,32}$/i;
-	if (!channelName.match(reg)) {
-		res.send(JSON.stringify({"status": "failed"}));
-	} else {
+	if (!channelName.match(reg))
+		res.status(400).end();
+	else {
 		// ensure channel doesn't already exist
 		console.log(`Checking channel ${channelName}`);
 		const exists = await checkForChannel(channelName);
 		console.log(`Exists: ${exists.rows}`);
 		if (exists && exists.rows.length !== 0) {
 			console.log("Channel already exists");
-			res.send(JSON.stringify({"status": "failed"}));
+			res.status(400).end();
 		} else {
 			const added = insertNewChannel(channelName, access, credentials, mode);
 			if (added) {
@@ -30,13 +30,12 @@ export const addChannel = async (req, res) => {
 				const ir = await insertNewMember(channelName, user);
 				if (!ir) {
 					console.log('Could not add member to channel.');
-					res.send(JSON.stringify({"status": "success"}));
-				} else {
-					res.send(JSON.stringify({"status": "success"}));
-				}
+					res.status(200).end();
+				} else
+					res.status(400).end();
 			} else {
 				console.log(`Couldn't add channel.`);
-				res.send(JSON.stringify({"status": "failed"}));
+				res.status(400).end();
 			}
 		}
 	}
@@ -77,16 +76,15 @@ export const loadChannelInfo = async (req, res) => {
 			const payload = `{"memberstat": "${status}", "name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
 			console.log(payload);
 			// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
-			res.send(payload);
+			res.status(200).send(payload);
 		} else {
 			const payload = `{"memberstat": "NOT", "name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
 			console.log(payload);
 			// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
-			res.send(payload);
+			res.status(200).send(payload);
 		}
-	} else {
-		res.send(JSON.stringify({"name": "failed"}));
-	}
+	} else
+		res.status(400).send(JSON.stringify({"name": "failed"}));
 }
 
 export const getMessages = async (req, res) => {
@@ -175,26 +173,23 @@ export const joinPublicChannel = async (req, res) => {
 	let query = 'select channelname, accesslevel, accessmode from channels where channelname=$1';
 	let values = [channel];
 	const resp = await db.query(query, values);
-	console.log(`Resp: ${resp}`);
 	if (resp && resp.rows) {
 		query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
 		values = [user, channel, 'MEMBER'];
 		const r = await db.query(query, values);
 		// FIXME: increment the user_count in the channel table
-		console.log(`r: ${r}`);
-		res.send(JSON.stringify({"status": "success"}));
-	} else {
-		res.send(JSON.stringify({"status": "failed"}));
-	}
+		res.status(200).end();
+	} else
+		res.status(400).end();
 }
 
 export const joinPSKChannel = async (req, res) => {
 	// join a channel protected with a pre-shared password
 	const { user } = req.cookies.sessionID;
 	const { password, channelname } = req.body;
-	if (!password.match(/[a-z0-9]{0,64}/i)) {
-		res.send(JSON.stringify({"status": "failed"}));
-	} else {
+	if (!password.match(/[a-z0-9]{0,64}/i))
+		res.status(400).end();
+	else {
 		// check for channel's existence and extract its access level/mode
 		// if it is PSK, extract password from req.body and check it against db pass
 		// if they match, add user to db
@@ -211,16 +206,13 @@ export const joinPSKChannel = async (req, res) => {
 					query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
 					values = [user, channelname, 'MEMBER'];
 					const r = await db.query(query, values);
-					res.send(JSON.stringify({"status": "success"}));
-				} else {
-					res.send(JSON.stringify({"status": "failed"}));
-				}
-			} else {
-				res.send(JSON.stringify({"status": "failed"}));
-			}
-		} else {
-			res.send(JSON.stringify({"status": "failed"}));
-		}
+					res.status(200).end();
+				} else
+					res.status(403).end();
+			} else
+				res.status(400).end();
+		} else
+			res.status(400).end();
 	}
 }
 
@@ -236,7 +228,6 @@ export const leaveChannel = async (req, res) => {
 	const { user } = req.cookies.sessionID;
 	const { channel } = req.query;
 	console.log(`User: ${user}\nChannel: ${channel}`);
-
 	// if user is a member of the channel, remove them. if that succeeds, return successful status code
 	// else return failed code
 	const r = await checkForMembership(user, channel);
@@ -246,9 +237,9 @@ export const leaveChannel = async (req, res) => {
 		const values = [user, channel];
 		const resp = await db.query(query, values);
 		console.log(`Resp: ${resp}`);
-		res.send(JSON.stringify({"status": "success"}));
+		res.status(200).end();
 	} else {
-		res.send(JSON.stringify({"status": "failed"}));
+		res.status(400).end();
 	}
 }
 
