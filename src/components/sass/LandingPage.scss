@@ -3,6 +3,12 @@
 	height: 90vh;
 	display: flex;
 	flex-direction: column;
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-color: #fdf0ff;
+	background-image: url('assets/tunnel-background.jpg');
+	background-blend-mode: screen;
 }
 
 #landing-message {
@@ -19,7 +25,6 @@
 #landing-page {
 	width: 100vw;
 	height: 80vh;
-	background: white;
 	display: flex;
 }
 

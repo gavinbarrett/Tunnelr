@@ -14,7 +14,7 @@ const SignUp = ({loggedIn}) => {
 	return (<div id="sign-up">
 		{loggedIn ? "" :
 		<button id="signup-button">
-			<Router.Link to="/signup">{"sign up"}</Router.Link>
+			<Router.Link to="/signup">{"Sign Up"}</Router.Link>
 		</button>}
 	</div>);
 }
