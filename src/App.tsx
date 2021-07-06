@@ -6,6 +6,7 @@ import { LandingPage } from './components/LandingPage';
 import { SignUp } from './components/SignUp';
 import { SignIn } from './components/SignIn';
 import { Account } from './components/Account';
+import { Contact } from './components/Contact';
 import { ChannelPage } from './components/ChannelPage';
 import { Chat } from './components/Chat';
 import { NotFound } from './components/NotFound';
@@ -51,6 +52,7 @@ const App = () => {
 				<Router.Route path="/signup" render={() => <SignUp updateLandingMessage={updateLandingMessage}/>}/>
 				<Router.Route path="/signin" render={() => <SignIn/>}/>
 				<Router.Route path="/account" render={() => <Account/>}/>
+				<Router.Route path="/contact" render={() => <Contact/>}/>
 				<Router.Route path="/channel" render={() => <ChannelPage/>}/>
 				<Router.Route path="/chat">
 					{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}

@@ -1,12 +1,15 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
+import * as Typewriter from 'react-typewriter';
 import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
 import './sass/LandingPage.scss';
 
 const LandingText = () => {
 	return (<div id="landing-text">
-		<p id="landing-tag">{"Type securely with Tunnelr"}</p>
+		<p id="landing-tag">
+			<Typewriter typing={1}>{"Type securely with Tunnelr"}</Typewriter>
+		</p>
 	</div>);
 }
 

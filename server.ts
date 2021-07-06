@@ -6,7 +6,9 @@ import { authorizeUser, retrieveSession, signUserUp, signUserIn, verifyAccount }
 import { addChannel, checkForChannel, getMessages, getUpdatedMessages, joinPublicChannel, joinPSKChannel, leaveChannel, loadChannels, loadChannelInfo, queryChannel } from './server/channels';
 import { addFriend, findAllUserFriends, queryFriend } from './server/friends';
 import { changePassword, deleteAccount, loadUserInfo, logUserOut, uploadUserProfile } from './server/accounts';
+import { emailFromOutside, emailFromUser } from './server/contact';
 import { handleWSConnection } from './server/websocketServer';
+import { checkForUserTables } from './server/config_db';
 import * as multer from 'multer';
 import * as WebSocket from 'ws';
 
@@ -16,6 +18,8 @@ const wss = new WebSocket.Server({ port: 8080 });
 const app = express();
 // import environment variables
 dotenv.config();
+
+checkForUserTables();
 
 // parse json
 app.use(express.json({limit: '100mb'}));
@@ -27,6 +31,7 @@ app.use(express.static('dist'));
 app.post('/signup', signUserUp);
 app.get('/verifyaccount', verifyAccount);
 app.post('/signin', signUserIn);
+app.post('/emailfromoutside', emailFromOutside);
 
 /* 
 authenticated functions 
@@ -65,6 +70,8 @@ app.post('/queryfriend', authorizeUser, queryFriend);
 app.post('/querychannel', authorizeUser, queryChannel);
 // create a new channel - ** FIXME: change name to createchannel **
 app.post('/addchannel', authorizeUser, addChannel);
+// send an email to Tunnelr's support from an authorized user
+app.post('/emailfromuser', authorizeUser, emailFromUser);
 
 wss.on('connection', handleWSConnection);
 

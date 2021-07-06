@@ -78,8 +78,6 @@ const Selector = ({updateSelf, updateUser, updateLoggedIn, name, user}) => {
 	const logUserOut = async () => {
 		console.log(`Logging out ${user.user}`);
 		const resp = await fetch('/logout', {method: "GET"});
-		const r = await resp.json();
-		console.log(r);
 		if (resp.status == 200) {
 			// log user out of front end
 			updateUser('');
