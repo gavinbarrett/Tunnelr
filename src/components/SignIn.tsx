@@ -27,10 +27,6 @@ export const SignIn = () => {
 			} else {
 				updateErrorMessage('Incorrect credentials');
 				updateErrorDisplayed(true);
-				setTimeout(() => {
-					updateErrorMessage('');
-					updateErrorDisplayed(false);
-				}, 5000);
 			}
 		}
 	}
@@ -39,25 +35,17 @@ export const SignIn = () => {
 		if (!username.match(reg)) {
 			updateErrorMessage('Username is not valid');
 			updateErrorDisplayed(true);
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplayed(false);
-			}, 5000);
 			return false;
 		} else if (!password.match(reg)) {
 			updateErrorMessage('Password is not valid');
 			updateErrorDisplayed(true);
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplayed(false);
-			}, 5000);
 			return false;
 		} else return true;
 	}
 	return (<><div id="signin-wrapper">
 		<div id="signin-box">
 			<div id="signin-title">
-				<ErrorMessage displayed={errorDisplayed}/>
+				<ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
 			</div>
 			<label htmlFor="username">Username</label>
 			<input name="username" maxLength={64} placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>

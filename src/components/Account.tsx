@@ -165,8 +165,6 @@ const FriendStatus = ({name, friend, friendsList, updateFriendsList, pendingFrie
 	const [status, updateStatus] = React.useState('Befriend');
 	React.useEffect(() => {
 		friendsList.map((elem, id) => {
-			console.log(elem);
-			console.log(friend);
 			if (friend == elem['friend']) updateStatus('Friended \u2713');
 		});
 		console.log(`PendingFriends: ${pendingFriendsList}`);

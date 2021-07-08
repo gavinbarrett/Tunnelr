@@ -34,40 +34,20 @@ export const SignUp = ({updateLandingMessage}) => {
 		if (!username.match(userRegex)) {
 			updateErrorMessage('Username is invalid');
 			updateErrorDisplay(true);
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplay(false);
-			}, 5000);
 			return false;
 		} else if (!password.match(userRegex)) {
-			console.log('password');
 			updateErrorMessage('Password is invalid');
 			updateErrorDisplay('true');
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplay(false);
-			}, 5000);
 			return false;
 		} else if (password != rePassword) {
-			console.log('retype');
 			updateErrorMessage('Passwords do not match');
 			updateErrorDisplay(true);
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplay(false);
-			}, 5000);
 			return false;
 		} else if (!email.match(emailRegex)) {
-			console.log('email');
 			updateErrorMessage('Email is not valid');
 			updateErrorDisplay(true);
-			setTimeout(() => {
-				updateErrorMessage('');
-				updateErrorDisplay(false);
-			}, 5000);
 			return false;
 		} else {
-			console.log('success');
 			return true;
 		}
 	}
@@ -75,7 +55,7 @@ export const SignUp = ({updateLandingMessage}) => {
 	return (<><div id="signup-wrapper">
 		<div id="signup-box">
 			<div id="signup-title">
-				<ErrorMessage displayed={errorDisplay}/>
+				<ErrorMessage displayed={errorDisplay} updateDisplayed={updateErrorDisplay}/>
 			</div>
 			<label htmlFor="username">Username</label>
 			<input name="username" maxLength={64} placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>

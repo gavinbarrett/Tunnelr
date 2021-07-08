@@ -1,16 +1,21 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
+import { ErrorMessage } from './ErrorMessage';
 import { UserAuth } from '../UserAuth';
+import { Messages } from '../Messages';
 import './sass/DeleteAccount.scss';
 
 export const DeleteAccount = ({updatePrompt}) => {
     const [username, updateUsername] = React.useState('');
     const [password, updatePassword] = React.useState('');
     const [checked, updateChecked] = React.useState('');
-    const [error, updateError] = React.useState('');
+    const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
     const { updateUser, updateLoggedIn, updateProfile } = React.useContext(UserAuth);
+    const { errorMessage, updateErrorMessage } = React.useContext(Messages);
+
     const history = useHistory();
     const clearVariables = () => {
+        updateErrorDisplayed(false);
         updateUsername('');
         updatePassword('');
         updateChecked('');
@@ -20,13 +25,16 @@ export const DeleteAccount = ({updatePrompt}) => {
     const deleteAccount = async () => {
         // FIXME: perform input validation
         if (username == '') {
-            updateError('Please enter your username');
+            updateErrorMessage('Please enter your username');
+            updateErrorDisplayed(true);
             return;
         } else if (password == '') {
-            updateError('Please enter your password');
+            updateErrorMessage('Please enter your password');
+            updateErrorDisplayed(true);
             return;
         } else if (checked == '') {
-            updateError('Please check the box');
+            updateErrorMessage('Please check the box');
+            updateErrorDisplayed(true);
             return;
         }
         const resp = await fetch('/deleteaccount', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"username": username, "password": password})});
@@ -38,13 +46,13 @@ export const DeleteAccount = ({updatePrompt}) => {
             console.log('Pushing to home');
             history.push("/");
         } else {
-            updateError('Could not delete account.');
+            updateErrorMessage('Could not delete account.');
         }
     }
     return (<div className={`settings-prompt delete-account-prompt`}>
 		<div id="exit" onClick={clearVariables}>{"x"}</div>
         <div className="error-container">
-            {error ? <div className="ui-error">{error}</div> : ''}
+            <ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
         </div>
         <div id="delete-account-warning">{"Are you sure you want to delete your account?"}</div>
         <label for="username">{"Enter username"}</label>
