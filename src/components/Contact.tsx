@@ -22,6 +22,10 @@ export const Contact = ({updateLandingMessage}) => {
     const { updateErrorMessage } = React.useContext(Messages);
     const history = useHistory();
 
+    React.useEffect(() => {
+        window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
+    }, []);
+
     const validSubjectBody = () => {
         if (subject && subject.match(/^[a-z0-9\s]{4,64}$/i)) {
             if (emailBody && emailBody.match(/^[a-z0-9\s,\.!\?\$\(\):;'"@#%\+=]{6,400}$/i))

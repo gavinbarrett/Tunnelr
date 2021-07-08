@@ -14,7 +14,7 @@ module.exports = {
 				use: ['style-loader', 'css-loader', 'sass-loader']
 			},
 			{
-				test: /\.(png|jpg)$/,
+				test: /\.(png|jpg|svg|ttf)$/,
 				exclude: /node_modules/,
 				use: ['url-loader']
 			}
