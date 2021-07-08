@@ -8,8 +8,8 @@ export const Footer = () => {
 			<div className="footer-box">
 				{/*<p>{"Tunnelr"}</p>*/}
 				<Router.Link to="/">{"Home"}</Router.Link>
-				<Router.Link to="/signup">{"SignUp"}</Router.Link>
 				<Router.Link to="/signin">{"SignIn"}</Router.Link>
+				<Router.Link to="/signup">{"SignUp"}</Router.Link>
 			</div>
 			<div className="footer-box">
 				{/*<p>{"About"}</p>*/}

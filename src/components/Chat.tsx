@@ -152,6 +152,5 @@ export const Chat = ({user}) => {
 		<SideBar expanded={expanded} updateExpanded={updateExpanded} prmpt={prmpt} updatePrompt={updatePrompt} updatePage={updatePage} userChannels={userChannels} user={user} setSocket={setSocket} wsocket={wsocket} minimized={minimized} updateMinimized={updateMinimized}/>
 			{page}
 		<PromptBox showing={prmpt} updatePrompt={updatePrompt} loadChannels={loadUserChannels}/>
-	</div>
-	<Footer/></>);
+	</div></>);
 }

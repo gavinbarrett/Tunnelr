@@ -1,21 +1,29 @@
 #account-page {
 	width: 100vw;
-	height: 90vh;
 	display: flex;
 	background: #F0EFEB;
+	//height: 90vh;
+	@media only screen and (min-width: 800px) {
+		height: initial;
+	}
 }
 
 #side {
 	width: 20vw;
-	height: 90vh;
+	//height: 90vh;
 	background: #7209b7;
 }
 
 #account-wrapper {
 	width: 80vw;
-	height: 90vh;
+	//height: 90vh;
 	display: flex;
+	flex-direction: column;
+	align-items: center;
 	background: #f3e2f5;
+	@media only screen and (min-width: 800px) {
+		flex-direction: row;
+	}
 }
 
 #account-wrapper > * {
@@ -28,11 +36,14 @@
 }
 
 #account-friends {
-	width: 35vw;
+	width: 60vw;
 	height: 90vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	@media only screen and (min-width: 800px) {
+		width: 35vw;
+	}
 }
 
 #account-name {
@@ -87,13 +98,16 @@ img#profile {
 }
 
 #friends-list {
-	width: 22vw;
+	width: 50vw;
 	height: 65vh;
 	display: flex;
 	flex-direction: column;
 	border-radius: 30px;
 	background: #7209b7;
 	scrollbar-width: thin;
+	@media only screen and (min-width: 800px) {
+		width: 22vw;
+	}
 }
 
 #friends-header {

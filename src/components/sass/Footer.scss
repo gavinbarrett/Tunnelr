@@ -16,21 +16,27 @@ footer {
 }
 
 .footer-box {
-	width: 16vw;
+	width: 20vw;
 	height: 25vh;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-evenly;
+	@media only screen and (min-width: 850px) {
+		width: 16vw;
+	}
 }
 
 .footer-box > p, .footer-box > a {
-	font-size: 1.45rem;
+	font-size: 1rem;
 	font-family: 'Inconsolata', monospace;
 	font-weight: bold;
 	margin: 0;
 	padding-left: 10%;
 	color: #F0EFEB;
 	text-decoration: none;
+	@media only screen and (min-width: 850px) {
+		font-size: 1.45rem;
+	}
 }
 
 .footer-box > a:active {
