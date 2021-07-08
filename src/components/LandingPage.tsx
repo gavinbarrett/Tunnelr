@@ -5,10 +5,11 @@ import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
 import './sass/LandingPage.scss';
 
-const LandingText = () => {
+const LandingText = ({loggedIn}) => {
 	return (<div id="landing-text">
 		<p id="landing-tag">
-			<Typewriter typing={1}>{"Type securely with Tunnelr"}</Typewriter>
+			{loggedIn ? 'Type securely with Tunnelr'
+			: <Typewriter typing={1} initDelay={10}>{"Type securely with Tunnelr"}</Typewriter>}
 		</p>
 	</div>);
 }
@@ -27,7 +28,7 @@ export const LandingPage = ({landingMessage}) => {
 	return (<><div id="landing-box">
 		<div id="landing-message">{landingMessage}</div>
 		<div id="landing-page">
-			<LandingText/>
+			<LandingText loggedIn={loggedIn}/>
 			<SignUp loggedIn={loggedIn}/>
 		</div>
 	</div>

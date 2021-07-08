@@ -52,7 +52,7 @@ const App = () => {
 				<Router.Route path="/signup" render={() => <SignUp updateLandingMessage={updateLandingMessage}/>}/>
 				<Router.Route path="/signin" render={() => <SignIn/>}/>
 				<Router.Route path="/account" render={() => <Account/>}/>
-				<Router.Route path="/contact" render={() => <Contact/>}/>
+				<Router.Route path="/contact" render={() => <Contact updateLandingMessage={updateLandingMessage}/>}/>
 				<Router.Route path="/channel" render={() => <ChannelPage/>}/>
 				<Router.Route path="/chat">
 					{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}

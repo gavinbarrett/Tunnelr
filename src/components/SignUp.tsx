@@ -12,9 +12,10 @@ export const SignUp = ({updateLandingMessage}) => {
 	const [rePassword, updateRePassword] = React.useState('');
 	const [email, updateEmail] = React.useState('');
 	const [signUpError, updateSignUpError] = React.useState('');
+	const [errorDisplay, updateErrorDisplay] = React.useState('');
 	const pageHistory = Router.useHistory();
 	const userRegex = /^[a-z0-9]+$/i;
-	const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i;
+	const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/i;
 
 	const attemptSignUp = async () => {
 		/* attempt to sign the user up for Tunnelr */
@@ -26,43 +27,67 @@ export const SignUp = ({updateLandingMessage}) => {
 			setTimeout(() => updateLandingMessage(''), 5000);
 			pageHistory.push("/");
 		} else {
-			updateSignUpError('Could not sign up');
-			setTimeout(() => updateSignUpError(''), 5000);
+			//updateSignUpError('Could not sign up');
+			//setTimeout(() => updateSignUpError(''), 5000);
 		}
 	}
 
-	const validCredentials = async () => {
+	const validCredentials = () => {
 		if (!username.match(userRegex)) {
+			console.log('username');
 			updateSignUpError('Username is invalid');
-			setTimeout(() => updateSignUpError(''), 5000);
+			updateErrorDisplay('error-displayed');
+			setTimeout(() => {
+				updateSignUpError('');
+				updateErrorDisplay('');
+			}, 5000);
 			return false;
 		} else if (!password.match(userRegex)) {
+			console.log('password');
 			updateSignUpError('Password is invalid');
-			setTimeout(() => updateSignUpError(''), 5000);
+			updateErrorDisplay('error-displayed');
+			setTimeout(() => {
+				updateSignUpError('');
+				updateErrorDisplay('');
+			}, 5000);
 			return false;
 		} else if (password != rePassword) {
+			console.log('retype');
 			updateSignUpError('Passwords do not match');
-			setTimeout(() => updateSignUpError(''), 5000);
+			updateErrorDisplay('error-displayed');
+			setTimeout(() => {
+				updateSignUpError('');
+				updateErrorDisplay('');
+			}, 5000);
 			return false;
 		} else if (!email.match(emailRegex)) {
+			console.log('email');
 			updateSignUpError('Email is not valid');
-			setTimeout(() => updateSignUpError(''), 5000);
+			updateErrorDisplay('error-displayed');
+			setTimeout(() => {
+				updateSignUpError('');
+				updateErrorDisplay('');
+			}, 5000);
 			return false;
-		} else
+		} else {
+			console.log('success');
 			return true;
+		}
 	}
 
 	return (<><div id="signup-wrapper">
 		<div id="signup-box">
-			<div id="signup-title">{signUpError}</div>
+			<div id="signup-title">
+				<p className={`error ${errorDisplay}`}>{signUpError}</p>
+			</div>
 			<label htmlFor="username">Username</label>
-			<input name="username" placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
+			<input name="username" maxLength={64} placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>
 			<label htmlFor="password">Password</label>
-			<input name="password" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updatePassword(e.target.value)}/>
+			<input name="password" maxLength={64} placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updatePassword(e.target.value)}/>
 			<label htmlFor="rePassword">Re-enter Password</label>
-			<input name="rePassword" placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updateRePassword(e.target.value)}/>
+			<input name="rePassword" maxLength={64} placeholder={"enter password"} autoComplete={"off"} type={"password"} onChange={e => updateRePassword(e.target.value)}/>
 			<label hmltFor="email">Email</label>
-			<input name="email" placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
+			<input name="email" maxLength={64} placeholder={"enter email"} autoComplete={"off"} onChange={e => updateEmail(e.target.value)}/>
 			<button onClick={attemptSignUp}>{"Sign Up"}</button>
 		</div>
 	</div>
