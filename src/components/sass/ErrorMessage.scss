@@ -1,0 +1,15 @@
+.error {
+	width: 25vw;
+	height: 7vh;
+	border: 2px solid red;
+	display: none;
+	color: red;
+	background: coral;
+	border-radius: 35px;
+}
+
+.error-displayed {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

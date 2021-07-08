@@ -1,16 +1,18 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
 import { updateDataStore } from './dataStore';
+import { ErrorMessage } from './ErrorMessage';
 import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
+import { Messages } from '../Messages';
 import './sass/SignIn.scss';
 
 export const SignIn = () => {
 	const { updateLoggedIn, updateUser } = React.useContext(UserAuth);
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
-	const [signInError, updateSignInError] = React.useState('');
-	const [errorDisplayed, updateErrorDisplayed] = React.useState('');
+	const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
+	const { errorMessage, updateErrorMessage } = React.useContext(Messages);
 	const history = Router.useHistory();
 	const reg = /^[a-z0-9]{2,64}$/i;
 	const attemptSignIn = async () => {
@@ -23,11 +25,11 @@ export const SignIn = () => {
 				updateUser(r["user"]);
 				history.push("/");
 			} else {
-				updateSignInError('Incorrect credentials');
-				updateErrorDisplayed('error-displayed');
+				updateErrorMessage('Incorrect credentials');
+				updateErrorDisplayed(true);
 				setTimeout(() => {
-					updateSignInError('');
-					updateErrorDisplayed('');
+					updateErrorMessage('');
+					updateErrorDisplayed(false);
 				}, 5000);
 			}
 		}
@@ -35,19 +37,19 @@ export const SignIn = () => {
 	const validCredentials = () => {
 		/* enforce alphanumeric usernames and passwords */
 		if (!username.match(reg)) {
-			updateSignInError('Username is not valid');
-			updateErrorDisplayed('error-displayed');
+			updateErrorMessage('Username is not valid');
+			updateErrorDisplayed(true);
 			setTimeout(() => {
-				updateSignInError('');
-				updateErrorDisplayed('');
+				updateErrorMessage('');
+				updateErrorDisplayed(false);
 			}, 5000);
 			return false;
 		} else if (!password.match(reg)) {
-			updateSignInError('Password is not valid');
-			updateErrorDisplayed('error-displayed');
+			updateErrorMessage('Password is not valid');
+			updateErrorDisplayed(true);
 			setTimeout(() => {
-				updateSignInError('');
-				updateErrorDisplayed('');
+				updateErrorMessage('');
+				updateErrorDisplayed(false);
 			}, 5000);
 			return false;
 		} else return true;
@@ -55,7 +57,7 @@ export const SignIn = () => {
 	return (<><div id="signin-wrapper">
 		<div id="signin-box">
 			<div id="signin-title">
-				<p className={`error ${errorDisplayed}`}>{signInError}</p>
+				<ErrorMessage displayed={errorDisplayed}/>
 			</div>
 			<label htmlFor="username">Username</label>
 			<input name="username" maxLength={64} placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>

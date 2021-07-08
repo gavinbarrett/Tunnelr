@@ -1,8 +1,10 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
 import { updateDataStore } from './dataStore';
+import { ErrorMessage } from './ErrorMessage';
 import { Footer } from './Footer';
 import { UserAuth } from '../UserAuth';
+import { Messages } from '../Messages';
 import './sass/SignUp.scss';
 
 export const SignUp = ({updateLandingMessage}) => {
@@ -11,8 +13,8 @@ export const SignUp = ({updateLandingMessage}) => {
 	const [password, updatePassword] = React.useState('');
 	const [rePassword, updateRePassword] = React.useState('');
 	const [email, updateEmail] = React.useState('');
-	const [signUpError, updateSignUpError] = React.useState('');
 	const [errorDisplay, updateErrorDisplay] = React.useState('');
+	const { errorMessage, updateErrorMessage } = React.useContext(Messages);
 	const pageHistory = Router.useHistory();
 	const userRegex = /^[a-z0-9]+$/i;
 	const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/i;
@@ -21,52 +23,47 @@ export const SignUp = ({updateLandingMessage}) => {
 		/* attempt to sign the user up for Tunnelr */
 		if (validCredentials()) {
 			const resp = await fetch("/signup", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password, "email": email})});
-			const r = await resp.json();
 			if (resp.status != 200) return; // FIXME: throw error
 			updateLandingMessage("Please verify your account from your email address");
 			setTimeout(() => updateLandingMessage(''), 5000);
 			pageHistory.push("/");
-		} else {
-			//updateSignUpError('Could not sign up');
-			//setTimeout(() => updateSignUpError(''), 5000);
 		}
 	}
 
 	const validCredentials = () => {
 		if (!username.match(userRegex)) {
-			console.log('username');
-			updateSignUpError('Username is invalid');
-			updateErrorDisplay('error-displayed');
+			updateErrorMessage('Username is invalid');
+			updateErrorDisplay(true);
 			setTimeout(() => {
-				updateSignUpError('');
-				updateErrorDisplay('');
+				updateErrorMessage('');
+				updateErrorDisplay(false);
 			}, 5000);
 			return false;
 		} else if (!password.match(userRegex)) {
 			console.log('password');
-			updateSignUpError('Password is invalid');
-			updateErrorDisplay('error-displayed');
+			updateErrorMessage('Password is invalid');
+			updateErrorDisplay('true');
 			setTimeout(() => {
-				updateSignUpError('');
-				updateErrorDisplay('');
+				updateErrorMessage('');
+				updateErrorDisplay(false);
 			}, 5000);
 			return false;
 		} else if (password != rePassword) {
 			console.log('retype');
-			updateSignUpError('Passwords do not match');
-			updateErrorDisplay('error-displayed');
+			updateErrorMessage('Passwords do not match');
+			updateErrorDisplay(true);
 			setTimeout(() => {
-				updateSignUpError('');
-				updateErrorDisplay('');
+				updateErrorMessage('');
+				updateErrorDisplay(false);
 			}, 5000);
 			return false;
 		} else if (!email.match(emailRegex)) {
 			console.log('email');
-			updateSignUpError('Email is not valid');
-			updateErrorDisplay('error-displayed');
+			updateErrorMessage('Email is not valid');
+			updateErrorDisplay(true);
 			setTimeout(() => {
-				updateSignUpError('');
-				updateErrorDisplay('');
+				updateErrorMessage('');
+				updateErrorDisplay(false);
 			}, 5000);
 			return false;
 		} else {
@@ -78,7 +75,7 @@ export const SignUp = ({updateLandingMessage}) => {
 	return (<><div id="signup-wrapper">
 		<div id="signup-box">
 			<div id="signup-title">
-				<p className={`error ${errorDisplay}`}>{signUpError}</p>
+				<ErrorMessage displayed={errorDisplay}/>
 			</div>
 			<label htmlFor="username">Username</label>
 			<input name="username" maxLength={64} placeholder={"enter username"} autoComplete={"off"} onChange={e => updateUsername(e.target.value)}/>

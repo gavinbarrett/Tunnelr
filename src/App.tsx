@@ -11,6 +11,7 @@ import { ChannelPage } from './components/ChannelPage';
 import { Chat } from './components/Chat';
 import { NotFound } from './components/NotFound';
 import { UserAuth } from './UserAuth';
+import { Messages } from './Messages';
 import './components/sass/App.scss';
 
 const App = () => {
@@ -18,6 +19,7 @@ const App = () => {
 	const [loggedIn, updateLoggedIn] = React.useState(false);
 	const [profile, updateProfile] = React.useState('images/blank.png');
 	const [landingMessage, updateLandingMessage] = React.useState('');
+	const [errorMessage, updateErrorMessage] = React.useState('');
 	//const dataLog = React.useReducer();
 	// FIXME once a user logs in, store their name, joined date, list of channels and friends, and profile pic
 	const loc = Router.useLocation();
@@ -46,6 +48,7 @@ const App = () => {
 	}
 	return (<div className="app-wrapper">
 		<UserAuth.Provider value={{user, updateUser, loggedIn, updateLoggedIn, profile, updateProfile, loc}}>
+		<Messages.Provider value={{landingMessage, updateLandingMessage, errorMessage, updateErrorMessage}}>
 			<Header user={user} loggedIn={loggedIn}/>
 			<Router.Switch>
 				<Router.Route path="/" exact render={() => <LandingPage landingMessage={landingMessage}/>}/>
@@ -62,6 +65,7 @@ const App = () => {
 					<Router.Redirect to="/notfound"/>
 				</Router.Route>
 			</Router.Switch>
+		</Messages.Provider>
 		</UserAuth.Provider>
 	</div>);
 }
