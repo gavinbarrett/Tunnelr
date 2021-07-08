@@ -30,9 +30,9 @@ export const addChannel = async (req, res) => {
 				const ir = await insertNewMember(channelName, user);
 				if (!ir) {
 					console.log('Could not add member to channel.');
-					res.status(200).end();
-				} else
 					res.status(400).end();
+				} else
+					res.status(200).end();
 			} else {
 				console.log(`Couldn't add channel.`);
 				res.status(400).end();

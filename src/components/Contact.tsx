@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Footer } from './Footer';
+import { ErrorMessage } from './ErrorMessage';
 import { UserAuth } from '../UserAuth';
+import { Messages } from '../Messages';
 import './sass/Contact.scss';
 
 const ReturnAddress = ({updateReturnAddr}) => {
@@ -16,59 +18,49 @@ export const Contact = ({updateLandingMessage}) => {
     const [subject, updateSubject] = React.useState('');
     const [emailBody, updateEmailBody] = React.useState('');
     const [returnAddr, updateReturnAddr] = React.useState('');
-    const [error, updateError] = React.useState('');
+    const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
+    const { updateErrorMessage } = React.useContext(Messages);
     const history = useHistory();
 
-    const changeSubject = event => updateSubject(event.target.value);
-    const changeEmailBody = event => updateEmailBody(event.target.value);
-
     const validSubjectBody = () => {
-        if (subject && subject.match(/^[a-z0-9\s]{4,64}$/)) {
-            if (emailBody && emailBody.match(/^[a-z0-9\s]{6,400}$/)) {
+        if (subject && subject.match(/^[a-z0-9\s]{4,64}$/i)) {
+            if (emailBody && emailBody.match(/^[a-z0-9\s,\.!\?\$\(\):;'"@#%\+=]{6,400}$/i))
                 return true;
-            } else {
-                updateError('Please enter a valid email body');
+            else {
+                updateErrorMessage('Please enter a valid email body');
+                updateErrorDisplayed(true);
                 return false;
             }
         } else {
-            console.log('subject does not match');
-            updateError('Please enter an email subject');
+            updateErrorMessage('Please enter an email subject');
+            updateErrorDisplayed(true);
             return false;
         }
     }
 
     const validReturnAddr = () => {
         console.log(`returnaddr: ${returnAddr}`);
-        if (returnAddr != '' && returnAddr.match(/^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/)) {
-            console.log('matched');
+        if (returnAddr != '' && returnAddr.match(/^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/))
             return true;
-        } else {
-            console.log('returning false');
+        else
             return false;
-        }
     }
 
     const sendEmail = async () => {
-        console.log(`Subject: ${subject}`);
-        console.log(`Body: ${emailBody}`);
-        console.log(`User: ${user}\nLoggedIn: ${loggedIn}`);
-        // already have user's email
-        // /emailFromUser
+        // send an email to Tunnelr's support line
         if (loggedIn) {
+            // already have user's email
             if (validSubjectBody()) {
                 // send to /emailfromuser
                 const resp = await fetch('/emailfromuser', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"subject": subject, "emailbody": emailBody})});
-                console.log(resp);
                 if (resp.status == 200) {
                     updateLandingMessage('Thank you. Your email has been sent to support.');
                     setTimeout(() => updateLandingMessage(''), 3000);
+                    history.push('/');
                 } else {
-                    updateError('Could not send email');
-                    setTimeout(() => updateError(''), 3000);
+                    updateErrorMessage('Could not send email');
+                    updateErrorDisplayed(true);
                 }
-            } else {
-                // throw error
-                updateError('Invalid email info');
             }
         } else {
             if (validSubjectBody() && validReturnAddr()) {
@@ -80,24 +72,23 @@ export const Contact = ({updateLandingMessage}) => {
                     setTimeout(() => updateLandingMessage(''), 3000);
                     history.push('/');
                 } else {
-                    updateError('Could not send email');
-                    setTimeout(() => updateError(''), 3000);
+                    updateErrorMessage('Could not send email');
+                    updateErrorDisplayed(true);
                 }
-            } else {
-                // throw error
-                updateError('Invalid email info');
             }
         }
     }
 
     return (<><div id="contact-page">
         <div id="contact-box">
-            {error}
+            <div id="contact-error">
+                <ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
+            </div>
             {user && loggedIn ? '' : <ReturnAddress updateReturnAddr={updateReturnAddr}/>}
             <label for="subject">{"Subject"}</label>
-            <input name="subject" id="subject" placeholder={"enter subject here"} onChange={changeSubject}/>
+            <input name="subject" id="subject" placeholder={"enter subject here"} onChange={event => updateSubject(event.target.value)}/>
             <label for="email">{"Email Body"}</label>
-            <textarea name="email" id="email-body" placeholder={"enter your email here"} onChange={changeEmailBody}></textarea>
+            <textarea name="email" id="email-body" placeholder={"enter your email here"} onChange={event => updateEmailBody(event.target.value)}></textarea>
             <button onClick={sendEmail}>{"Send Email"}</button>
         </div>
     </div>
