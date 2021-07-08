@@ -24,7 +24,7 @@ export const emailFromUser = async (req, res) => {
             subject: subject,
             text: emailbody + `\n\nReturn email: ${email}.`
         };
-        const sent = transporter.sendMail(mailConfig, (err, info) => {
+        transporter.sendMail(mailConfig, (err, info) => {
             if (err) {
                 console.log(`Error sending email: ${err}`);
                 res.status(400).end();
@@ -42,5 +42,28 @@ export const emailFromUser = async (req, res) => {
 export const emailFromOutside = (req, res) => {
     const { subject, emailbody, returnaddr } = req.body;
     console.log(`Subject: ${subject}\nEmail: ${emailbody}\nReturn: ${returnaddr}`);
-    res.status(200).end();
+    if (!subject.match(/^[a-z0-9 ]+$/)) {
+        console.log('subject did not match');
+        res.status(400).end();
+    } else if (!returnaddr.match(/^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/)) {
+        console.log('return addr did not match');
+        res.status(400).end();
+    } else {
+        console.log('attempting to send email');
+        let mailConfig = {
+            from: process.env.MAILADDRESS,
+            to: process.env.MAILADDRESS,
+            subject: subject,
+            text: emailbody + `\n\nReturn email: ${returnaddr}.`
+        };
+        transporter.sendMail(mailConfig, (err, info) => {
+            if (err) {
+                console.log(`Error sending email: ${err}`);
+                res.status(400).end();
+            } else {
+                console.log(`Mail sent: ${info.response}`);
+                res.status(200).end();
+            }
+        });
+    }
 }
