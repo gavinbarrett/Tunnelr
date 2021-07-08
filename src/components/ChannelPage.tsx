@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Footer } from './Footer';
 import { useLocation } from 'react-router-dom';
+import { ErrorMessage } from './ErrorMessage';
 import { UserAuth } from '../UserAuth';
+import { Messages } from '../Messages';
 import './sass/ChannelPage.scss';
 
 export const ChannelPage = () => {
@@ -13,8 +15,8 @@ export const ChannelPage = () => {
     const [memberStat, updateMemberStat] = React.useState('NOT');
     const [created, updateCreated] = React.useState('');
     const [userCount, updateUserCount] = React.useState(null);
-    const [displayLeave, updateDisplayLeave] = React.useState('');
-    const [displayPassword, updateDisplayPassword] = React.useState('');
+    const [displayLeave, updateDisplayLeave] = React.useState(false);
+    const [displayPassword, updateDisplayPassword] = React.useState(false);
     const [joinButton, updateJoinButton] = React.useState(<Join name={name} updateMemberStat={updateMemberStat}/>);
     const loc = useLocation();
     React.useEffect(() => {
@@ -55,33 +57,42 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, 
     const [channelName, updateChannelName] = React.useState('');
     const [leaveError, updateLeaveError] = React.useState('');
     const [checked, updateChecked] = React.useState('');
+    const [displayError, updateDisplayError] = React.useState(false);
+    const { updateErrorMessage } = React.useContext(Messages);
     const leaveChannel = async () => {
         // leave a channel
         if (channelName != name) {
             console.log('Channels do not match');
-            updateLeaveError('Channels do not match');
+            updateErrorMessage('Channels do not match');
+            updateDisplayError(true);
             return;
         } else if (checked != 'checked') {
             console.log('Please check the box');
-            updateLeaveError('Please check the box');
+            updateErrorMessage('Please check the box');
+            updateDisplayError(true);
             return;
         }
         const resp = await fetch(`/leavechannel?channel=${name}`, {method: 'GET'});
         if (resp.status == 200) {
-            updateDisplayLeave('');
+            updateDisplayLeave(false);
+            updateDisplayError(false);
+            updateErrorMessage('');
             updateChannelName('');
             updateChecked('');
             updateMemberStat('NOT');
             updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
-        } else
-            updateLeaveError('Failed to leave channel');
+        } else {
+            updateErrorMessage('Failed to leave channel');
+            updateDisplayError(true);
+        }
     }
     return (<div className={`leave-prompt ${displayLeave}`}>
         <div id="exit-leave-prompt">
-            {leaveError ? <p className={`ui-error`}>{leaveError}</p> : ''}
+            <ErrorMessage displayed={displayError} updateDisplayed={updateDisplayError}/>
             <p id="exit" onClick={() => {
-                updateDisplayLeave('');
-                updateLeaveError('');
+                updateDisplayLeave(false);
+                updateDisplayError(false);
+                updateErrorMessage('');
                 updateChecked('');
                 updateChannelName('');
             }}>{'\u2715'}</p>
@@ -101,9 +112,13 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, 
 
 const PasswordPrompt = ({name, displayPassword, updateDisplayPassword, updateMemberStat}) => {
     const [password, updatePassword] = React.useState('');
-    const [error, updateError] = React.useState('');
+    const [displayError, updateDisplayError] = React.useState(false);
+    const { updateErrorMessage } = React.useContext(Messages);
     const joinPSKChannel = async () => {
-        if (!password.match(/[a-z0-9]{0,64}/i)) updateError('Password does not match regex');
+        if (!password.match(/[a-z0-9]{4,64}/i)) {
+            updateErrorMessage('Password is not valid');
+            updateDisplayError(true);
+        }
         // FIXME: regex match to input validate the password
         const resp = await fetch('/joinpskchannel', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"password": password, "channelname": name})});
         updatePassword('');
@@ -114,7 +129,7 @@ const PasswordPrompt = ({name, displayPassword, updateDisplayPassword, updateMem
     }
     return (<div className={`channel-password-prompt ${displayPassword}`}>
         <div id="password-prompt-exit">
-            {error ? <div id="psk-error">{error}</div> : ''}
+            <ErrorMessage displayed={displayError} updateDisplayed={updateDisplayError}/>
             <div id="exit" onClick={() => {
                 updatePassword('');
                 updateDisplayPassword('');

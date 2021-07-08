@@ -11,7 +11,7 @@ export const DeleteAccount = ({updatePrompt}) => {
     const [checked, updateChecked] = React.useState('');
     const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
     const { updateUser, updateLoggedIn, updateProfile } = React.useContext(UserAuth);
-    const { errorMessage, updateErrorMessage } = React.useContext(Messages);
+    const { updateErrorMessage } = React.useContext(Messages);
 
     const history = useHistory();
     const clearVariables = () => {
@@ -43,11 +43,9 @@ export const DeleteAccount = ({updatePrompt}) => {
             updateUser('');
             updateLoggedIn(false);
             updateProfile('images/blank.png');
-            console.log('Pushing to home');
             history.push("/");
-        } else {
+        } else
             updateErrorMessage('Could not delete account.');
-        }
     }
     return (<div className={`settings-prompt delete-account-prompt`}>
 		<div id="exit" onClick={clearVariables}>{"x"}</div>

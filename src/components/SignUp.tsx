@@ -14,7 +14,7 @@ export const SignUp = ({updateLandingMessage}) => {
 	const [rePassword, updateRePassword] = React.useState('');
 	const [email, updateEmail] = React.useState('');
 	const [errorDisplay, updateErrorDisplay] = React.useState('');
-	const { errorMessage, updateErrorMessage } = React.useContext(Messages);
+	const { updateErrorMessage } = React.useContext(Messages);
 	const pageHistory = Router.useHistory();
 	const userRegex = /^[a-z0-9]+$/i;
 	const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/i;

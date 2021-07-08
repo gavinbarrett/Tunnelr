@@ -12,7 +12,7 @@ export const SignIn = () => {
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
-	const { errorMessage, updateErrorMessage } = React.useContext(Messages);
+	const { updateErrorMessage } = React.useContext(Messages);
 	const history = Router.useHistory();
 	const reg = /^[a-z0-9]{2,64}$/i;
 	const attemptSignIn = async () => {
