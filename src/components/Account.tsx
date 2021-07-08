@@ -67,8 +67,9 @@ const FriendsList = ({friendsList, updateName}) => {
 		<p id="friends-header">{"Friends"}</p>
 		<div id="friend-wrapper">
 			{friendsList.length ? friendsList.map((elem, id) => {
-				return <p className="friend-slide" onClick={() => showUser(elem.friend)}>{elem.friend}</p>
-			}) : <p id="no-friends">{""}</p>}
+				return <p className="friend-slide" title={elem.friend} onClick={() => showUser(elem.friend)}>
+					<p className="friend-name">{elem.friend}</p>
+			</p>}) : <p id="no-friends">{""}</p>}
 		</div>
 	</div>);
 }
@@ -103,7 +104,7 @@ const HomePage = ({name, user, joinedDate, friendsList, updateFriendsList, profi
 	return (<div id="account-wrapper">
 		<div id="account-home">
 			<div id="account-name">
-				{name}
+				<p id="account-name-text" title={name}>{name}</p>
 			</div>
 			<div id="account-pic">
 				<div id="pic-container">

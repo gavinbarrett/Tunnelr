@@ -55,9 +55,13 @@
 	color: black;
 	font-size: 3rem;
 	font-family: 'Tahoma', sans-serif;
-	overflow-x: hidden;
-	overflow-y: hidden;
+}
+
+#account-name > #account-name-text {
+	white-space: nowrap;
+	overflow: hidden;
 	text-overflow: ellipsis;
+	padding: 1.5rem;
 }
 
 #account-pic {
@@ -140,6 +144,14 @@ img#profile {
 	font-weight: bold;
 	font-family: 'Tahoma', sans-serif;
 	transition: all 0.3s ease-in-out;
+	
+}
+
+.friend-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 0.5rem;
 }
 
 .friend-slide:hover {

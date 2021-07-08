@@ -36,7 +36,7 @@
 	align-items: center;
 	font-size: 2rem;
 	font-family: 'Inconsolata', monospace;
-	@media only screen and (min-width: 700px) {
+	@media only screen and (min-width: 800px) {
 		font-size: 4rem;
 	}
 }
@@ -46,7 +46,10 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 6rem;
+	padding: 3rem;
+	@media only screen and (min-width: 800) {
+		padding: 5rem;
+	}
 }
 
 #landing-tag > span {
@@ -63,14 +66,18 @@
 }
 
 #signup-button {
-	width: 16vw;
+	width: 25vw;
 	height: 10vh;
 	background: #7209b7;
-	font-size: 1.5rem;
+	font-size: 0.8rem;
 	color: white;
 	border: 0;
-	border-radius: 35px;
+	border-radius: 45px;
 	cursor: pointer;
+	@media only screen and (min-width: 500px) {
+		width: 20vw;
+		font-size: 1.5rem;
+	}
 }
 
 #signup-button > a {

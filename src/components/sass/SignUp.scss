@@ -32,9 +32,12 @@
 #signup-box > label {
 	width: 40vw;
 	height: 5vh;
-	font-size: 1.5rem;
+	font-size: 1rem;
 	color: #F0EFEB;
 	margin: 0;
+	@media only screen and (min-width: 500px) {
+		font-size: 1.5rem;
+	}
 }
 
 #signup-box > input {
@@ -44,7 +47,12 @@
 	border: none;
 	padding: 0.5rem;
 	border-radius: 25px;
-	font-size: 1.25rem;
+	font-size: 0.9rem;
+	@media only screen and (min-width: 500px) {
+		width: 50vw;
+		height: 4vh;
+		font-size: 1.25rem;
+	}
 }
 
 #signup-box > input:focus, input:active {
@@ -54,13 +62,18 @@
 #signup-box > button {
 	border: 0;
 	color: white;
-	width: 20vw;
-	height: 8vh;
+	width: 28vw;
+	height: 5vh;
 	background: purple;
 	border-radius: 35px;
-	font-size: 1.5rem;
+	font-size: 1rem;
 	transition: all 0.2s ease-in-out;
 	margin: 1rem;
+	@media only screen and (min-width: 500px) {
+		font-size: 1.5rem;
+		width: 20vw;
+		height: 8vh;
+	}
 }
 
 #signup-box > button:hover {
