@@ -3,7 +3,7 @@ import * as db from './databaseFunctions';
 export const addFriend = async (req, res) => {
 	const { friend } = req.query;
 	const { user } = req.cookies.sessionID;
-	let query = 'select * from friendships where friend2=$1 and friend1=$2 and status=$3';
+	let query = 'select * from friendships where friend2=$1 and friend1=$2 and status=$3 or friend2=$2 and friend1=$1 and status=$3';
 	let values = [user, friend, 'Pending'];
 	// check for friendship relation
 	const resp = await db.query(query, values);

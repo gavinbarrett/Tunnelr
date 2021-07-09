@@ -43,17 +43,17 @@ export const addChannel = async (req, res) => {
 
 export const loadChannels = async (req, res) => {
 	const { user } = req.cookies.sessionID;
-	if (!user.match(/^[a-z0-9]{2,32}$/i))
-		res.send(JSON.stringify({"status": "failed"}));
+	if (!user.match(/^[a-z0-9]{2,64}$/i))
+		res.status(400).end();
 	else {
 		const query = 'select channelname from members where username=$1';
 		const values = [user];
 		const channels = await db.query(query, values);
 		console.log(`Channels: ${channels.rows}`);
 		if (channels && channels.rows.length !== 0)
-			res.send(JSON.stringify({"status": channels.rows}));
+			res.status(200).send(JSON.stringify({"channels": channels.rows}));
 		else
-			res.send(JSON.stringify({"status": "failed"}));
+			res.status(400).end();
 	}
 }
 

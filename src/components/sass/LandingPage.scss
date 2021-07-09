@@ -26,23 +26,29 @@
 	width: 100vw;
 	height: 80vh;
 	display: flex;
+	flex-direction: column;
+	@media only screen and (min-width: 500px) {
+		flex-direction: row;
+	}
 }
 
 #landing-text {
-	width: 60vw;
-	height: 90vh;
+	width: 100vw;
+	height: 55vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	font-size: 2rem;
 	font-family: 'Inconsolata', monospace;
-	@media only screen and (min-width: 800px) {
+	@media only screen and (min-width: 500px) {
 		font-size: 4rem;
+		width: 60vw;
+		height: 90vh;
 	}
 }
 
 #landing-tag {
-	width: 80%;
+	width: 80vw;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -58,11 +64,15 @@
 }
 
 #sign-up {
-	width: 40vw;
-	height: 90vh;
+	width: 100vw;
+	height: 35vh;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	@media only screen and (min-width: 500px) {
+		width: 40vw;
+		height: 90vh;
+	}
 }
 
 #signup-button {

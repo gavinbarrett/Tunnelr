@@ -43,9 +43,12 @@ export const Account = () => {
 		const profilepic = r['profile'];
 		// set profile picture
 		(profilepic == "null") ? updateProfile('images/blank.png') : updateProfile(`data:image/png;base64,${profilepic}`);
+		console.log(`Names: ${Object.getOwnPropertyNames(r)}`);
 		if (!r['friends']) return;
 		console.log('pending');
 		console.log(r['pending']);
+		console.log('friends');
+		console.log(r['friends']);
 		updatePendingFriendsList(r['pending']);
 		updateFriendsList(r['friends']);
 	}
