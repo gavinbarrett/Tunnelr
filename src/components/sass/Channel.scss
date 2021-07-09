@@ -67,19 +67,25 @@
 
 .message {
 	width: 62vw;
-	font-size: 1.7rem;
 	font-weight: bold;
 	margin: 0;
 	color: white;
+	font-size: 1rem;
+	@media only screen and (min-width: 800px) {
+		font-size: 1.7rem;
+	}
 }
 
 .sender {
 	width: 62vw;
 	display: flex;
 	justify-content: space-between;
-	font-size: 1.2rem;
 	margin: 0;
 	color: #9232d1;
+	font-size: 0.7rem;
+	@media only screen and (min-width: 800px) {
+		font-size: 1rem;
+	}
 }
 
 .sender > p {
@@ -88,6 +94,11 @@
 
 .sender > .sender-name {
 	font-weight: bold;
+	width: 20vw;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: end;
 }
 
 .sent-message > .sender {
@@ -113,9 +124,12 @@ button#sendmessage {
 	height: 75vh;
 	color: black;
 	font-family: 'Inconsolata', monospace;
-	font-size: 3rem;
+	font-size: 1.2rem;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+	@media only screen and (min-width: 800px) {
+		font-size: 3rem;
+	}
 }

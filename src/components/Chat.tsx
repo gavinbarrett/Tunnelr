@@ -33,13 +33,15 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 	return (<div className={`channel-bar ${expanded}`}>
 		<div id="box" onClick={switchPage}>{">"}</div>
 		<div className={`add-channel${expanded} chatmenu`} onClick={upHome}>{"Chat Menu"}</div>
-		<div className={`add-channel${expanded} addchannel`} onClick={upPrompt}>
+		<div className={`newchannel add-channel${expanded} addchannel`} onClick={upPrompt}>
 			<div className="channel-banner">
 				{"+ New Channel"}
 			</div>
 		</div>
-		{userChannels.length ? userChannels.map((elem, idx) => {
-			return <div key={idx} className={`add-channel${expanded}`} onClick={upPage(elem.channelname)}>{elem.channelname}</div>
+		{userChannels && userChannels.length ? userChannels.map((elem, idx) => {
+			return <div key={idx} className={`add-channel${expanded}`} onClick={upPage(elem.channelname)}>
+				{elem.channelname}
+			</div>
 		}) : ''}
 	</div>);
 }
@@ -132,10 +134,10 @@ export const Chat = ({user}) => {
 	const loadUserChannels = async () => {
 		/* load the channels the user belongs to */
 		const resp = await fetch("/loadchannels", {method: "GET"});
-		const r = await resp.json();
-		console.log(r['status']);
-		if (r["status"] !== "failed")
-			updateUserChannels(r["status"]);
+		if (resp.status == 200) {
+			const r = await resp.json();
+			updateUserChannels(r["channels"]);
+		}
 	}
 
 	const setSocket = id => {

@@ -79,8 +79,11 @@
 	justify-content: center;
 	align-items: center;
 	font-family: 'Inconsolata', monospace;
-	font-size: 2rem;
+	font-size: 1rem;
 	color: black;
+	@media only screen and (min-width: 800px) {
+		font-size: 1.8rem;
+	}
 }
 
 #friended-box {
@@ -191,13 +194,20 @@ img#profile {
 	width: 100%;
 	height: 20vh;
 	font-family: 'Inconsolata', monospace;
-	font-size: 1.5rem;
+	font-size: 0.62rem;
 	display: flex;
 	align-items: center;
 	padding-left: 1rem;
 	cursor: default;
 	transition: all 0.5s ease-in;
 	color: white;
+	overflow: hidden;
+	@media only screen and (min-width: 500px) {
+		font-size: 1rem;
+	}
+	@media only screen and (min-width: 800px) {
+		font-size: 1.5rem;
+	}
 }
 
 #self-sidebar > *:hover {
@@ -230,15 +240,21 @@ img#profile {
 }
 
 #account-controller > button, label {
-	width: 25vw;
+	width: 40vw;
 	height: 8vh;
 	text-align: center;
 	color: white;
 	border: 0;
-	border-radius: 25px;
+	border-radius: 35px;
 	font-family: 'Tahoma', sans-serif;
-	font-size: 1.5rem;
+	font-size: 1rem;
 	margin: 0.2em;
+	@media only screen and (min-width: 600px) {
+		width: 45vw;
+		height: 10vh;
+		font-size: 1.5rem;
+	}
+
 }
 
 button#change-password {

@@ -68,7 +68,7 @@ export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
 				let time = new Date(parseInt(elem[0]));
 				let data = JSON.parse(elem[1][1]);
 				let cls = (data.sender == sender) ? 'sent-message' : 'received-message';
-				return <div key={index} className={`${cls}`}><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p className="sender-name">{data.sender}</p></p></div>
+				return <div key={index} className={`${cls}`}><p className="message">{data.message}</p><p className="sender"><p>{time.toLocaleString()}</p><p title={data.sender} className="sender-name">{data.sender}</p></p></div>
 			}) : <NoMessages/>}
 			<div id="anchor"></div>
 		</div>

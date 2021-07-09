@@ -7,34 +7,46 @@
 }
 
 .channel-bar {
-	width: 5vw;
+	width: 8vw;
 	height: 90vh;
 	background: #7209B7;
 	overflow-x: hidden;
-	transition: all 0.5s ease-in-out;
+	transition: width 0.5s ease-in-out;
 	overflow-y: hidden;
+	@media only screen and (min-width: 900px) {
+		width: 5vw;
+	}
 }
 
 .chat-menu {
-	width: 95vw;
+	width: 92vw;
 	height: 90vh;
 	display: flex;
 	flex-direction: column;
 	font-family: 'Tahoma', sans-serif;
+	@media only screen and (min-width: 900px) {
+		width: 95vw;
+	}
 }
 
 .expanded {
-	width: 35vw;
+	width: 40vw;
 	overflow-y: scroll;
 	scrollbar-width: thin;
+	@media only screen and (min-width: 900px) {
+		width: 35vw;
+	}
 }
 
 .minimized {
-	width: 65vw;
+	width: 60vw;
+	@media only screen and (min-width: 900px) {
+		width: 65vw;
+	}
 }
 
 #box {
-	width: 5vw;
+	width: 8vw;
 	height: 8vh;
 	background: black;
 	color: white;
@@ -42,6 +54,9 @@
 	justify-content: center;
 	align-items: center;
 	cursor: default;
+	@media only screen and (min-width: 900px) {
+		width: 5vw;
+	}
 }
 
 .add-channel {
@@ -60,11 +75,14 @@
 	align-items: center;
 	background: black;
 	color: white;
-	font-size: 1.5rem;
+	font-size: 1rem;
 	cursor: default;
 	padding-left: 2vw;
 	font-family: 'Inconsolata', monospace;
 	transition: all 0.75s ease-in-out;
+	@media only screen and (min-width: 900px) {
+		font-size: 1.5rem;
+	}
 }
 
 .add-channelexpanded:hover {
@@ -76,8 +94,18 @@
 	cursor: default;
 }
 
+.newchannel {
+	font-size: 0.6rem;
+	@media only screen and (min-width: 500px) {
+		font-size: 0.8rem;
+	}
+	@media only screen and (min-width: 800px) {
+		font-size: 1.5rem;
+	}
+}
+
 .channel-banner {
-	width: 20vw;
+	width: 24vw;
 	height: 8vh;
 	background: #ffffff;
 	border-radius: 40px;
