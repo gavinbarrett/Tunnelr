@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as Router from 'react-router-dom';
 import * as Typewriter from 'react-typewriter';
 import { Footer } from './Footer';
-import { UserAuth } from '../UserAuth';
+import { UserInfo } from '../UserInfo';
 import './sass/LandingPage.scss';
 
 const LandingText = ({loggedIn}) => {
@@ -24,7 +24,7 @@ const SignUp = ({loggedIn}) => {
 }
 
 export const LandingPage = ({landingMessage}) => {
-	const { loggedIn } = React.useContext(UserAuth);
+	const { loggedIn } = React.useContext(UserInfo);
 	return (<><div id="landing-box">
 		<div id="landing-message">{landingMessage}</div>
 		<div id="landing-page">

@@ -1,0 +1,83 @@
+#account-wrapper {
+	width: 80vw;
+	//height: 90vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #f3e2f5;
+	@media only screen and (min-width: 800px) {
+		flex-direction: row;
+	}
+}
+
+#account-wrapper > * {
+	cursor: default;
+}
+
+#account-home {
+	width: 45vw;
+	height: 90vh;
+}
+
+#account-name {
+	width: 45vw;
+	height: 20vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: black;
+	font-size: 3rem;
+	font-family: 'Tahoma', sans-serif;
+}
+
+#account-name > #account-name-text {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	padding: 1.5rem;
+}
+
+#account-pic {
+	width: 45vw;
+	height: 50vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#pic-container {
+	width: 200px;
+	height: 200px;
+}
+
+img#profile {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+#account-friends {
+	width: 60vw;
+	height: 90vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	@media only screen and (min-width: 800px) {
+		width: 35vw;
+	}
+}
+
+#account-date {
+	width: 45vw;
+	height: 10vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	font-family: 'Inconsolata', monospace;
+	font-size: 1rem;
+	color: black;
+	@media only screen and (min-width: 800px) {
+		font-size: 1.8rem;
+	}
+}

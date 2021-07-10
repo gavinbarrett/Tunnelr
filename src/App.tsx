@@ -10,44 +10,56 @@ import { Contact } from './components/Contact';
 import { ChannelPage } from './components/ChannelPage';
 import { Chat } from './components/Chat';
 import { NotFound } from './components/NotFound';
-import { UserAuth } from './UserAuth';
+import { UserInfo } from './UserInfo';
 import { Messages } from './Messages';
 import './components/sass/App.scss';
 
 const App = () => {
-	const [user, updateUser] = React.useState('');
-	const [loggedIn, updateLoggedIn] = React.useState(false);
-	const [profile, updateProfile] = React.useState('images/blank.png');
 	const [landingMessage, updateLandingMessage] = React.useState('');
 	const [errorMessage, updateErrorMessage] = React.useState('');
+	const [user, updateUser] = React.useState('');
+	const [loggedIn, updateLoggedIn] = React.useState(false);
+	const [joined, updateJoined] = React.useState('');
+	const [profile, updateProfile] = React.useState('images/blank.png');
+	const [friends, updateFriends] = React.useState([]);
+	const [pending, updatePending] = React.useState([]);
+	const [channels, updateChannels] = React.useState([]);
 	//const dataLog = React.useReducer();
 	// FIXME once a user logs in, store their name, joined date, list of channels and friends, and profile pic
 	const loc = Router.useLocation();
 	React.useEffect(() => {
 		// try to retrieve prior session
 		getSession();
-		const sessionData = window.sessionStorage.getItem("data");
-		if (sessionData) {
-			console.log(`Retrieved session data: ${sessionData}`);
-			const { user, loggedin } = JSON.parse(sessionData);
-			console.log(`Updating user to ${user}`);
-			console.log(`Session store contained: ${user}\n${loggedin}`);
-		} 
+		//const sessionData = window.sessionStorage.getItem("data");
+		//if (sessionData) {
+			//console.log(`Retrieved session data: ${sessionData}`);
+			//const { user, loggedin } = JSON.parse(sessionData);
+			//console.log(`Updating user to ${user}`);
+			//console.log(`Session store contained: ${user}\n${loggedin}`);
+		//} 
 	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
 		// FIXME: ajax should return the user's profile picture, friends list, joined channels, and joined date
 		if (resp.status == 200) {
-			const r = await resp.json();
+			const payload = await resp.json();
 			// FIXME: couldn't reauth session, dont log user back in
 			console.log("No session exists; please log in.");
 			console.log('Logging user back into their session');
+			const { user, created_at, friends, pending, channels, profile } = payload; 
 			updateLoggedIn(true);
-			updateUser(r["user"]);
+			updateUser(user);
+			const created_date = created_at.split(' ');
+			const date = created_date.splice(1, 3);
+			updateJoined(date.join(' '));
+			updateFriends(friends);
+			updatePending(pending);
+			updateChannels(channels);
+			profile ? updateProfile(`data:image/png;base64,${profile}`) : updateProfile('images/blank.png');
 		}
 	}
 	return (<div className="app-wrapper">
-		<UserAuth.Provider value={{user, updateUser, loggedIn, updateLoggedIn, profile, updateProfile, loc}}>
+		<UserInfo.Provider value={{user, updateUser, loggedIn, updateLoggedIn, joined, updateJoined, profile, updateProfile, friends, updateFriends, pending, updatePending, channels, updateChannels, loc}}>
 		<Messages.Provider value={{landingMessage, updateLandingMessage, errorMessage, updateErrorMessage}}>
 			<Header user={user} loggedIn={loggedIn}/>
 			<Router.Switch>
@@ -66,7 +78,7 @@ const App = () => {
 				</Router.Route>
 			</Router.Switch>
 		</Messages.Provider>
-		</UserAuth.Provider>
+		</UserInfo.Provider>
 	</div>);
 }
 

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { ErrorMessage } from './ErrorMessage';
-import { UserAuth } from '../UserAuth';
+import { UserInfo } from '../UserInfo';
 import { Messages } from '../Messages';
 import './sass/DeleteAccount.scss';
 
@@ -10,7 +10,7 @@ export const DeleteAccount = ({updatePrompt}) => {
     const [password, updatePassword] = React.useState('');
     const [checked, updateChecked] = React.useState('');
     const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
-    const { updateUser, updateLoggedIn, updateProfile } = React.useContext(UserAuth);
+    const { updateUser, updateLoggedIn, updateProfile } = React.useContext(UserInfo);
     const { updateErrorMessage } = React.useContext(Messages);
 
     const history = useHistory();
@@ -27,25 +27,23 @@ export const DeleteAccount = ({updatePrompt}) => {
         if (username == '') {
             updateErrorMessage('Please enter your username');
             updateErrorDisplayed(true);
-            return;
         } else if (password == '') {
             updateErrorMessage('Please enter your password');
             updateErrorDisplayed(true);
-            return;
         } else if (checked == '') {
             updateErrorMessage('Please check the box');
             updateErrorDisplayed(true);
-            return;
+        } else {
+            const resp = await fetch('/deleteaccount', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"username": username, "password": password})});
+            if (resp.status == 200) {
+                // log user out, reset all variables, return to the landing page
+                updateUser('');
+                updateLoggedIn(false);
+                updateProfile('images/blank.png');
+                history.push("/");
+            } else
+                updateErrorMessage('Could not delete account.');
         }
-        const resp = await fetch('/deleteaccount', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({"username": username, "password": password})});
-        if (resp.status == 200) {
-            // log user out, reset all variables, return to the landing page
-            updateUser('');
-            updateLoggedIn(false);
-            updateProfile('images/blank.png');
-            history.push("/");
-        } else
-            updateErrorMessage('Could not delete account.');
     }
     return (<div className={`settings-prompt delete-account-prompt`}>
 		<div id="exit" onClick={clearVariables}>{"x"}</div>

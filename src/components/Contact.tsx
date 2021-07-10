@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Footer } from './Footer';
 import { ErrorMessage } from './ErrorMessage';
-import { UserAuth } from '../UserAuth';
+import { UserInfo } from '../UserInfo';
 import { Messages } from '../Messages';
 import './sass/Contact.scss';
 
@@ -14,7 +14,7 @@ const ReturnAddress = ({updateReturnAddr}) => {
 }
 
 export const Contact = ({updateLandingMessage}) => {
-    const { user, loggedIn } = React.useContext(UserAuth);
+    const { user, loggedIn } = React.useContext(UserInfo);
     const [subject, updateSubject] = React.useState('');
     const [emailBody, updateEmailBody] = React.useState('');
     const [returnAddr, updateReturnAddr] = React.useState('');

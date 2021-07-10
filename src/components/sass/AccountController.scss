@@ -1,0 +1,85 @@
+#settings-page {
+	width: 80vw;
+	height: 90vh;
+	background: #f3e2f5;
+	display: flex;
+	flex-direction: column;
+}
+
+#account-controller {
+	display: flex;
+	flex-direction: column;
+	padding-left: 10vw;
+	padding-top: 8vh;
+}
+
+#account-controller > button, label {
+	width: 40vw;
+	height: 8vh;
+	text-align: center;
+	color: white;
+	border: 0;
+	border-radius: 35px;
+	font-family: 'Tahoma', sans-serif;
+	font-size: 1rem;
+	margin: 0.2em;
+	@media only screen and (min-width: 600px) {
+		width: 45vw;
+		height: 10vh;
+		font-size: 1.5rem;
+	}
+}
+
+button#change-password {
+	background: navy;
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#change-password:hover {
+	background: rgb(0, 0, 70);
+	transition: background-color 0.2s ease-in-out;
+}
+
+label#change-profile {
+	background: navy;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: background-color 0.2s ease-in-out;
+}
+
+label#change-profile:hover {
+	background: rgb(0, 0, 70);
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#leave-channel {
+	background: navy;
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#delete-channel {
+	background: red;
+	font-weight: bold;
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#delete-channel:hover {
+	background: rgb(177, 4, 4);
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#delete-account {
+	background: red;
+	font-weight: bold;
+	transition: background-color 0.2s ease-in-out;
+}
+
+button#delete-account:hover {
+	background: rgb(177, 4, 4);
+	transition: background-color 0.2s ease-in-out;
+}
+
+#profile-uploader {
+	display: none;
+}

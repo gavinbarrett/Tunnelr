@@ -2,12 +2,12 @@ import * as React from 'react';
 import { Footer } from './Footer';
 import { useLocation } from 'react-router-dom';
 import { ErrorMessage } from './ErrorMessage';
-import { UserAuth } from '../UserAuth';
+import { UserInfo } from '../UserInfo';
 import { Messages } from '../Messages';
 import './sass/ChannelPage.scss';
 
 export const ChannelPage = () => {
-    const { user, loggedIn } = React.useState(UserAuth);
+    const { user, loggedIn } = React.useState(UserInfo);
     const [name, updateName] = React.useState('');
     const [access, updateAccess] = React.useState('');
     const [mode, updateMode] = React.useState('');

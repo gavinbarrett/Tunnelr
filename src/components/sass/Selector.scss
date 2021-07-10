@@ -1,0 +1,30 @@
+#self-sidebar > * {
+	width: 100%;
+	height: 20vh;
+	font-family: 'Inconsolata', monospace;
+	font-size: 0.62rem;
+	display: flex;
+	align-items: center;
+	padding-left: 1rem;
+	cursor: default;
+	transition: background-color 0.5s ease-in;
+	color: white;
+	overflow: hidden;
+	@media only screen and (min-width: 500px) {
+		font-size: 1rem;
+	}
+	@media only screen and (min-width: 800px) {
+		font-size: 1.5rem;
+	}
+}
+
+#self-sidebar > *:hover {
+	background: #2e042e;
+	transition: background-color 0.5s ease-in;
+}
+
+#homepage {}
+
+#settings {}
+
+#logout {}

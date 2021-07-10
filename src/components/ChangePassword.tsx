@@ -8,40 +8,35 @@ export const ChangePassword = ({updatePrompt}) => {
 	const [newPass, updateNewPass] = React.useState('');
 	const [retryPass, updateRetryPass] = React.useState('');
 	const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
-	const { errorMessage, updateErrorMessage } = React.useContext(Messages);
+	const { updateErrorMessage } = React.useContext(Messages);
 	const validPassword = pass => pass.match(/^[a-z0-9]{10,64}$/i);
 	const tryNewPassword = async () => {
-		console.log(`old: ${oldPass}\nnew: ${newPass}\nretry: ${retryPass}`);
 		if (oldPass == '') {
 			updateErrorMessage('Please enter your old password');
 			updateErrorDisplayed(true);
-			return;
 		} else if (newPass == '') {
 			updateErrorMessage('Please enter a new password');
 			updateErrorDisplayed(true);
-			return;
 		} else if (retryPass == '') {
 			updateErrorMessage('Please re-enter your new password');
 			updateErrorDisplayed(true);
-			return;
 		} else if (newPass != retryPass) {
 			updateErrorMessage('New passwords do not match');
 			updateErrorDisplayed(true);
-			return;
-		}
-		if (!validPassword(newPass)) {
+		} else if (!validPassword(newPass)) {
 			updateErrorMessage('Invalid password [A-Z0-9]');
 			updateErrorDisplayed(true);
-			return;
+		} else {
+			const resp = await fetch('/changepassword', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"oldpassword": oldPass, "newpassword": newPass})});
+			if (resp.status == 200) {
+				// successfully changed password; clear variables
+				clearVariables();
+			} else
+				updateErrorMessage('Could not change password');
 		}
-		const resp = await fetch('/changepassword', {method: 'POST', headers: {"Content-Type": "application/json"}, body: JSON.stringify({"oldpassword": oldPass, "newpassword": newPass})});
-		if (resp.status == 200) {
-			// successfully changed password; clear variables
-			clearVariables();
-		} else
-			updateErrorMessage('Could not change password');
 	}
 	const clearVariables = async () => {
+		// reset all component variables
 		updateErrorMessage('');
 		updateErrorDisplayed(false);
 		updateOldPass('');
@@ -52,15 +47,14 @@ export const ChangePassword = ({updatePrompt}) => {
 	return (<div className={`settings-prompt password-prompt`}>
 		<div id="exit" onClick={clearVariables}>{"x"}</div>
 		<div className="error-container">
-			{/*{pwError ? <div className="ui-error">{pwError}</div> : ''}*/}
 			<ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
 		</div>
 		<label for="oldpw">{"Enter old password"}</label>
-		<input name="oldpw" onChange={event => updateOldPass(event.target.value)}/>
+		<input name="oldpw" maxLength={64} onChange={event => updateOldPass(event.target.value)}/>
 		<label for="newpw">{"Enter new password"}</label>
-		<input name="newpw" onChange={event => updateNewPass(event.target.value)}/>
+		<input name="newpw" maxLength={64} onChange={event => updateNewPass(event.target.value)}/>
 		<label for="newpwretry">{"Retype new password"}</label>
-		<input name="newpwretry" onChange={event => updateRetryPass(event.target.value)}/>
+		<input name="newpwretry" maxLength={64} onChange={event => updateRetryPass(event.target.value)}/>
 		<button onClick={tryNewPassword}>{"Change Password"}</button>
 	</div>);
 }

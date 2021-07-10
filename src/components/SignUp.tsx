@@ -1,14 +1,13 @@
 import * as React from 'react';
 import * as Router from 'react-router-dom';
-import { updateDataStore } from './dataStore';
 import { ErrorMessage } from './ErrorMessage';
 import { Footer } from './Footer';
-import { UserAuth } from '../UserAuth';
+import { UserInfo } from '../UserInfo';
 import { Messages } from '../Messages';
 import './sass/SignUp.scss';
 
 export const SignUp = ({updateLandingMessage}) => {
-	const { updateLoggedIn, updateUser } = React.useContext(UserAuth);
+	const { updateLoggedIn, updateUser } = React.useContext(UserInfo);
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const [rePassword, updateRePassword] = React.useState('');
@@ -23,10 +22,15 @@ export const SignUp = ({updateLandingMessage}) => {
 		/* attempt to sign the user up for Tunnelr */
 		if (validCredentials()) {
 			const resp = await fetch("/signup", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({"user": username, "pass": password, "email": email})});
-			if (resp.status != 200) return; // FIXME: throw error
-			updateLandingMessage("Please verify your account from your email address");
-			setTimeout(() => updateLandingMessage(''), 5000);
-			pageHistory.push("/");
+			console.log(resp.status);
+			if (resp.status != 200) {
+				updateErrorMessage('Could not sign up');
+				updateErrorDisplay(true);
+			} else {
+				updateLandingMessage('Please verify your account from your email address');
+				setTimeout(() => updateLandingMessage(''), 5000);
+				pageHistory.push("/");
+			}
 		}
 	}
 

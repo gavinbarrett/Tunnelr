@@ -3,6 +3,7 @@ import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import * as nodemailer from 'nodemailer';
 import * as db from './databaseFunctions';
+import { readProfileFromDisk } from './accounts';
 
 const expiry: number = 60 * 60 // 60 minute session
 dotenv.config();
@@ -25,7 +26,7 @@ export const authorizeUser = async (req, res, next) => {
 export const authenticateUserForUser = async (req, res, next) => {
 	/* Authenticate the user's session ID against the cache for one of the user's resources */
 	if (!req.cookies.sessionID) {
-		res.status(401).send(JSON.stringify({"status": "failed"}));
+		res.status(401).end();
 	} else {
 		console.log(req.cookies.sessionID);
 		const user = req.cookies.sessionID.user;
@@ -33,8 +34,34 @@ export const authenticateUserForUser = async (req, res, next) => {
 		const id = req.cookies.sessionID.sessionid;
 		const keys = db.exists(id);
 		// FIXME: ensure queried user is associated with Redis entry
-		keys ? next() : res.status(401).send(JSON.stringify({"status": "failed"}));
+		keys ? next() : res.status(401).end();
 	}
+}
+
+const getInfo = async (user) => {
+	let query = 'select username, profile, created_at from users where username=$1';
+	let values = [user];
+	const userData = await db.query(query, values);
+	query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
+	values = [user, user];
+	//console.log('In session function');
+	//console.log(`User rows:`);
+	//console.table(userData.rows);
+	//const { created_at, profile } = userData.rows[0];
+	const friends = await db.query(query, values);
+	//console.log(`Friends:`);
+	//console.log(friends.rows);
+	query = "select friend2 as friend from friendships where friend1=$1 and status='Pending'";
+	values = [user];
+	const pending = await db.query(query, values);
+	//console.log(`Pending:`);
+	//console.log(pending.rows);
+	query = 'select channelname from members where username=$1';
+	values = [user];
+	const channels = await db.query(query, values);
+	//console.log(`Channels:`);
+	//console.log(channels.rows);
+	return { userData, friends, pending, channels };
 }
 
 const establishSession = async (user, res) => {
@@ -43,23 +70,43 @@ const establishSession = async (user, res) => {
 		user: user,
 		sessionid: id
 	};
+	// FIXME: check for profile picture, friends, channels
+	const info = await getInfo(user);
+	const { created_at, profile } = info.userData.rows[0];
+	console.log(`Created at: ${created_at}`);
+	console.log(`Profile: ${profile}`);
 	// set session id
 	db.set(id, user, 'EX', expiry);
 	// set cookie data
 	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
-	res.status(200).send(JSON.stringify({"user": user}));
+	if (profile) {
+		const pic = await readProfileFromDisk(profile);
+		const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": "${pic}"}`;
+		res.status(200).send(data);
+	} else {
+		const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": ${null}}`;
+		res.status(200).send(data);
+	}
 }
 
 export const retrieveSession = async (req, res) => {
 	/* Retrieve user session */
 	if (req.cookies.sessionID) {
-		//console.log("Trying to retrieve");
 		const { user, sessionid } = req.cookies.sessionID;
 		const session = await checkForSession(sessionid);
-		console.log(`Session: ${session}`);
-		if (session)
-			res.status(200).send(JSON.stringify({"user": user}));
-		else
+		//console.log(`Session: ${session}`);
+		if (session) {
+			const info = await getInfo(user);
+			const { created_at, profile } = info.userData.rows[0];
+			if (profile) {
+				const pic = await readProfileFromDisk(profile);
+				const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": "${pic}"}`;
+				res.status(200).send(data);
+			} else {
+				const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": ${null}}`;
+				res.status(200).send(data);
+			}
+		} else
 			res.status(400).end();
 	} else
 		res.status(400).end();
@@ -68,12 +115,10 @@ export const retrieveSession = async (req, res) => {
 const checkForSession = async id => {
 	try {
 		const session = await db.get(id);
-		//console.log(`Checked session: ${session}`);
 		if (session)
 			return session;
 		return null;
 	} catch(err) {
-		//console.log(`Error occurred: ${err}`);
 		return null;
 	}
 }
@@ -88,29 +133,12 @@ export const authenticate = async (user, pass, res) => {
 		console.log(matched);
 		if (matched) {
 			console.log(`Signing in ${user}`);
-			// FIXME: check for profile picture, friends, channels
-			let query = 'select username, profile, created_at from users where username=$1';
-			let values = [user];
-			const userData = await db.query(query, values);
-			query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
-			values = [user, user];
-			console.log(userData.rows);
-			const friends = await db.query(query, values);
-			console.log(friends.rows);
-			query = 'select channelname from members where username=$1';
-			values = [user];
-			const channels = await db.query(query, values);
-			console.log(channels.rows);
-
-			// FIXME: check for profile; if it exists, read it from disk
 			// send all data to the client
 			establishSession(user, res);
-			// FIXME set cookie to return to user
 		} else
 			res.status(400).send(JSON.stringify({"status": "failed"}));
-	} else {
+	} else
 		res.status(400).send(JSON.stringify({"status": "failed"}));
-	}
 }
 
 export const signUserIn = async (req, res) => {
@@ -133,8 +161,8 @@ export const signUserUp = async (req, res) => {
 	if (await validQueries([user, pass, email], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i, /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i])) {
 		// check database for username
 		const added = await checkForUser(user);
-		if (added.rows.length !== 0)	// return failed sign up attempt if user already exists
-			res.send(JSON.stringify({"status": "failed"}));
+		if (added.rows.length)	// return failed sign up attempt if user already exists
+			res.status(406).end();
 		else {		// 
 			// if the user doesn't exist, attempt to sign them up
 			if (addUser(user, pass, email)) {
@@ -143,14 +171,14 @@ export const signUserUp = async (req, res) => {
 				if (sent) {
 					res.status(200).send(JSON.stringify({"user": user}));
 				} else {
-					res.send(JSON.stringify({"user": "failed"}));
+					res.status(406).end();
 				}
 			} else {
-				res.send(JSON.stringify({"user": "failed"}));
+				res.status(406).end();
 			}
 		}
 	} else {
-		res.send(JSON.stringify({"user": "failed"}));
+		res.status(400).end();
 	}
 }
 
@@ -164,6 +192,9 @@ const sendMail = async (user, email) => {
 	});
 	console.log(process.env.MAILADDRESS);
 	console.log(process.env.MAILPW);
+	// FIXME: instead of directing to ?user=user, put a session key in redis and send it to the user
+	// the user will click on this link and the backend will process the require to make sure it's legitimate
+	// we won't be able to use normal session keys because I'm currently encoding them in base64. Maybe use base32?
 	let mailConfig = {
 		from: process.env.MAIL,
 		to: email,

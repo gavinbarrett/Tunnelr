@@ -104,7 +104,7 @@ export const loadUserInfo = async (req, res) => {
 	let friends = JSON.stringify(data.rows);
 	console.log(`Friends: ${friends}`);
 	//query = "select friend2 as pendingfriend from friendships where friend1=$1 and status='Pending' union select friend1 from friendships where friend2=$2 and status='Pending'";
-	query = "select friend2 from friendships where friend1=$1 and friend2=$2 and status='Pending'";
+	query = "select friend2 as pending from friendships where friend1=$1 and friend2=$2 and status='Pending'";
 	values = [user, name];
 	const pending = await db.query(query, values);
 	console.log(`Created at: ${created_at}`);
@@ -112,12 +112,12 @@ export const loadUserInfo = async (req, res) => {
 	values = [name];
 	const channels = await db.query(query, values);
 	if (!profile) {
-        const date = `{"created_at": "${created_at}", "profile": "${null}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
+        const date = `{"user": "${user}", "created_at": "${created_at}", "profile": ${null}, "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
         res.status(200).send(date);
     } else {
         // read user's profile from the disk
         const pic = await readProfileFromDisk(profile);
-        const date = `{"created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
+        const date = `{"user": "${user}", "created_at": "${created_at}", "profile": "${pic}", "friends": ${friends}, "pending": ${JSON.stringify(pending.rows)}, "channels": ${JSON.stringify(channels)}}`;
         res.status(200).send(date);
     }
 }
@@ -170,7 +170,7 @@ const insertProfileIntoDB = async (user, hash) => {
 	}
 }
 
-const readProfileFromDisk = async (profile) => {
+export const readProfileFromDisk = async (profile) => {
 	const dir = `./data/profiles/`;
 	console.log(`Profile: "${profile}"`);
 	const fileRegex = new RegExp(`${profile}\.(png|jpg|jpeg)`);
