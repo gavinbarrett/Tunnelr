@@ -7,13 +7,17 @@
 }
 
 #befriend-button {
-	width: 14vw;
+	width: 22vw;
 	height: 8vh;
 	border-radius: 25px;
 	color: white;
 	background: purple;
-	font-size: 1.2rem;
+	font-size: 1rem;
 	font-family: 'Tahoma', sans-serif;
 	font-weight: bold;
 	border: 0;
+	@media only screen and (min-width: 800px) {
+		width: 14vw;
+		font-size: 1.2rem;
+	}
 }

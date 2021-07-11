@@ -2,14 +2,12 @@
 	width: 100vw;
 	display: flex;
 	background: #F0EFEB;
-	//height: 90vh;
 	@media only screen and (min-width: 800px) {
 		height: initial;
 	}
 }
 
 #side {
-	width: 20vw;
-	//height: 90vh;
+	width: 10vw;
 	background: #7209b7;
 }

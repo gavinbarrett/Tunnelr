@@ -24,7 +24,6 @@ const App = () => {
 	const [friends, updateFriends] = React.useState([]);
 	const [pending, updatePending] = React.useState([]);
 	const [channels, updateChannels] = React.useState([]);
-	//const dataLog = React.useReducer();
 	// FIXME once a user logs in, store their name, joined date, list of channels and friends, and profile pic
 	const loc = Router.useLocation();
 	React.useEffect(() => {

@@ -3,7 +3,7 @@ import { FriendsList } from './FriendsList';
 import { UserInfo } from '../UserInfo';
 import './sass/HomePage.scss';
 
-export const HomePage = ({name, user, updateName}) => {
+export const HomePage = ({name, updateName}) => {
     const { joined, profile, friends } = React.useContext(UserInfo);
 	return (<div id="account-wrapper">
 		<div id="account-home">

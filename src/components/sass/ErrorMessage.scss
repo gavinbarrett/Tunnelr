@@ -1,5 +1,5 @@
 .error {
-	width: 25vw;
+	width: 32vw;
 	height: 7vh;
 	border: 2px solid red;
 	display: none;
@@ -7,6 +7,11 @@
 	background: coral;
 	border-radius: 35px;
     font-family: 'Tahoma', sans-serif;
+	font-size: 0.7rem;
+	@media only screen and (min-width: 700px) {
+		width: 25vw;
+		font-size: 1.2rem;
+	}
 }
 
 .error-displayed {

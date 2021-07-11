@@ -8,7 +8,7 @@ import { UserInfo } from '../UserInfo';
 import './sass/Account.scss';
 
 export const Account = () => {
-	const { user, updateUser, updateLoggedIn, profile, updateProfile, joined, updateJoined, friends, updateFriends, pending, updatePending, loc } = React.useContext(UserInfo);
+	const { user, loc } = React.useContext(UserInfo);
 	const [self, updateSelf] = React.useState(true);
 
 	const [name, updateName] = React.useState(null);
@@ -30,7 +30,6 @@ export const Account = () => {
 		if (username == user) {
 			updateName(username);
 			console.log('Already have data')
-			return;
 		} else if (username) {
 			console.log('grabbing data');
 			updateName(username);
@@ -39,7 +38,7 @@ export const Account = () => {
 			history.push('/notfound');
 	}
 	const grabUserInfo = async name => {
-		//console.log(`Grabbing ${name}`);
+		console.log(`Grabbing ${name}`);
 		const resp = await fetch(`/loaduserinfo/?name=${name}`, {method: 'GET'});
 		if (resp.status == 200) {
 			const r = await resp.json();
@@ -61,7 +60,7 @@ export const Account = () => {
 			<div id="side">
 				<Selector updateSelf={updateSelf}/>
 			</div>
-			{self ? <HomePage name={name} user={user} updateName={updateName}/> : <AccountController/>}
+			{self ? <HomePage name={name} updateName={updateName}/> : <AccountController/>}
 		</> : <>
 			<div id="side">
 			</div>
@@ -69,12 +68,3 @@ export const Account = () => {
 		</>}
 	</div>);
 }
-
-/*
-return (<div id="account-page">
-<div id="side">
-	{name === user ? <Selector updateSelf={updateSelf}/> : ''}
-</div>
-{self ? (name === user ? <HomePage name={name} user={user} updateName={updateName}/> : <UserPage profile={} joined={}/>) : <AccountController/>}
-</div>);
-*/

@@ -43,7 +43,7 @@ export const ChannelPage = () => {
     }
     return (<><div id="channel-page">
             <div id="channel-header">{name}</div>
-            <div id="channel-access">{`Access Control: ${access}`}{"/"}{mode}</div>
+            <div id="channel-access">{`Access: ${access}`}{access == 'Private' ? '/' : ''}{mode}</div>
             <div id="doc">{`Created on ${doc}`}</div>
             <JoinButton name={name} access={access} mode={mode} memberStat={memberStat} updateMemberStat={updateMemberStat} updateDisplayLeave={updateDisplayLeave} updateDisplayPassword={updateDisplayPassword} joinButton={joinButton} updateJoinButton={updateJoinButton}/>
             <LeavePrompt name={name} displayLeave={displayLeave} updateDisplayLeave={updateDisplayLeave} updateJoinButton={updateJoinButton} updateMemberStat={updateMemberStat}/>
@@ -55,7 +55,6 @@ export const ChannelPage = () => {
 
 const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, updateMemberStat}) => {
     const [channelName, updateChannelName] = React.useState('');
-    const [leaveError, updateLeaveError] = React.useState('');
     const [checked, updateChecked] = React.useState('');
     const [displayError, updateDisplayError] = React.useState(false);
     const { updateErrorMessage } = React.useContext(Messages);
@@ -65,25 +64,24 @@ const LeavePrompt = ({name, displayLeave, updateDisplayLeave, updateJoinButton, 
             console.log('Channels do not match');
             updateErrorMessage('Channels do not match');
             updateDisplayError(true);
-            return;
         } else if (checked != 'checked') {
             console.log('Please check the box');
             updateErrorMessage('Please check the box');
             updateDisplayError(true);
-            return;
-        }
-        const resp = await fetch(`/leavechannel?channel=${name}`, {method: 'GET'});
-        if (resp.status == 200) {
-            updateDisplayLeave(false);
-            updateDisplayError(false);
-            updateErrorMessage('');
-            updateChannelName('');
-            updateChecked('');
-            updateMemberStat('NOT');
-            updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
         } else {
-            updateErrorMessage('Failed to leave channel');
-            updateDisplayError(true);
+            const resp = await fetch(`/leavechannel?channel=${name}`, {method: 'GET'});
+            if (resp.status == 200) {
+                updateDisplayLeave(false);
+                updateDisplayError(false);
+                updateErrorMessage('');
+                updateChannelName('');
+                updateChecked('');
+                updateMemberStat('NOT');
+                updateJoinButton(<Join name={name} updateMemberStat={updateMemberStat}/>);
+            } else {
+                updateErrorMessage('Failed to leave channel');
+                updateDisplayError(true);
+            }
         }
     }
     return (<div className={`leave-prompt ${displayLeave}`}>
