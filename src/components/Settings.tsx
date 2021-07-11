@@ -1,13 +1,23 @@
 import * as React from 'react';
 import { ChangePassword } from './ChangePassword';
 import { DeleteAccount } from './DeleteAccount';
-import { UserInfo } from '../UserInfo'; 
+import { UserInfo } from '../UserInfo';
+import './sass/Settings.scss';
 
+const Success = ({updateSuccess}) => {
+	// successfully uploaded profile picture; display message to user
+	React.useEffect(() => {
+		setTimeout(() => updateSuccess(null), 5000);
+	}, []);
+	return (<div id="success">
+		{"Profile uploaded"}
+	</div>);
+}
 
-export const AccountController = () => {
+export const Settings = () => {
 	const { updateProfile } = React.useContext(UserInfo);
 	const [prompt, updatePrompt] = React.useState(null);
-
+	const [success, updateSuccess] = React.useState(null);
 	const changePassword = async () => {
 		updatePrompt(<ChangePassword updatePrompt={updatePrompt}/>);
 	}
@@ -23,13 +33,16 @@ export const AccountController = () => {
 			const payload = await resp.json();
 			const { profile } = payload;
 			updateProfile(`data:image/png;base64,${profile}`);
+			updateSuccess(<Success updateSuccess={updateSuccess}/>);
 		}
 	}
 	const deleteChannel = async () => {}
 	const deleteAccount = async () => updatePrompt(<DeleteAccount updatePrompt={updatePrompt}/>);
-
 	return (<div id="settings-page">
 		<div id="account-controller">
+			<div id="account-message">
+				{success ? success : ''}
+			</div>
 			<button id="change-password" onClick={changePassword}>{"Change Password"}</button>
 			<label for="profile-uploader" id="change-profile">{"Change Profile"}</label>
 			<input id="profile-uploader" type="file" accept="image/*" onChange={changeProfile}/>

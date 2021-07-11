@@ -1,5 +1,5 @@
 #settings-page {
-	width: 80vw;
+	width: 90vw;
 	height: 90vh;
 	background: #f3e2f5;
 	display: flex;
@@ -95,11 +95,11 @@ button#delete-account:hover {
 	flex-direction: column;
 	justify-content: space-evenly;
 	align-items: center;
-	width: 80vw;
+	width: 90vw;
 	height: 90vh;
 	position: absolute;
 	background: #7209b7;
-	transition: all 1s ease-in-out;
+	//transition: all 1s ease-in-out;
 }
 
 .delete-account-prompt > button {

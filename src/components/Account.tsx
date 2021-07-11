@@ -3,14 +3,13 @@ import { useHistory } from 'react-router-dom';
 import { HomePage } from './HomePage';
 import { UserPage } from './UserPage';
 import { Selector } from './Selector';
-import { AccountController } from './AccountController';
+import { Settings } from './Settings';
 import { UserInfo } from '../UserInfo';
 import './sass/Account.scss';
 
 export const Account = () => {
 	const { user, loc } = React.useContext(UserInfo);
 	const [self, updateSelf] = React.useState(true);
-
 	const [name, updateName] = React.useState(null);
 	const [userJoined, updateUserJoined] = React.useState([]);
 	const [userProfile, updateUserProfile] = React.useState([]);
@@ -60,7 +59,7 @@ export const Account = () => {
 			<div id="side">
 				<Selector updateSelf={updateSelf}/>
 			</div>
-			{self ? <HomePage name={name} updateName={updateName}/> : <AccountController/>}
+			{self ? <HomePage name={name} updateName={updateName}/> : <Settings/>}
 		</> : <>
 			<div id="side">
 			</div>

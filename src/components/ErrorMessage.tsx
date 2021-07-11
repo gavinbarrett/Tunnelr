@@ -5,7 +5,6 @@ import './sass/ErrorMessage.scss';
 export const ErrorMessage = ({displayed, updateDisplayed}) => {
     const { errorMessage, updateErrorMessage } = React.useContext(Messages);
     React.useEffect(() => {
-        console.log('Display change');
         checkRender();
     }, [displayed]);
     const checkRender = () => {

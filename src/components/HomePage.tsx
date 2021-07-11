@@ -12,7 +12,7 @@ export const HomePage = ({name, updateName}) => {
 			</div>
 			<div id="account-pic">
 				<div id="pic-container">
-					<img id="profile" src={profile} accept={'image/*'}/>
+					<img id="profile" src={profile} accept={'image/*'} loading={'lazy'}/>
 				</div>
 			</div>
 			<div id="account-date">{`Joined: ${joined}`}</div>
