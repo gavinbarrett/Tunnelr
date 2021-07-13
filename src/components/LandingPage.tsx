@@ -3,6 +3,7 @@ import * as Router from 'react-router-dom';
 import * as Typewriter from 'react-typewriter';
 import { Footer } from './Footer';
 import { UserInfo } from '../UserInfo';
+import { Messages } from '../Messages';
 import './sass/LandingPage.scss';
 
 const LandingText = ({loggedIn}) => {
@@ -23,8 +24,9 @@ const SignUp = ({loggedIn}) => {
 	</div>);
 }
 
-export const LandingPage = ({landingMessage}) => {
+export const LandingPage = () => {
 	const { loggedIn } = React.useContext(UserInfo);
+	const { landingMessage } = React.useContext(Messages);
 	return (<><div id="landing-box">
 		<div id="landing-message">{landingMessage}</div>
 		<div id="landing-page">

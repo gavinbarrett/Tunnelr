@@ -37,28 +37,40 @@
 }
 
 #form > input {
-	width: 40vw;
+	width: 30vw;
 	border: 0;
 	border-radius: 35px;
 	padding: 0.5rem;
-	font-size: 1.25rem;
+	font-size: 1rem;
 	outline: none;
+	@media only screen and (min-width: 700px) {
+		width: 40vw;
+		font-size: 1.25rem;
+	}
 }
 
 #form > label {
 	font-family: 'Inconsolata', monospace;
-	font-size: 1.75rem;
+	font-size: 1.2rem;
+	color: white;
+	@media only screen and (min-width: 700px) {
+		font-size: 1.75rem;
+	}
 }
 
 #form > button {
-	width: 20vw;
+	width: 24vw;
 	height: 8vh;
 	border: 0;
 	color: #f0efeb;
 	background: blue;
 	border-radius: 35px;
-	font-size: 1.4rem;
+	font-size: 1rem;
 	font-weight: bold;
+	@media only screen and (min-width: 700px) {
+		width: 20vw;
+		font-size: 1.4rem;
+	}
 }
 
 #exit {
@@ -83,13 +95,16 @@
 
 #authbox {
 	display: flex;
-	width: 40vw;
+	width: 50vw;
 	justify-content: space-evenly;
+	@media only screen and (min-width: 700px) {
+		width: 40vw;
+	}
 }
 
 #authbox > select {
 	appearance: none;
-	width: 15vw;
+	width: 20vw;
 	height: 10vh;
 	font-size: 1rem;
 	border: 0;
@@ -97,6 +112,10 @@
 	padding: 1rem;
 	background: red;
 	color: white;
+	@media only screen and (min-width: 700px) {
+		width: 15vw;
+		font-size: 1.4rem;
+	}
 }
 
 #title-container {

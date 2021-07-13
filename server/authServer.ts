@@ -199,7 +199,7 @@ const sendMail = async (user, email) => {
 		from: process.env.MAIL,
 		to: email,
 		subject: 'Verification Required for Tunnelr',
-		html: `<p>Please click <a href="http://localhost:5555/verifyaccount?user=${user}">here</a> to verify your account</p>`
+		html: `<p>Please click <a href="http://localhost:5000/verifyaccount?user=${user}">here</a> to verify your account</p>`
 	};
 	transporter.sendMail(mailConfig, (err, info) => {
 		if (err) {
@@ -213,9 +213,9 @@ const sendMail = async (user, email) => {
 }
 
 export const verifyAccount = async (req, res) => {
-	console.log('Attempting to verify an account sent to an email link.');
+	//console.log('Attempting to verify an account sent to an email link.');
 	const { user } = req.query;
-	console.log(`Verifying ${user}`);
+	//console.log(`Verifying ${user}`);
 	let query = 'select username from users where username=$1 and verified=$2';
 	let values = [user, 'No'];
 	const resp = await db.query(query, values);
@@ -283,7 +283,7 @@ export const computeSaltedHashedPass = async pass => {
 const addUser = async (user, pass, email) => {
 	/* Add a user to the Tunnelr database */
 	const hashed = await computeSaltedHashedPass(pass);
-	console.log(hashed);
+	//console.log(hashed);
 	const query = 'insert into users (username, password, email) values ($1, $2, $3)';
 	const values = [user, hashed, email];
 	try {
@@ -291,7 +291,7 @@ const addUser = async (user, pass, email) => {
 		if (!added) return false;
 		else return true;
 	} catch(err) {
-		console.log(`Error: ${err}`);
+		//console.log(`Error: ${err}`);
 		return false;
 	}
 }

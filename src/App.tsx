@@ -29,13 +29,6 @@ const App = () => {
 	React.useEffect(() => {
 		// try to retrieve prior session
 		getSession();
-		//const sessionData = window.sessionStorage.getItem("data");
-		//if (sessionData) {
-			//console.log(`Retrieved session data: ${sessionData}`);
-			//const { user, loggedin } = JSON.parse(sessionData);
-			//console.log(`Updating user to ${user}`);
-			//console.log(`Session store contained: ${user}\n${loggedin}`);
-		//} 
 	}, []);
 	const getSession = async () => {
 		const resp = await fetch("/getsession", {method: "GET"});
@@ -62,11 +55,11 @@ const App = () => {
 		<Messages.Provider value={{landingMessage, updateLandingMessage, errorMessage, updateErrorMessage}}>
 			<Header user={user} loggedIn={loggedIn}/>
 			<Router.Switch>
-				<Router.Route path="/" exact render={() => <LandingPage landingMessage={landingMessage}/>}/>
-				<Router.Route path="/signup" render={() => <SignUp updateLandingMessage={updateLandingMessage}/>}/>
+				<Router.Route path="/" exact render={() => <LandingPage/>}/>
+				<Router.Route path="/signup" render={() => <SignUp/>}/>
 				<Router.Route path="/signin" render={() => <SignIn/>}/>
 				<Router.Route path="/account" render={() => <Account/>}/>
-				<Router.Route path="/contact" render={() => <Contact updateLandingMessage={updateLandingMessage}/>}/>
+				<Router.Route path="/contact" render={() => <Contact/>}/>
 				<Router.Route path="/channel" render={() => <ChannelPage/>}/>
 				<Router.Route path="/chat">
 					{loggedIn ? <Chat user={user}/> : <Router.Redirect to="/signin"/>}

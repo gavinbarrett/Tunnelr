@@ -8,15 +8,15 @@ import './sass/ChannelPage.scss';
 
 export const ChannelPage = () => {
     const { user, loggedIn } = React.useState(UserInfo);
-    const [name, updateName] = React.useState('');
-    const [access, updateAccess] = React.useState('');
-    const [mode, updateMode] = React.useState('');
-    const [doc, updateDoc] = React.useState('');
-    const [memberStat, updateMemberStat] = React.useState('NOT');
-    const [created, updateCreated] = React.useState('');
-    const [userCount, updateUserCount] = React.useState(null);
-    const [displayLeave, updateDisplayLeave] = React.useState(false);
-    const [displayPassword, updateDisplayPassword] = React.useState(false);
+    const [name, updateName] = React.useState<string>('');
+    const [access, updateAccess] = React.useState<string>('');
+    const [mode, updateMode] = React.useState<string>('');
+    const [doc, updateDoc] = React.useState<string>('');
+    const [memberStat, updateMemberStat] = React.useState<string>('NOT');
+    const [created, updateCreated] = React.useState<string>('');
+    const [userCount, updateUserCount] = React.useState<number>(0);
+    const [displayLeave, updateDisplayLeave] = React.useState<boolean>(false);
+    const [displayPassword, updateDisplayPassword] = React.useState<boolean>(false);
     const [joinButton, updateJoinButton] = React.useState(<Join name={name} updateMemberStat={updateMemberStat}/>);
     const loc = useLocation();
     React.useEffect(() => {

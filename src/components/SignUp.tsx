@@ -6,14 +6,14 @@ import { UserInfo } from '../UserInfo';
 import { Messages } from '../Messages';
 import './sass/SignUp.scss';
 
-export const SignUp = ({updateLandingMessage}) => {
+export const SignUp = () => {
 	const { updateLoggedIn, updateUser } = React.useContext(UserInfo);
 	const [username, updateUsername] = React.useState('');
 	const [password, updatePassword] = React.useState('');
 	const [rePassword, updateRePassword] = React.useState('');
 	const [email, updateEmail] = React.useState('');
 	const [errorDisplay, updateErrorDisplay] = React.useState('');
-	const { updateErrorMessage } = React.useContext(Messages);
+	const { updateErrorMessage, updateLandingMessage } = React.useContext(Messages);
 	const pageHistory = Router.useHistory();
 	const userRegex = /^[a-z0-9]+$/i;
 	const emailRegex = /^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/i;

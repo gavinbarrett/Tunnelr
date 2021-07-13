@@ -13,7 +13,7 @@
 	padding-top: 8vh;
 }
 
-#account-controller > button, label {
+#account-controller > button, label[id="change-profile"] {
 	width: 40vw;
 	height: 8vh;
 	text-align: center;
@@ -28,6 +28,14 @@
 		height: 10vh;
 		font-size: 1.5rem;
 	}
+}
+
+.setting-prompt > button {
+	color: white;
+}
+
+.setting-prompt > label {
+	background: #7209b7;
 }
 
 #account-message {
@@ -57,17 +65,17 @@
 }
 
 button#change-password {
-	background: navy;
+	background: #7209b7;
 	transition: background-color 0.2s ease-in-out;
 }
 
 button#change-password:hover {
-	background: rgb(0, 0, 70);
+	background: rgb(68, 5, 110);
 	transition: background-color 0.2s ease-in-out;
 }
 
 label#change-profile {
-	background: navy;
+	background: #7209b7;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -75,17 +83,17 @@ label#change-profile {
 }
 
 label#change-profile:hover {
-	background: rgb(0, 0, 70);
+	background: rgb(68, 5, 110);
 	transition: background-color 0.2s ease-in-out;
 }
 
 button#leave-channel {
-	background: navy;
+	background: #7209b7;
 	transition: background-color 0.2s ease-in-out;
 }
 
 button#delete-channel {
-	background: red;
+	background: black;
 	font-weight: bold;
 	transition: background-color 0.2s ease-in-out;
 }
@@ -96,16 +104,25 @@ button#delete-channel:hover {
 }
 
 button#delete-account {
-	background: red;
+	background: black;
 	font-weight: bold;
 	transition: background-color 0.2s ease-in-out;
 }
 
 button#delete-account:hover {
-	background: rgb(177, 4, 4);
+	background: rgb(243, 3, 3);
 	transition: background-color 0.2s ease-in-out;
 }
 
 #profile-uploader {
 	display: none;
+}
+
+.settings-label {
+	font-size: 1.2rem;
+	font-family: 'Tahoma', sans-serif;
+	color: black;
+	@media only screen and (min-width: 700px) {
+		font-size: 1.5rem;
+	}
 }

@@ -3,7 +3,7 @@ import { UserInfo } from '../UserInfo';
 import './sass/FriendStatus.scss';
 
 export const FriendStatus = ({name, userFriends, updateUserFriends}) => {
-	const [status, updateStatus] = React.useState('Befriend');
+	const [status, updateStatus] = React.useState<string>('Befriend');
 	const { user, friends, updateFriends, pending } = React.useContext(UserInfo);
 	React.useEffect(() => {
 		friends && friends.length && friends.map(elem => {

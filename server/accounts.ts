@@ -11,21 +11,21 @@ export const changePassword = async (req, res) => {
 	const { oldpassword, newpassword } = req.body;
 	const { user } = req.cookies.sessionID;
 	console.log(`Received from ${user}:\nOld PW: ${oldpassword}\nNew PW: ${newpassword}`);
-	let query = 'select username, password from users where username=$1';
-	let values = [user];
+	let query: string = 'select username, password from users where username=$1';
+	let values: Array<string> = [user];
 	const resp = await db.query(query, values);
 	if (resp && resp.rows) { 
 		// extract user credentials from the user table
 		const { username, password } = resp.rows[0];
-		console.log(resp.rows[0].username);
-		console.log(resp.rows[0].password);
+		//console.log(resp.rows[0].username);
+		//console.log(resp.rows[0].password);
 		const matched = await checkHashes(oldpassword, password);
 		if (matched) {
 			// user is authenticated; reset password
 			// run bcrypt on the newpassword
 			// construct an update query to update the user's record
 			const salted = await computeSaltedHashedPass(newpassword);
-			console.log(`Resetting password to salted password: ${salted}`);
+			//console.log(`Resetting password to salted password: ${salted}`);
 			query = 'update users set password=$1 where username=$2 and password=$3';
 			values = [salted, user, password];
 			const resp2 = await db.query(query, values);
@@ -42,14 +42,15 @@ export const changePassword = async (req, res) => {
 
 export const deleteAccount = async (req, res) => {
 	const { username, password } = req.body;
-	const { user } = req.cookies.sessionID;
-	console.log(`Username: '${username}'\nPassword: '${password}'\nUser: '${user}'`);
+	const { user, sessionid } = req.cookies.sessionID;
+	// FIXME: ensure that the user is who they say they are and are currently logged in (i.e. check the redis cache)
+	//console.log(`Username: '${username}'\nPassword: '${password}'\nUser: '${user}'`);
 	if (user != username) {
 		// a user is requesting deletion of another user's account; do not authorize
 		res.status(403).end();
 	} else {
-		console.log(`Username: ${username}\nPassword: ${password}`);
-		console.log(user);
+		//console.log(`Username: ${username}\nPassword: ${password}`);
+		//console.log(user);
 		// pull user and credentials from the database
 		let query = 'select username, password from users where username=$1';
 		let values = [username];
@@ -59,23 +60,19 @@ export const deleteAccount = async (req, res) => {
 			console.log(`Hashed: ${hashed}`);
 			//const computedPass = await computeSaltedHashedPass(password);
 			// compare the passwords. if they match, user is authenticated
-			const f = await checkHashes(password, hashed);
-			console.log(`F: ${f}`);
-			if (f) {
+			const matched = await checkHashes(password, hashed);
+			if (matched) {
 				// found user
 				query = 'delete from users where username=$1';
 				// delte the user from the database
-				// FIXME: what else do we have to do? How do we handle their messages, channels, friends??
-				const r = await db.query(query, values);
-				if (r && r.rows) {
+				// FIXME: what else do we have to do? How do we handle their messages, channels, friends, profile picture??
+				const deleted = await db.query(query, values);
+				if (deleted && deleted.rows) {
 					// user has been deleted; now delete the user session
-					const cookie = req.cookies.sessionID.sessionid;
-					if (db.exists(cookie)) db.del(cookie);
+					if (db.exists(sessionid)) db.del(sessionid);
 					res.status(200).end();
-				} else {
-					console.log('Could not delete user');
+				} else
 					res.status(400).end();
-				}
 			} else
 				res.status(403).end();
 		} else {
@@ -124,29 +121,24 @@ export const loadUserInfo = async (req, res) => {
 
 export const uploadUserProfile = async (req, res) => {
 	/* save a user's profile photo to disk */
-    console.log(req.cookies);
-	const user = req.cookies.sessionID['user'];
-    console.log(req);
+	const { user } = req.cookies.sessionID;
 	const image = req.file["buffer"];
 	try {
-		// try to insert image file into the users table
-		// FIXME: save to disk instead of inserting into the db; add the hash to the user record
+		// compute the SHA256 hash of the image
 		const hash = await hashFile(image);
-		console.log(`Hash: ${hash}`);
 		// save profile photo on disk
 		// FIXME: programmatically set image file extension
 		const written = await writeProfileToDisk(hash, image, 'jpg');
+		// read the data (we should instead read the image variable)
 		const profile = await readProfileFromDisk(hash);
-        console.log(`Image: ${image}`);
 		// insert hash into the document table
 		const result = await insertProfileIntoDB(user, hash);
-		console.log(`Written: ${written}\nResult: ${result}`);
+		//console.log(`Written: ${written}\nResult: ${result}`);
 		if (written && result)
 			res.status(200).send(JSON.stringify({"profile": profile}));
 		else
 			res.status(400).end();
 	} catch (error) {
-		console.log(`Error uploading file: ${error}`);
 		res.status(400).end();
 	}
 }
@@ -158,43 +150,31 @@ const insertProfileIntoDB = async (user, hash) => {
 	if (await validateQuery(values, alphaSpaceRegex)) {
 		try {
 			const rows = await db.query(query, values);
-            console.log(rows);
 			if (rows) return true;
             return false;
-		} catch(error) {
-			console.log(`Error inserting profile into db: ${error}`);
+		} catch (error) {
 			return false;
 		}
-	} else {
+	} else
 		return false;
-	}
 }
 
 export const readProfileFromDisk = async (profile) => {
 	const dir = `./data/profiles/`;
-	console.log(`Profile: "${profile}"`);
 	const fileRegex = new RegExp(`${profile}\.(png|jpg|jpeg)`);
 	return new Promise((resolve, reject) => {
 		fs.readdir(dir, (err, files) => {
 			if (!files || err) resolve(null);
-			else {
-				const file = files.filter(ff => { return ff.match(fileRegex) });
-				if (!file || file.toString() == "") resolve(null);
-				const path = `./data/profiles/${file.toString()}`;
-				fs.access(path, err => {
-					if (err) {
-						console.log(`Error accessing file: ${err}`);
-						resolve(null);
-					}
-					fs.readFile(path, 'base64', (err, data) => {
-						if (err) {
-							console.log(`Error reading file: ${err}`);
-							resolve(null);
-						}
-						resolve(data);
-					});
+			const file = files.filter(ff => { return ff.match(fileRegex) });
+			if (!file || file.toString() == "") resolve(null);
+			const path = `./data/profiles/${file.toString()}`;
+			fs.access(path, err => {
+				if (err) resolve(null);
+				fs.readFile(path, 'base64', (err, data) => {
+					if (err) resolve(null);
+					resolve(data);
 				});
-			}
+			});
 		});
 	});
 }
@@ -202,11 +182,7 @@ export const readProfileFromDisk = async (profile) => {
 const writeProfileToDisk = async (hash, file, ext) => {
     return new Promise((resolve, reject) => {
         fs.writeFile(`./data/profiles/${hash}.${ext}`, file, err => {
-            if (err) {
-                console.log(err);
-                resolve(null);
-            }
-            console.log(`${hash}.${ext} written to disk.`);
+            if (err) resolve(null);
             resolve(true);
         });
     });
@@ -223,10 +199,7 @@ const validateQuery = async (inputs, regex) => {
 }
 
 export const logUserOut = async (req, res) => {
-    // FIXME: make sure that the user being logged out is the user requesting the log out
-    // FIXME: this is currently a flaw in our authflow
     const cookie = req.cookies.sessionID.sessionid;
-    const user = req.cookies.sessionID.user;
     // delete user session
     if (db.exists(cookie)) db.del(cookie);
     // return status code

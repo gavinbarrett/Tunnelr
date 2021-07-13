@@ -6,10 +6,10 @@ import { Messages } from '../Messages';
 import './sass/DeleteAccount.scss';
 
 export const DeleteAccount = ({updatePrompt}) => {
-    const [username, updateUsername] = React.useState('');
-    const [password, updatePassword] = React.useState('');
-    const [checked, updateChecked] = React.useState('');
-    const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
+    const [username, updateUsername] = React.useState<string>('');
+    const [password, updatePassword] = React.useState<string>('');
+    const [checked, updateChecked] = React.useState<string>('');
+    const [errorDisplayed, updateErrorDisplayed] = React.useState<boolean>(false);
     const { updateUser, updateLoggedIn, updateProfile } = React.useContext(UserInfo);
     const { updateErrorMessage } = React.useContext(Messages);
 
@@ -51,12 +51,12 @@ export const DeleteAccount = ({updatePrompt}) => {
             <ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
         </div>
         <div id="delete-account-warning">{"Are you sure you want to delete your account?"}</div>
-        <label for="username">{"Enter username"}</label>
+        <label for="username" className="settings-label">{"Enter username"}</label>
         <input name="username" type="text" onChange={event => updateUsername(event.target.value)}/>
-        <label for="password">{"Enter password"}</label>
+        <label for="password" className="settings-label">{"Enter password"}</label>
         <input name="password" type="text" onChange={event => updatePassword(event.target.value)}/>
         <div id="delete-account-checkbox">
-            <label for="account-checkbox">{"Check the box"}</label>
+            <label for="account-checkbox" className="settings-label">{"Check the box"}</label>
             <input name="account-checkbox" type="checkbox" checked={checked} onChange={flipCheckbox}/>
         </div>
         <button onClick={deleteAccount}>{"Delete Account"}</button>

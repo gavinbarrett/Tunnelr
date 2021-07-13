@@ -4,11 +4,11 @@ import { Messages } from '../Messages';
 import './sass/PromptBox.scss';
 
 export const PromptBox = ({showing, updatePrompt, loadChannels}) => {
-	const [channelName, updateChannelName] = React.useState('');
-	const [privacy, updatePrivacy] = React.useState('Private');
-	const [mode, updateMode] = React.useState('Password');
-	const [credentials, updateCredentials] = React.useState('');
-	const [displayError, updateDisplayError] = React.useState(false);
+	const [channelName, updateChannelName] = React.useState<string>('');
+	const [privacy, updatePrivacy] = React.useState<string>('Private');
+	const [mode, updateMode] = React.useState<string>('Password');
+	const [credentials, updateCredentials] = React.useState<string>('');
+	const [displayError, updateDisplayError] = React.useState<boolean>(false);
 	const { updateErrorMessage } = React.useContext(Messages);
 
 	const addChannel = async () => {

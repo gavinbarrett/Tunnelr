@@ -6,88 +6,19 @@
 	flex-direction: column;
 }
 
-#account-controller {
-	display: flex;
-	flex-direction: column;
-	padding-left: 10vw;
-	padding-top: 8vh;
-}
-
-#account-controller > button, label {
-	width: 40vw;
-	height: 8vh;
-	text-align: center;
-	color: white;
-	border: 0;
-	border-radius: 35px;
-	font-family: 'Tahoma', sans-serif;
-	font-size: 1rem;
-	margin: 0.2em;
-	@media only screen and (min-width: 600px) {
-		width: 45vw;
-		height: 10vh;
-		font-size: 1.5rem;
-	}
-}
-
-button#change-password {
-	background: navy;
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#change-password:hover {
-	background: rgb(0, 0, 70);
-	transition: background-color 0.2s ease-in-out;
-}
-
-label#change-profile {
-	background: navy;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	transition: background-color 0.2s ease-in-out;
-}
-
-label#change-profile:hover {
-	background: rgb(0, 0, 70);
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#leave-channel {
-	background: navy;
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#delete-channel {
-	background: red;
-	font-weight: bold;
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#delete-channel:hover {
-	background: rgb(177, 4, 4);
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#delete-account {
-	background: red;
-	font-weight: bold;
-	transition: background-color 0.2s ease-in-out;
-}
-
-button#delete-account:hover {
-	background: rgb(177, 4, 4);
-	transition: background-color 0.2s ease-in-out;
-}
-
 #profile-uploader {
 	display: none;
 }
 
 #delete-account-warning {
-	font-size: 2.5rem;
-	color: white;
+	font-size: 1.5rem;
+	color: #7209b7;
 	font-family: 'Tahoma', sans-serif;
+	text-align: center;
+	@media only screen and (min-width: 700px) {
+		width: 50vw;
+		font-size: 2.5rem;
+	}
 }
 
 .delete-account-prompt {
@@ -98,23 +29,29 @@ button#delete-account:hover {
 	width: 90vw;
 	height: 90vh;
 	position: absolute;
-	background: #7209b7;
-	//transition: all 1s ease-in-out;
+	background: white;
 }
 
 .delete-account-prompt > button {
-	width: 20vw;
+	width: 25vw;
 	height: 8vh;
 	border: 0;
 	border-radius: 35px;
+	font-size: 1rem;
 	background: red;
 	color: white;
+	@media only screen and (min-width: 700px) {
+		width: 22vw;
+		font-size: 1.2rem;
+	}
 }
 
 .settings-prompt > input {
 	width: 60vw;
 	height: 6vh;
 	margin: 0.5rem;
-	border: 0;
-	border-radius: 25px;
+	padding: 0.5rem;
+	font-size: 1rem;
+	border: 3px solid #7209b7;
+	border-radius: 35px;
 }

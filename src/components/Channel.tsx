@@ -2,15 +2,13 @@ import * as React from 'react';
 import './sass/Channel.scss';
 
 export const Channel = ({sender, id, wsocket, minimized, updateMinimized}) => {
-	const [message, updateMessage] = React.useState('');
-	const [channelMessages, updateChannelMessages] = React.useState([]);
-	const [lastMessage, updateLastMessage] = React.useState('0');
-
+	const [message, updateMessage] = React.useState<string>('');
+	const [lastMessage, updateLastMessage] = React.useState<string>('0');
+	const [channelMessages, updateChannelMessages] = React.useState<Array<Object>>([]);
 	React.useEffect(() => {
 		console.log(`Sender: ${sender}`);
 		establishWSocket();
 	}, [id]);
-
 	const establishWSocket = async () => {
 		wsocket.current.onopen = () => {
 			// FIXME: request data from channel

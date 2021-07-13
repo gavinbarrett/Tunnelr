@@ -4,10 +4,10 @@ import { Messages } from '../Messages';
 import './sass/ChangePassword.scss';
 
 export const ChangePassword = ({updatePrompt}) => {
-	const [oldPass, updateOldPass] = React.useState('');
-	const [newPass, updateNewPass] = React.useState('');
-	const [retryPass, updateRetryPass] = React.useState('');
-	const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
+	const [oldPass, updateOldPass] = React.useState<string>('');
+	const [newPass, updateNewPass] = React.useState<string>('');
+	const [retryPass, updateRetryPass] = React.useState<string>('');
+	const [errorDisplayed, updateErrorDisplayed] = React.useState<boolean>(false);
 	const { updateErrorMessage } = React.useContext(Messages);
 	const validPassword = pass => pass.match(/^[a-z0-9]{10,64}$/i);
 	const tryNewPassword = async () => {
@@ -49,11 +49,12 @@ export const ChangePassword = ({updatePrompt}) => {
 		<div className="error-container">
 			<ErrorMessage displayed={errorDisplayed} updateDisplayed={updateErrorDisplayed}/>
 		</div>
-		<label for="oldpw">{"Enter old password"}</label>
+		<div id="set-new-pass">{"Set a new password"}</div>
+		<label for="oldpw" className="settings-label">{"Enter old password"}</label>
 		<input name="oldpw" maxLength={64} onChange={event => updateOldPass(event.target.value)}/>
-		<label for="newpw">{"Enter new password"}</label>
+		<label for="newpw" className="settings-label">{"Enter new password"}</label>
 		<input name="newpw" maxLength={64} onChange={event => updateNewPass(event.target.value)}/>
-		<label for="newpwretry">{"Retype new password"}</label>
+		<label for="newpwretry" className="settings-label">{"Retype new password"}</label>
 		<input name="newpwretry" maxLength={64} onChange={event => updateRetryPass(event.target.value)}/>
 		<button onClick={tryNewPassword}>{"Change Password"}</button>
 	</div>);

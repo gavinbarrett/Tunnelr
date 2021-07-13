@@ -13,18 +13,15 @@ const ReturnAddress = ({updateReturnAddr}) => {
         </>);
 }
 
-export const Contact = ({updateLandingMessage}) => {
+export const Contact = () => {
+    const [subject, updateSubject] = React.useState<string>('');
+    const [emailBody, updateEmailBody] = React.useState<string>('');
+    const [returnAddr, updateReturnAddr] = React.useState<string>('');
+    const [errorDisplayed, updateErrorDisplayed] = React.useState<boolean>(false);
+    const { updateErrorMessage, updateLandingMessage } = React.useContext(Messages);
     const { user, loggedIn } = React.useContext(UserInfo);
-    const [subject, updateSubject] = React.useState('');
-    const [emailBody, updateEmailBody] = React.useState('');
-    const [returnAddr, updateReturnAddr] = React.useState('');
-    const [errorDisplayed, updateErrorDisplayed] = React.useState(false);
-    const { updateErrorMessage } = React.useContext(Messages);
-    const history = useHistory();
 
-    React.useEffect(() => {
-        window.scrollTo({top: 0, left: 0, behavior: 'smooth'});
-    }, []);
+    const history = useHistory();
 
     const validSubjectBody = () => {
         if (subject && subject.match(/^[a-z0-9\s]{4,64}$/i)) {
@@ -43,11 +40,9 @@ export const Contact = ({updateLandingMessage}) => {
     }
 
     const validReturnAddr = () => {
-        console.log(`returnaddr: ${returnAddr}`);
         if (returnAddr != '' && returnAddr.match(/^[a-z0-9]+@[a-z0-9]+\.[a-z0-9]+$/))
             return true;
-        else
-            return false;
+        return false;
     }
 
     const sendEmail = async () => {
