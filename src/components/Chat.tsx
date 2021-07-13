@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useHistory } from 'react-router-dom';
 import { Channel } from './Channel';
 import { PromptBox } from './PromptBox';
-import { Footer } from './Footer';
+import { UserInfo } from '../UserInfo';
 import './sass/Chat.scss';
 
 const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, userChannels, user, setSocket, wsocket, minimized, updateMinimized}) => {
@@ -49,6 +49,7 @@ const SideBar = ({expanded, updateExpanded, prmpt, updatePrompt, updatePage, use
 const ChatMenu = ({minimized, updateMinimized}) => {
 	const [friendSearchList, updateFriendSearchList] = React.useState([]);
 	const [channelSearchList, updateChannelSearchList] = React.useState([]);
+	const { user } = React.useContext(UserInfo);
 	const history = useHistory();
 	const queryFriend = async event => {
 		// FIXME: validate input
@@ -90,7 +91,9 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 		console.log(channel);
 		history.push(`/channel/${channel}`);
 	}
-	const addFriendFromSuggestions = async () => {} 
+	const addFriendFromSuggestions = async () => {
+
+	} 
 	return(<div className={`chat-menu ${minimized}`}>
 		<div id="friend-search-box">
 			<p className="search-title">{"search for friends"}</p>
@@ -98,7 +101,8 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 				<input className="search-box" id="friend-search" placeholder={'e.g. beatbox99'} onChange={queryFriend}/>
 				<div id="friend-search-list">
 					{friendSearchList.length ? friendSearchList.map(elem => {
-						return <div className="friend-box"><p className="friend-sugg" onClick={() => showUser(elem.username)}>{elem.username}</p><p className={"friend-box-add"} onClick={addFriendFromSuggestions}>{"+"}</p></div>;
+						if (elem.username == user) return;
+						return <div className="friend-box"><p className="friend-sugg" onClick={() => showUser(elem.username)}>{elem.username}</p>{/*<p className={"friend-box-add"} onClick={addFriendFromSuggestions}>{"+"}</p>*/}</div>;
 					}) : ''}
 				</div>
 			</div>
@@ -109,7 +113,7 @@ const ChatMenu = ({minimized, updateMinimized}) => {
 				<input list="channel-search-list" className="search-box" id="channel-search" placeholder={'e.g. @meadowpeak'} onChange={queryChannel}/>
 				<div id="channel-search-list">
 					{channelSearchList.length ? channelSearchList.map(elem => {
-						return <p className={"channel-sugg"} onClick={() => showChannel(elem.channelname)}>{elem.channelname}</p>;
+						return <div className="channel-box"><p className={"channel-sugg"} onClick={() => showChannel(elem.channelname)}>{elem.channelname}</p></div>;
 					}) : ''}
 				</div>
 			</div>

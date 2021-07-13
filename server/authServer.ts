@@ -168,14 +168,12 @@ export const signUserUp = async (req, res) => {
 			if (addUser(user, pass, email)) {
 				console.log(`Signing up new user ${user}. Awaiting verification.`);
 				const sent = sendMail(user, email);
-				if (sent) {
+				if (sent)
 					res.status(200).send(JSON.stringify({"user": user}));
-				} else {
+				else
 					res.status(406).end();
-				}
-			} else {
+			} else
 				res.status(406).end();
-			}
 		}
 	} else {
 		res.status(400).end();
@@ -192,6 +190,10 @@ const sendMail = async (user, email) => {
 	});
 	console.log(process.env.MAILADDRESS);
 	console.log(process.env.MAILPW);
+	const verifyID: string = await createSessionID();
+	const safeID: string = encodeURIComponent(verifyID);
+	db.set(verifyID, user, 'EX', expiry);
+
 	// FIXME: instead of directing to ?user=user, put a session key in redis and send it to the user
 	// the user will click on this link and the backend will process the require to make sure it's legitimate
 	// we won't be able to use normal session keys because I'm currently encoding them in base64. Maybe use base32?
@@ -199,7 +201,7 @@ const sendMail = async (user, email) => {
 		from: process.env.MAIL,
 		to: email,
 		subject: 'Verification Required for Tunnelr',
-		html: `<p>Please click <a href="http://localhost:5000/verifyaccount?user=${user}">here</a> to verify your account</p>`
+		html: `<p>Please click <a href="http://localhost:5000/verifyaccount?id=${safeID}">here</a> to verify your account</p>`
 	};
 	transporter.sendMail(mailConfig, (err, info) => {
 		if (err) {
@@ -214,34 +216,44 @@ const sendMail = async (user, email) => {
 
 export const verifyAccount = async (req, res) => {
 	//console.log('Attempting to verify an account sent to an email link.');
-	const { user } = req.query;
-	//console.log(`Verifying ${user}`);
-	let query = 'select username from users where username=$1 and verified=$2';
-	let values = [user, 'No'];
-	const resp = await db.query(query, values);
-	if (resp && resp.rows) {
-		// need to verify user
-		query = 'update users set verified=$1 where username=$2';
-		values = ['Verified', user];
-		const r = await db.query(query, values);
-		if (r && r.rows) {
-			res.status(200).redirect('/');
-		} else {
-			res.status(200).send('Could not verify');
-		}
+	const { id } = req.query;
+	const user: string = await db.get(id);
+	console.log(`Verifying ${user} with id: ${id}`);
+	if (!user) {
+		res.status(400).redirect('/');
 	} else {
-		res.status(200).send('Already verified');
+		//console.log(`Verifying ${user}`);
+		let query: string = 'select username from users where username=$1 and verified=$2';
+		let values: Array<string> = [user, 'No'];
+		const resp = await db.query(query, values);
+		if (resp && resp.rows) {
+			// need to verify user
+			query = 'update users set verified=$1 where username=$2';
+			values = ['Verified', user];
+			const r = await db.query(query, values);
+			// remove verification id from cache
+			db.del(id);
+			if (r && r.rows) {
+				res.status(200).redirect('/');
+			} else {
+				res.status(200).send('Could not verify');
+			}
+		} else {
+			// remove verification id from cache
+			db.del(id);
+			res.status(200).send('Already verified');
+		}
 	}
 }
 
 const checkForUser = async user => {
-	/* Check the database for the existence of a user */
-	const query = 'select * from users where username=$1';
-	const values = [user];
+	/* Check the database for a verified user */
+	const query: string = 'select * from users where username=$1 and verified=$2';
+	const values: Array<string> = [user, 'Verified'];
 	return await db.query(query, values);
 }
 
-export const checkHashes = async (password, hashed) => {
+export const checkHashes = async (password, hashed): Promise<string|boolean> => {
 	return new Promise(resolve => {
 		bcrypt.compare(password, hashed, (err, hash) => {
 			if (err) resolve(false);
@@ -296,7 +308,7 @@ const addUser = async (user, pass, email) => {
 	}
 }
 
-const createSessionID = async () => {
+const createSessionID = async (): Promise<string> => {
 	/* return 64 bytes of entropy encoded in base64 to be used as a session ID */
 	return new Promise(resolve => {
 		resolve(crypto.randomBytes(64).toString('base64'));
