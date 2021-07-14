@@ -1,6 +1,6 @@
 Users Table
 -----------
-create table users (username varchar(64), password varchar(64), email varchar(64), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
+create table users (username varchar(64), password varchar(64), email varchar(64), profile varchar(64), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, verified varchar(8) DEFAULT 'No');
 
 -- Grant privileges --
 grant all privileges on table users to gavin;
@@ -17,7 +17,16 @@ grant all privileges on table friendships to gavin;
 Channel Table
 -------------
 
-create table channels (channelname varchar(64), accesslevel varchar(7), accessmode varchar(3), credentials varchar(64), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP);
+create table channels (channelname varchar(64), accesslevel varchar(7), accessmode varchar(3), credentials varchar(64), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, user_count integer default 0);
 
 -- Grant privileges --
 grant all privileges on table channels to gavin;
+
+
+Members Table
+-------------
+
+create table members (username varchar(64), channelname varchar(64), status varchar(7) default 'NOT');
+
+-- Grant privileges --
+grant all privileges on table members to gavin;

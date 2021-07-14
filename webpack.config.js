@@ -1,6 +1,6 @@
 module.exports = {
 	entry: './src/App.tsx',
-	mode: 'development',
+	mode: 'production',
 	module: {
 		rules: [
 			{

@@ -78,7 +78,7 @@ const establishSession = async (user, res) => {
 	// set session id
 	db.set(id, user, 'EX', expiry);
 	// set cookie data
-	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true,*/ httpOnly: true, sameSite: true});
+	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, secure: true, httpOnly: true, sameSite: true});
 	if (profile) {
 		const pic = await readProfileFromDisk(profile);
 		const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": "${pic}"}`;
@@ -201,7 +201,7 @@ const sendMail = async (user, email) => {
 		from: process.env.MAIL,
 		to: email,
 		subject: 'Verification Required for Tunnelr',
-		html: `<p>Please click <a href="http://localhost:5000/verifyaccount?id=${safeID}">here</a> to verify your account</p>`
+		html: `<p>Please click <a href="https://tunnelr.site/verifyaccount?id=${safeID}">here</a> to verify your account</p>`
 	};
 	transporter.sendMail(mailConfig, (err, info) => {
 		if (err) {
