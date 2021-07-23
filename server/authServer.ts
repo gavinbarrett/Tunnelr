@@ -182,18 +182,19 @@ export const signUserUp = async (req, res) => {
 
 const sendMail = async (user, email) => {
 	const transporter = nodemailer.createTransport({
-		service: 'gmail',
+		host: 'mail.gandi.net',
 		auth: {
 			user: process.env.MAILADDRESS,
 			pass: process.env.MAILPW,
+		},
+		port: 25,
+		tls: {
+			rejectUnauthorized: true
 		}
 	});
-	console.log(process.env.MAILADDRESS);
-	console.log(process.env.MAILPW);
 	const verifyID: string = await createSessionID();
 	const safeID: string = encodeURIComponent(verifyID);
 	db.set(verifyID, user, 'EX', expiry);
-
 	// FIXME: instead of directing to ?user=user, put a session key in redis and send it to the user
 	// the user will click on this link and the backend will process the require to make sure it's legitimate
 	// we won't be able to use normal session keys because I'm currently encoding them in base64. Maybe use base32?
@@ -292,7 +293,7 @@ export const computeSaltedHashedPass = async pass => {
 	});
 }
 
-const addUser = async (user, pass, email) => {
+const addUser = async (user, pass, email): Promise<boolean> => {
 	/* Add a user to the Tunnelr database */
 	const hashed = await computeSaltedHashedPass(pass);
 	//console.log(hashed);
@@ -303,7 +304,6 @@ const addUser = async (user, pass, email) => {
 		if (!added) return false;
 		else return true;
 	} catch(err) {
-		//console.log(`Error: ${err}`);
 		return false;
 	}
 }

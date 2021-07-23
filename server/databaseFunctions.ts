@@ -2,10 +2,10 @@ import * as Redis from 'ioredis';
 import { Pool } from 'pg';
 
 const pool = new Pool({
-	user: process.env.USER,
-	host: process.env.HOST,
+	user: 'postgres',
+	host: 'localhost',
 	database: "tunnelr",
-	password: process.env.PW,
+	password: '',
 	port: 5432
 });
 
