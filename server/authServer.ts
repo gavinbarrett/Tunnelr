@@ -182,7 +182,7 @@ export const signUserUp = async (req, res) => {
 
 const sendMail = async (user, email) => {
 	const transporter = nodemailer.createTransport({
-		host: 'mail.gandi.net',
+		service: 'gmail',
 		auth: {
 			user: process.env.MAILADDRESS,
 			pass: process.env.MAILPW,
@@ -209,7 +209,7 @@ const sendMail = async (user, email) => {
 			console.log(`Error sending email: ${err}`);
 			return true;
 		} else {
-			console.log(`Mail sent: ${info.response}`);
+			console.log(`Mail sent to <${email}>: ${info.response}`);
 			return false;
 		}
 	});
