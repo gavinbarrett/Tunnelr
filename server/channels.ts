@@ -2,84 +2,73 @@ import * as url from 'url';
 import * as bcrypt from 'bcrypt';
 import { checkHashes } from './authServer';
 import * as db from './databaseFunctions';
+import { QueryResult } from 'pg';
+import { Request, Response } from 'express';
 
-export const addChannel = async (req, res) => {
+export const addChannel = async (req: Request, res: Response) => {
 	const { channelName, access, credentials, mode } = req.body;
-	const user = req.cookies.sessionID.user;
-	console.log(`Channel Name: ${channelName}`);
-	console.log(`Access level: ${access}`);
-	console.log(`Mode: ${mode}`);
+	const user: string = req.cookies.sessionID.user;
 	// FIXME: perform input validation on access and credentials fields
 	// perform input validation
-	const reg = /^@[a-z0-9]{5,32}$/i;
+	const reg: RegExp = /^@[a-z0-9]{5,32}$/i;
 	if (!channelName.match(reg))
 		res.status(400).end();
 	else {
 		// ensure channel doesn't already exist
-		console.log(`Checking channel ${channelName}`);
 		const exists = await checkForChannel(channelName);
-		console.log(`Exists: ${exists.rows}`);
 		if (exists && exists.rows.length !== 0) {
-			console.log("Channel already exists");
 			res.status(400).end();
 		} else {
 			const added = insertNewChannel(channelName, access, credentials, mode);
 			if (added) {
-				console.log(`Channel ${channelName} added.`);
 				// FIXME: add user to channel
-				const ir = await insertNewMember(channelName, user);
-				if (!ir) {
+				const userAdded = await insertNewMember(channelName, user);
+				if (userAdded) {
 					console.log('Could not add member to channel.');
 					res.status(400).end();
 				} else
 					res.status(200).end();
 			} else {
-				console.log(`Couldn't add channel.`);
 				res.status(400).end();
 			}
 		}
 	}
 }
 
-export const loadChannels = async (req, res) => {
+export const loadChannels = async (req: Request, res: Response) => {
 	const { user } = req.cookies.sessionID;
 	if (!user.match(/^[a-z0-9]{2,64}$/i))
 		res.status(400).end();
 	else {
-		const query = 'select channelname from members where username=$1';
-		const values = [user];
-		const channels = await db.query(query, values);
-		//console.log(`Channels: ${channels.rows}`);
-		if (channels && channels.rows.length !== 0)
+		const query: string = 'select channelname from members where username=$1';
+		const values: Array<string> = [user];
+		const channels: QueryResult = await db.query(query, values);
+		if (channels.rowCount)
 			res.status(200).send(JSON.stringify({"channels": channels.rows}));
 		else
 			res.status(400).end();
 	}
 }
 
-export const loadChannelInfo = async (req, res) => {
+export const loadChannelInfo = async (req: Request, res: Response) => {
 	const channelName = req.query.channelname;
-	const user = req.cookies.sessionID.user;
-	//console.log(`Checking channel ${channelName} for user ${user}`);
-	const exists = await checkForChannel(channelName);
-	const member = await checkForMembership(user, channelName);
-	//console.log(`Exists: ${exists.rows}`);
-	if (exists && exists.rows && exists.rows.length) {
+	const user: string = req.cookies.sessionID.user;
+	const exists = await checkForChannel(channelName.toString());
+	const member = await checkForMembership(user, channelName.toString());
+	if (exists.rowCount) {
 		const channelname = exists.rows[0]['channelname'];
 		const accesslevel = exists.rows[0]['accesslevel'];
 		const accessmode = exists.rows[0]['accessmode'];
 		const created_at = exists.rows[0]['created_at'];
 		// FIXME: don't destructure in case the columns don't
-		if (member && member.rows && member.rows.length) {
-			const username = member.rows[0].username;
-			const status = member.rows[0].status;
-			const payload = `{"memberstat": "${status}", "name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
-			//console.log(payload);
+		if (member.rowCount) {
+			const username: string = member.rows[0].username;
+			const status: string = member.rows[0].status;
+			const payload: string = `{"memberstat": "${status}", "name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
 			// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
 			res.status(200).send(payload);
 		} else {
 			const payload = `{"memberstat": "NOT", "name": "${channelname}", "access": "${accesslevel}", "mode": "${accessmode}", "created_at": "${created_at}"}`;
-			//console.log(payload);
 			// FIXME: load all info from the channel - privacy level, privacy mode, date of creation, etc
 			res.status(200).send(payload);
 		}
@@ -87,7 +76,7 @@ export const loadChannelInfo = async (req, res) => {
 		res.status(400).send(JSON.stringify({"name": "failed"}));
 }
 
-export const getMessages = async (req, res) => {
+export const getMessages = async (req: Request, res: Response) => {
 	const uobj = url.parse(req.url);
 	const pathname = uobj.pathname;
 	const p = new URLSearchParams(uobj.search);
@@ -97,31 +86,26 @@ export const getMessages = async (req, res) => {
 	else res.send(JSON.stringify({"status": allMessages[0]}));
 }
 
-export const getUpdatedMessages = async (req, res) => {
+export const getUpdatedMessages = async (req: Request, res: Response) => {
 	const uobj = url.parse(req.url);
 	const pathname = uobj.pathname;
 	const p = new URLSearchParams(uobj.search);
-	const channelName = p.get("roomID");
-	const messageid = p.get("lastmessage");
-	//console.log(`channelName: ${channelName}`);
-	//console.log(`messageid: ${messageid}`);
+	const channelName: string = p.get("roomID");
+	const messageid: number = parseInt(p.get("lastmessage"));
 	const newMessages = await db.xread(channelName, messageid);
-	//console.log(`Messages: ${newMessages}`);
 	if (!newMessages || newMessages.length === 0) res.send(JSON.stringify({"status": "failed"}));
 	else res.send(JSON.stringify({"status": newMessages}));
 }
 
-export const queryChannel = async (req, res) => {
+export const queryChannel = async (req: Request, res: Response) => {
 	const { channelid } = req.body;
-	//console.log(channelid);
 	// FIXME: input validation
-	const channelReg = /^[a-z0-9]{5,32}$/i;
-	const query = 'select channelName, accessLevel from channels where channelName ~* $1';
-	const values = [channelid];
-	const exists = await db.query(query, values);
+	const channelReg: RegExp = /^[a-z0-9]{5,32}$/i;
+	const query: string = 'select channelName, accessLevel from channels where channelName ~* $1';
+	const values: Array<string> = [channelid];
+	const exists: QueryResult = await db.query(query, values);
 	if (exists) {
-		//console.log(exists.rows);
-		if (exists.rows.length === 0) {
+		if (exists.rowCount) {
 			res.send(JSON.stringify({"status": "failed"}));
 		} else {
 			res.send(JSON.stringify({"status": exists.rows}));
@@ -131,19 +115,19 @@ export const queryChannel = async (req, res) => {
 	}
 }
 
-const insertNewChannel = async (channelName, access, credentials, mode) => {
+const insertNewChannel = async (channelName: string, access: string, credentials: string, mode: string) => {
 	// hash credentials
-	const hashed = await hashChannelCredentials(credentials);
+	const hashed: string|null = await hashChannelCredentials(credentials);
 	//console.log(hashed);
-	let accessmode = '';
+	let accessmode: string = '';
 	if (access === 'Private') {
 		if (mode === 'Password') accessmode = 'PSK';
 		else accessmode = 'ACL';
 	}
-	const query = 'insert into channels (channelName, accessLevel, credentials, accessmode) values ($1, $2, $3, $4)'
-	const values = [channelName, access, hashed, accessmode];
+	const query: string = 'insert into channels (channelName, accessLevel, credentials, accessmode) values ($1, $2, $3, $4)'
+	const values: Array<string> = [channelName, access, hashed, accessmode];
 	try {
-		const added = await db.query(query, values);
+		const added: QueryResult = await db.query(query, values);
 		if (!added) return false;
 		else return true;
 	} catch (err) {
@@ -152,11 +136,11 @@ const insertNewChannel = async (channelName, access, credentials, mode) => {
 	}
 }
 
-const insertNewMember = async (channelname, user) => {
-	const values = [channelname, user, 'MEMBER'];
-	const query = `insert into members (channelname, username, status) values ($1, $2, $3)`;
+const insertNewMember = async (channelname: string, user: string) => {
+	const values: Array<string> = [channelname, user, 'MEMBER'];
+	const query: string = `insert into members (channelname, username, status) values ($1, $2, $3)`;
 	try {
-		const added = await db.query(query, values);
+		const added: QueryResult = await db.query(query, values);
 		if (!added) return false;
 		return true;
 	} catch(err) {
@@ -165,25 +149,25 @@ const insertNewMember = async (channelname, user) => {
 	}
 }
 
-export const joinPublicChannel = async (req, res) => {
+export const joinPublicChannel = async (req: Request, res: Response) => {
 	const { user } = req.cookies.sessionID;
 	const { channel } = req.query;
 	// check for channel's existence and extract its access level/mode
 	// if it is public, then add user
-	let query = 'select channelname, accesslevel, accessmode from channels where channelname=$1';
-	let values = [channel];
-	const resp = await db.query(query, values);
-	if (resp && resp.rows) {
+	let query: string = 'select channelname, accesslevel, accessmode from channels where channelname=$1';
+	let values: Array<string> = [channel.toString()];
+	const resp: QueryResult = await db.query(query, values);
+	if (resp.rowCount) {
 		query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
-		values = [user, channel, 'MEMBER'];
-		const r = await db.query(query, values);
+		values = [user, channel.toString(), 'MEMBER'];
+		const r: QueryResult = await db.query(query, values);
 		// FIXME: increment the user_count in the channel table
 		res.status(200).end();
 	} else
 		res.status(400).end();
 }
 
-export const joinPSKChannel = async (req, res) => {
+export const joinPSKChannel = async (req: Request, res: Response) => {
 	// join a channel protected with a pre-shared password
 	const { user } = req.cookies.sessionID;
 	const { password, channelname } = req.body;
@@ -193,19 +177,19 @@ export const joinPSKChannel = async (req, res) => {
 		// check for channel's existence and extract its access level/mode
 		// if it is PSK, extract password from req.body and check it against db pass
 		// if they match, add user to db
-		let query = 'select accesslevel, accessmode, credentials from channels where channelname=$1';
-		let values = [channelname];
-		const resp = await db.query(query, values);
-		if (resp && resp.rows) {
+		let query: string = 'select accesslevel, accessmode, credentials from channels where channelname=$1';
+		let values: Array<string> = [channelname];
+		const resp: QueryResult = await db.query(query, values);
+		if (resp.rowCount) {
 			const { accesslevel, accessmode, credentials } = resp.rows[0];
 			if (accesslevel == "Private" && accessmode == "PSK") {
 				// FIXME: perform input validation on password; if valid, compare it to credentials
-				const hashes = await checkHashes(password, credentials);
+				const hashes: string = await checkHashes(password, credentials);
 				if (hashes) {
 					// hashes match; user is authenticated. add a record in the members table
 					query = 'insert into members (username, channelname, status) values ($1, $2, $3)';
 					values = [user, channelname, 'MEMBER'];
-					const r = await db.query(query, values);
+					const r: QueryResult = await db.query(query, values);
 					res.status(200).end();
 				} else
 					res.status(403).end();
@@ -216,35 +200,34 @@ export const joinPSKChannel = async (req, res) => {
 	}
 }
 
-export const joinACLChannel = async (req, res) => {
+export const joinACLChannel = async (req: Request, res: Response) => {
 	const { user } = req.cookies.sessionID;
 	// check for channel's existence and extract its access level/mode
 	// if it is ACL, change user status to PENDING and notify the creator of the channel so they can confirm you
-	const query = '';
+	const query: string = '';
 	res.send(JSON.stringify({"status": "failed"}));
 }
 
-export const leaveChannel = async (req, res) => {
+export const leaveChannel = async (req: Request, res: Response) => {
 	const { user } = req.cookies.sessionID;
 	const { channel } = req.query;
 	//console.log(`User: ${user}\nChannel: ${channel}`);
 	// if user is a member of the channel, remove them. if that succeeds, return successful status code
 	// else return failed code
-	const membership = await checkForMembership(user, channel);
-	if (membership && membership.rows) {
+	const membership = await checkForMembership(user, channel.toString());
+	if (membership.rowCount) {
 		// remove user
-		const query = 'delete from members where username=$1 and channelname=$2';
-		const values = [user, channel];
-		const resp = await db.query(query, values);
-		console.log(`Resp: ${resp}`);
+		const query: string = 'delete from members where username=$1 and channelname=$2';
+		const values: Array<string> = [user, channel];
+		const resp: QueryResult = await db.query(query, values);
 		res.status(200).end();
 	} else {
 		res.status(400).end();
 	}
 }
 
-const hashChannelCredentials = async pass => {
-	const rounds = 10;
+const hashChannelCredentials = async (pass: string): Promise<string|null> => {
+	const rounds: number = 10;
 	return new Promise(resolve => {
 		bcrypt.genSalt(rounds, (err, salt) => {
 			if (err) resolve(null);
@@ -258,23 +241,23 @@ const hashChannelCredentials = async pass => {
 	});
 }
 
-export const checkForChannel = async (channelName) => {
+export const checkForChannel = async (channelName: string): Promise<QueryResult> => {
 	/* check if a channel exists */
-	const query = `select channelname, accesslevel, accessmode, created_at from channels where channelname=$1`
+	const query: string = `select channelname, accesslevel, accessmode, created_at from channels where channelname=$1`
 	//const query = `select * from channels where channelname=$1`;
-	const values = [channelName];
+	const values: Array<string> = [channelName];
 	return db.query(query, values);
 }
 
-export const checkForMembership = async (username, channelname) => {
-	const query = `select * from members where username=$1 and channelname=$2`;
-	const values = [username, channelname];
+export const checkForMembership = async (username: string, channelname: string): Promise<QueryResult> => {
+	const query: string = `select * from members where username=$1 and channelname=$2`;
+	const values: Array<string> = [username, channelname];
 	return db.query(query, values);
 }
 
-export const checkForChannelExistence = async channelName => {
+export const checkForChannelExistence = async (channelName: string): Promise<QueryResult> => {
 	/* check if a channel exists */
-	const query = `select * from channels where channelname=$1`;
-	const values = [channelName];
+	const query: string = `select * from channels where channelname=$1`;
+	const values: Array<string> = [channelName];
 	return db.query(query, values);
 }

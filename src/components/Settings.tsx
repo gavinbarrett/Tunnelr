@@ -26,9 +26,9 @@ export const Settings = () => {
 		console.log(`Uploading file: ${file}`);
 		if (!file) return;
 		const formData = new FormData();
-		formData.append('profile', file);
+		formData.append('file', file);
 		// try to upload profile picture
-		const resp = await fetch('/uploaduserprofile', {method: 'PUT', body: formData});
+		const resp = await fetch('/uploaduserprofile', {method: 'POST', body: formData});
 		if (resp.status == 200) {
 			const payload = await resp.json();
 			const { profile } = payload;

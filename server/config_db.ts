@@ -1,7 +1,7 @@
 import * as db from './databaseFunctions';
 
 const establishDatabase = async () => {
-    let query = "create table users (username varchar(64), password varchar(64), email varchar(64), profile varchar(64), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, verified varchar(8) DEFAULT 'No')";
+    let query = "create table users (username varchar(64), password varchar(64), email varchar(64), profile varchar(70), created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP, verified varchar(8) DEFAULT 'No')";
     let permissions = "grant all privileges on table users to gavin";
     let resp = await db.query(query, []);
     console.log(resp);
@@ -18,8 +18,7 @@ const establishDatabase = async () => {
 export const checkForUserTables = async () => {
     const c = "select to_regclass('users')";
     const resp = await db.query(c, []);
-    console.log(resp);
-    if (resp.rows.length) {
-            
-    }
+    //console.log(resp);
+    if (resp.rowCount) return;
+    establishDatabase();
 }

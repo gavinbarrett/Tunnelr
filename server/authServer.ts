@@ -3,7 +3,8 @@ import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 import * as nodemailer from 'nodemailer';
 import * as db from './databaseFunctions';
-import { readProfileFromDisk } from './accounts';
+import { readProfileFromDisk } from './profile';
+import { Query, QueryResult } from 'pg';
 
 const expiry: number = 60 * 60 // 60 minute session
 dotenv.config();
@@ -39,28 +40,18 @@ export const authenticateUserForUser = async (req, res, next) => {
 }
 
 const getInfo = async (user) => {
-	let query = 'select username, profile, created_at from users where username=$1';
-	let values = [user];
-	const userData = await db.query(query, values);
+	let query: string = 'select username, profile, created_at from users where username=$1';
+	let values: Array<string> = [user];
+	const userData: QueryResult = await db.query(query, values);
 	query = "select friend2 as friend from friendships where friend1=$1 and status='Friended' union select friend1 from friendships where friend2=$2 and status='Friended'";
 	values = [user, user];
-	//console.log('In session function');
-	//console.log(`User rows:`);
-	//console.table(userData.rows);
-	//const { created_at, profile } = userData.rows[0];
-	const friends = await db.query(query, values);
-	//console.log(`Friends:`);
-	//console.log(friends.rows);
+	const friends: QueryResult = await db.query(query, values);
 	query = "select friend2 as friend from friendships where friend1=$1 and status='Pending'";
 	values = [user];
-	const pending = await db.query(query, values);
-	//console.log(`Pending:`);
-	//console.log(pending.rows);
+	const pending: QueryResult = await db.query(query, values);
 	query = 'select channelname from members where username=$1';
 	values = [user];
-	const channels = await db.query(query, values);
-	//console.log(`Channels:`);
-	//console.log(channels.rows);
+	const channels: QueryResult = await db.query(query, values);
 	return { userData, friends, pending, channels };
 }
 
@@ -78,13 +69,13 @@ const establishSession = async (user, res) => {
 	// set session id
 	db.set(id, user, 'EX', expiry);
 	// set cookie data
-	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, secure: true, httpOnly: true, sameSite: true});
+	res.cookie("sessionID", clientData, { maxAge: 1000 * expiry, /*secure: true, httpOnly: true, sameSite: true*/});
 	if (profile) {
 		const pic = await readProfileFromDisk(profile);
-		const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": "${pic}"}`;
+		const data: string = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": "${pic}"}`;
 		res.status(200).send(data);
 	} else {
-		const data = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": ${null}}`;
+		const data: string = `{"user": "${user}", "created_at": "${created_at}", "friends": ${JSON.stringify(info.friends.rows)}, "pending": ${JSON.stringify(info.pending.rows)}, "channels": ${JSON.stringify(info.channels.rows)}, "profile": ${null}}`;
 		res.status(200).send(data);
 	}
 }
@@ -92,9 +83,10 @@ const establishSession = async (user, res) => {
 export const retrieveSession = async (req, res) => {
 	/* Retrieve user session */
 	if (req.cookies.sessionID) {
+		console.log(req.cookies.sessionID);
 		const { user, sessionid } = req.cookies.sessionID;
-		const session = await checkForSession(sessionid);
-		//console.log(`Session: ${session}`);
+		const session: QueryResult = await checkForSession(sessionid);
+		console.log(`Session: ${session}`);
 		if (session) {
 			const info = await getInfo(user);
 			const { created_at, profile } = info.userData.rows[0];
@@ -114,7 +106,7 @@ export const retrieveSession = async (req, res) => {
 
 const checkForSession = async id => {
 	try {
-		const session = await db.get(id);
+		const session: QueryResult = await db.get(id);
 		if (session)
 			return session;
 		return null;
@@ -124,13 +116,14 @@ const checkForSession = async id => {
 }
 
 export const authenticate = async (user, pass, res) => {
-	const added = await checkForUser(user);
-	if (added.rows.length !== 0) {	// return failed sign up attempt if user already exists
+	const added: QueryResult = await checkForUser(user);
+	if (added.rowCount) {	// return failed sign up attempt if user already exists
 		// extract hashed password
-		const hashed = added.rows[0].password;
+		const hashed: string = added.rows[0].password;
+		console.log(`Pass: ${pass}\nHashed: ${hashed}`);
 		// FIXME: validate bcrypt
-		const matched = await checkHashes(pass, hashed);
-		console.log(matched);
+		const matched: string = await checkHashes(pass, hashed);
+		console.log(`Matched: ${matched}`);
 		if (matched) {
 			console.log(`Signing in ${user}`);
 			// send all data to the client
@@ -157,21 +150,28 @@ export const signUserIn = async (req, res) => {
 export const signUserUp = async (req, res) => {
 	/* Attempt to sign the user up */
 	const { user, pass, email } = req.body;
+	console.log(`Signing up user: ${user}\nPassword: ${pass}\nemail: ${email}`);
 	// attempt to sign user up if credentials are valid
 	if (await validQueries([user, pass, email], [/^[a-z0-9]+$/i, /^[a-z0-9]+$/i, /^[a-z0-9]+@[a-z0-9]+\.[a-z]+$/i])) {
 		// check database for username
-		const added = await checkForUser(user);
-		if (added.rows.length)	// return failed sign up attempt if user already exists
+		const added: QueryResult = await checkForUser(user);
+		if (added.rows.length) {	// return failed sign up attempt if user already exists
+			console.log(`User ${user} exists in the system`);
 			res.status(406).end();
-		else {		// 
+		} else { // 
 			// if the user doesn't exist, attempt to sign them up
-			if (addUser(user, pass, email)) {
+			const useradded = await addUser(user, pass, email);
+			if (useradded) {
 				console.log(`Signing up new user ${user}. Awaiting verification.`);
-				const sent = sendMail(user, email);
-				if (sent)
+				const sent:boolean = await sendMail(user, email);
+				console.log(`Sent: ${sent}`);
+				if (sent) {
+					console.log(`Sent email to ${email}`);
 					res.status(200).send(JSON.stringify({"user": user}));
-				else
+				} else {
+					console.log('Could not send mail');
 					res.status(406).end();
+				}
 			} else
 				res.status(406).end();
 		}
@@ -180,7 +180,7 @@ export const signUserUp = async (req, res) => {
 	}
 }
 
-const sendMail = async (user, email) => {
+const sendMail = async (user, email): Promise<boolean> => {
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
@@ -198,27 +198,31 @@ const sendMail = async (user, email) => {
 	// FIXME: instead of directing to ?user=user, put a session key in redis and send it to the user
 	// the user will click on this link and the backend will process the require to make sure it's legitimate
 	// we won't be able to use normal session keys because I'm currently encoding them in base64. Maybe use base32?
+	let end = `${process.env.VERIFY_ENDPOINT}/verifyaccount?id=${safeID}`;
+	console.log(`Sending user to endpoint: ${end}`);
 	let mailConfig = {
 		from: process.env.MAIL,
 		to: email,
 		subject: 'Verification Required for Tunnelr',
-		html: `<p>Please click <a href="https://tunnelr.site/verifyaccount?id=${safeID}">here</a> to verify your account</p>`
+		html: `<p>Please click <a href="${end}">here</a> to verify your account</p>`
 	};
-	transporter.sendMail(mailConfig, (err, info) => {
-		if (err) {
-			console.log(`Error sending email: ${err}`);
-			return true;
-		} else {
-			console.log(`Mail sent to <${email}>: ${info.response}`);
-			return false;
-		}
-	});
+	const info = await transporter.sendMail(mailConfig);
+	if (info.rejected.length) {
+		console.log(`Error sending email: ${Object.getOwnPropertyNames(info)}`);
+		console.log(info.accepted);
+		console.log(info.rejected);
+		console.log(info.response);
+		return false;
+	} else {
+		console.log(`Mail sent to <${email}>: ${info.response}`);
+		return true;
+	}
 }
 
 export const verifyAccount = async (req, res) => {
 	//console.log('Attempting to verify an account sent to an email link.');
 	const { id } = req.query;
-	const user: string = await db.get(id);
+	const user = await db.get(id);
 	console.log(`Verifying ${user} with id: ${id}`);
 	if (!user) {
 		res.status(400).redirect('/');
@@ -234,7 +238,7 @@ export const verifyAccount = async (req, res) => {
 			const r = await db.query(query, values);
 			// remove verification id from cache
 			db.del(id);
-			if (r && r.rows) {
+			if (r) {
 				res.status(200).redirect('/');
 			} else {
 				res.status(200).send('Could not verify');
@@ -247,23 +251,23 @@ export const verifyAccount = async (req, res) => {
 	}
 }
 
-const checkForUser = async user => {
+const checkForUser = async (user): Promise<QueryResult> => {
 	/* Check the database for a verified user */
 	const query: string = 'select * from users where username=$1 and verified=$2';
 	const values: Array<string> = [user, 'Verified'];
-	return await db.query(query, values);
+	return db.query(query, values);
 }
 
-export const checkHashes = async (password, hashed): Promise<string|boolean> => {
+export const checkHashes = async (password, hashed): Promise<string> => {
 	return new Promise(resolve => {
 		bcrypt.compare(password, hashed, (err, hash) => {
-			if (err) resolve(false);
+			if (err) resolve('');
 			else resolve(hash);
 		});
 	});
 }
 
-const validQueries = async (queries, regexes) => {
+const validQueries = async (queries, regexes): Promise<boolean> => {
 	/* Ensure the query string passes the regex validation */
 	return new Promise(resolve => {
 		queries.map((value, idx) => {
@@ -277,9 +281,9 @@ const validQueries = async (queries, regexes) => {
 	});
 }
 
-export const computeSaltedHashedPass = async pass => {
+export const computeSaltedHashedPass = async (pass): Promise<string> => {
 	/* Generate a salted hash of the user submitted password */
-	const rounds = 10;
+	const rounds: number = 10;
 	return new Promise((resolve, reject) => {
 		bcrypt.genSalt(rounds, (err, salt) => {
 			if (err) reject(err);
@@ -295,12 +299,12 @@ export const computeSaltedHashedPass = async pass => {
 
 const addUser = async (user, pass, email): Promise<boolean> => {
 	/* Add a user to the Tunnelr database */
-	const hashed = await computeSaltedHashedPass(pass);
-	//console.log(hashed);
-	const query = 'insert into users (username, password, email) values ($1, $2, $3)';
-	const values = [user, hashed, email];
+	const hashed: string = await computeSaltedHashedPass(pass);
+	console.log(`Computed hash: ${hashed}`);
+	const query: string = 'insert into users (username, password, email) values ($1, $2, $3)';
+	const values: Array<string> = [user, hashed, email];
 	try {
-		const added = await db.query(query, values);
+		const added: QueryResult = await db.query(query, values);
 		if (!added) return false;
 		else return true;
 	} catch(err) {

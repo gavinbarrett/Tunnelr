@@ -1,5 +1,7 @@
 import * as nodemailer from 'nodemailer';
 import * as db from './databaseFunctions';
+import { QueryResult } from 'pg';
+import { Request, Response } from 'express';
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -9,14 +11,14 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-export const emailFromUser = async (req, res) => {
+export const emailFromUser = async (req: Request, res: Response) => {
     const { subject, emailbody } = req.body;
     const { user } = req.cookies.sessionID;
     console.log(`Subject: ${subject}\nEmail: ${emailbody}`);
-    const query = 'select email from users where username=$1';
-    const values = [user];
-    const resp = await db.query(query, values);
-    if (resp && resp.rows) {
+    const query: string = 'select email from users where username=$1';
+    const values: Array<string> = [user];
+    const resp: QueryResult = await db.query(query, values);
+    if (resp.rowCount) {
         const { email } = resp.rows[0];
         let mailConfig = {
             from: process.env.MAILADDRESS,
@@ -39,7 +41,7 @@ export const emailFromUser = async (req, res) => {
     }
 }
 
-export const emailFromOutside = (req, res) => {
+export const emailFromOutside = (req: Request, res: Response) => {
     const { subject, emailbody, returnaddr } = req.body;
     console.log(`Subject: ${subject}\nEmail: ${emailbody}\nReturn: ${returnaddr}`);
     if (!subject.match(/^[a-z0-9 ]+$/)) {
